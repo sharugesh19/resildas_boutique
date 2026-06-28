@@ -1,0 +1,264 @@
+/* ===== Resilda's Boutique — Hero Section =====
+   Palette:
+   --rb-bg     : #1F3329  deep emerald (boutique velvet)
+   --rb-bg-2   : #16241C  darker emerald, for gradient depth
+   --rb-cream  : #F4EFE4  warm ivory text
+   --rb-gold   : #C9A857  brass / gold accent
+   --rb-rose   : #D9B6A6  dusty rose, secondary accent
+*/
+
+.rb-hero {
+  --rb-bg: #1f3329;
+  --rb-bg-2: #16241c;
+  --rb-cream: #f4efe4;
+  --rb-gold: #c9a857;
+  --rb-rose: #d9b6a6;
+
+  background: linear-gradient(160deg, var(--rb-bg) 0%, var(--rb-bg-2) 100%);
+  color: var(--rb-cream);
+  padding: clamp(2.5rem, 6vw, 6rem) clamp(1.25rem, 5vw, 4rem);
+  overflow: hidden;
+  font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+}
+
+.rb-hero__inner {
+  max-width: 1180px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  align-items: center;
+  gap: clamp(2rem, 5vw, 4rem);
+}
+
+/* ---------- Copy column ---------- */
+
+.rb-hero__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--rb-gold);
+  font-weight: 600;
+}
+
+.rb-hero__eyebrow::before {
+  content: "";
+  width: 22px;
+  height: 1px;
+  background: var(--rb-gold);
+}
+
+.rb-hero__title {
+  font-family: "Fraunces", "Playfair Display", Georgia, serif;
+  font-weight: 600;
+  font-size: clamp(2.6rem, 5.2vw, 4.2rem);
+  line-height: 1.05;
+  margin: 0.9rem 0 1.1rem;
+  letter-spacing: -0.01em;
+}
+
+.rb-hero__title em {
+  font-style: italic;
+  color: var(--rb-rose);
+}
+
+.rb-hero__subtitle {
+  font-size: clamp(1rem, 1.1vw, 1.125rem);
+  line-height: 1.65;
+  max-width: 34ch;
+  color: rgba(244, 239, 228, 0.82);
+  margin-bottom: 2rem;
+}
+
+.rb-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  margin-bottom: 2.75rem;
+}
+
+.rb-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.85rem 1.6rem;
+  border-radius: 999px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.rb-btn--primary {
+  background: var(--rb-gold);
+  color: #1f3329;
+  box-shadow: 0 8px 24px -8px rgba(201, 168, 87, 0.55);
+}
+
+.rb-btn--primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px -8px rgba(201, 168, 87, 0.7);
+}
+
+.rb-btn--ghost {
+  background: transparent;
+  color: var(--rb-cream);
+  border: 1px solid rgba(244, 239, 228, 0.35);
+}
+
+.rb-btn--ghost:hover {
+  border-color: var(--rb-gold);
+  color: var(--rb-gold);
+}
+
+.rb-hero__stats {
+  display: flex;
+  gap: clamp(1.5rem, 4vw, 2.75rem);
+  padding-top: 1.75rem;
+  border-top: 1px solid rgba(244, 239, 228, 0.15);
+}
+
+.rb-hero__stats div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.rb-hero__stats strong {
+  font-family: "Fraunces", "Playfair Display", Georgia, serif;
+  font-size: 1.35rem;
+  color: var(--rb-gold);
+}
+
+.rb-hero__stats span {
+  font-size: 0.78rem;
+  color: rgba(244, 239, 228, 0.65);
+  letter-spacing: 0.02em;
+}
+
+/* ---------- Visual column ---------- */
+
+.rb-hero__visual {
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+.rb-hero__frame {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  border-radius: 18px;
+  padding: 10px;
+  background: linear-gradient(
+    160deg,
+    rgba(201, 168, 87, 0.55),
+    rgba(244, 239, 228, 0.08)
+  );
+}
+
+.rb-hero__image {
+  width: 100%;
+  height: clamp(380px, 50vw, 520px);
+  object-fit: cover;
+  border-radius: 14px;
+  display: block;
+}
+
+.rb-hero__glow {
+  position: absolute;
+  width: 420px;
+  height: 420px;
+  background: radial-gradient(
+    circle,
+    rgba(201, 168, 87, 0.28),
+    transparent 70%
+  );
+  filter: blur(10px);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: -1;
+}
+
+/* Signature element — hanging boutique price tag */
+
+.rb-tag {
+  position: absolute;
+  top: -18px;
+  right: -22px;
+  background: var(--rb-cream);
+  color: var(--rb-bg);
+  padding: 0.9rem 1.2rem 0.9rem 1.6rem;
+  border-radius: 4px 12px 12px 4px;
+  box-shadow: 0 14px 30px -10px rgba(0, 0, 0, 0.45);
+  transform: rotate(6deg);
+  min-width: 150px;
+}
+
+.rb-tag__hole {
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--rb-bg);
+  box-shadow: 0 0 0 2px rgba(31, 51, 41, 0.15);
+}
+
+.rb-tag__text {
+  display: block;
+  font-family: "Fraunces", "Playfair Display", Georgia, serif;
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: 0.01em;
+}
+
+.rb-tag__sub {
+  display: block;
+  font-size: 0.7rem;
+  color: rgba(31, 51, 41, 0.65);
+  margin-top: 0.15rem;
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 900px) {
+  .rb-hero__inner {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .rb-hero__subtitle {
+    margin-inline: auto;
+  }
+
+  .rb-hero__actions,
+  .rb-hero__stats {
+    justify-content: center;
+  }
+
+  .rb-hero__visual {
+    order: -1;
+  }
+
+  .rb-tag {
+    right: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rb-btn {
+    transition: none;
+  }
+}
+
+/* Visible keyboard focus */
+.rb-btn:focus-visible {
+  outline: 2px solid var(--rb-gold);
+  outline-offset: 3px;
+}
