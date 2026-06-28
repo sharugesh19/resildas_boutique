@@ -1,0 +1,167 @@
+// src/admin/AdminOrders.jsx
+import { useEffect, useState } from 'react';
+import {
+  collection,
+  getDocs,
+  doc,
+  updateDoc,
+  orderBy,
+  query,
+} from 'firebase/firestore';
+import { db } from '../firebase/firebaseConfig';
+
+const ORDER_STATUSES = ['placed', 'processing', 'shipped', 'delivered', 'cancelled'];
+
+const STATUS_CLASS = {
+  placed: 'pill-placed',
+  processing: 'pill-processing',
+  shipped: 'pill-shipped',
+  delivered: 'pill-delivered',
+  cancelled: 'pill-cancelled',
+};
+
+export default function AdminOrders() {
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(null);
+  const [msg, setMsg] = useState(null);
+
+  useEffect(() => {
+    fetchOrders();
+  }, []);
+
+  async function fetchOrders() {
+    setLoading(true);
+    try {
+      const snap = await getDocs(
+        query(collection(db, 'orders'), orderBy('createdAt', 'desc'))
+      );
+      setOrders(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleStatusChange(orderId, newStatus) {
+    setSaving(orderId);
+    try {
+      await updateDoc(doc(db, 'orders', orderId), {
+        orderStatus: newStatus,
+        updatedAt: new Date(),
+      });
+      setOrders((prev) =>
+        prev.map((o) => (o.id === orderId ? { ...o, orderStatus: newStatus } : o))
+      );
+      showMsg('success', 'Order status updated.');
+    } catch (e) {
+      showMsg('error', 'Failed to update: ' + e.message);
+    } finally {
+      setSaving(null);
+    }
+  }
+
+  function showMsg(type, text) {
+    setMsg({ type, text });
+    setTimeout(() => setMsg(null), 3000);
+  }
+
+  const fmt = (n) =>
+    '₹' + Number(n || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 });
+
+  const fmtDate = (ts) => {
+    if (!ts) return '—';
+    const d = ts.toDate ? ts.toDate() : new Date(ts);
+    return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+  };
+
+  return (
+    <>
+      <div className="page-header">
+        <div>
+          <h2>Orders</h2>
+          <p>{orders.length} orders total</p>
+        </div>
+        <button onClick={fetchOrders} className="btn btn-ghost">
+          ↻ Refresh
+        </button>
+      </div>
+
+      {msg && <div className={`admin-alert ${msg.type}`}>{msg.text}</div>}
+
+      <div className="admin-card">
+        <div className="admin-table-wrap">
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Phone</th>
+                <th>Total</th>
+                <th>Payment</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Update Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {loading && (
+                <tr className="loading-row">
+                  <td colSpan={8}>Loading orders…</td>
+                </tr>
+              )}
+              {!loading && orders.length === 0 && (
+                <tr className="loading-row">
+                  <td colSpan={8}>No orders found.</td>
+                </tr>
+              )}
+              {orders.map((o) => (
+                <tr key={o.id}>
+                  <td>
+                    <code style={{ fontSize: 11, color: 'var(--admin-text-muted)' }}>
+                      #{o.id.slice(0, 8).toUpperCase()}
+                    </code>
+                  </td>
+                  <td><strong>{o.customerName || o.name || '—'}</strong></td>
+                  <td>{o.phone || '—'}</td>
+                  <td><strong>{fmt(o.total)}</strong></td>
+                  <td>
+                    <span
+                      className={`pill ${
+                        o.paymentMethod === 'prepaid' ? 'pill-paid' : 'pill-cod'
+                      }`}
+                    >
+                      {o.paymentMethod === 'prepaid' ? 'Paid' : 'COD'}
+                    </span>
+                  </td>
+                  <td>
+                    <span className={`pill ${STATUS_CLASS[o.orderStatus] || 'pill-placed'}`}>
+                      {o.orderStatus || 'placed'}
+                    </span>
+                  </td>
+                  <td>{fmtDate(o.createdAt)}</td>
+                  <td>
+                    {saving === o.id ? (
+                      <span className="spinner" />
+                    ) : (
+                      <select
+                        className="status-select"
+                        value={o.orderStatus || 'placed'}
+                        onChange={(e) => handleStatusChange(o.id, e.target.value)}
+                      >
+                        {ORDER_STATUSES.map((s) => (
+                          <option key={s} value={s}>
+                            {s.charAt(0).toUpperCase() + s.slice(1)}
+                          </option>
+                        ))}
+                      </select>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </>
+  );
+}
