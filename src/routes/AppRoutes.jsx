@@ -1,42 +1,88 @@
-import React from 'react'
-import { Routes, Route } from 'react-router-dom'
-import Home          from '../pages/Home'
-import Products      from '../pages/Products'
-import ProductDetail from '../pages/ProductDetail'
-import Wishlist      from '../pages/Wishlist'
-import Login         from '../pages/Login'
-import Checkout      from '../pages/Checkout'
-import NotFound      from '../pages/NotFound'
-import ProtectedWishlist from '../components/common/ProtectedWishlist'
-import AdminRoutes   from '../admin/AdminRoutes'
+import React, { Suspense, lazy } from 'react'
+import { Routes, Route, useLocation } from 'react-router-dom'
+import { AnimatePresence } from 'framer-motion'
+import PageTransition from '../components/common/PageTransition'
+
+const Home              = lazy(() => import('../pages/Home'))
+const Products          = lazy(() => import('../pages/Products'))
+const ProductDetail     = lazy(() => import('../pages/ProductDetail'))
+const Wishlist          = lazy(() => import('../pages/Wishlist'))
+const Login             = lazy(() => import('../pages/Login'))
+const Checkout          = lazy(() => import('../pages/Checkout'))
+const NotFound          = lazy(() => import('../pages/NotFound'))
+const ProtectedWishlist = lazy(() => import('../components/common/ProtectedWishlist'))
+const AdminRoutes       = lazy(() => import('../admin/AdminRoutes'))
+
+function PageLoader() {
+  return (
+    <div style={{
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      minHeight: '60vh',
+      fontSize: '1rem',
+      color: '#c2903a',
+      fontFamily: 'Jost, sans-serif',
+      letterSpacing: '0.1em',
+    }}>
+      Loading…
+    </div>
+  )
+}
 
 function AppRoutes() {
+  const location = useLocation()
+
   return (
-    <Routes>
-      {/* Public routes */}
-      <Route path="/"                   element={<Home />} />
-      <Route path="/products"           element={<Products />} />
-      <Route path="/products/:category" element={<Products />} />
-      <Route path="/product/:id"        element={<ProductDetail />} />
-      <Route path="/login"              element={<Login />} />
-      <Route path="/checkout"           element={<Checkout />} />
+    <Suspense fallback={<PageLoader />}>
+      {/*
+        AnimatePresence watches for route changes and plays exit animation
+        before the new page mounts. mode="wait" ensures one page exits
+        fully before the next one enters.
+      */}
+      <AnimatePresence mode="wait" initial={false}>
+        <Routes location={location} key={location.pathname}>
 
-      {/* Protected — login required */}
-      <Route
-        path="/wishlist"
-        element={
-          <ProtectedWishlist>
-            <Wishlist />
-          </ProtectedWishlist>
-        }
-      />
+          {/* Public routes */}
+          <Route path="/" element={
+            <PageTransition><Home /></PageTransition>
+          } />
+          <Route path="/products" element={
+            <PageTransition><Products /></PageTransition>
+          } />
+          <Route path="/products/:category" element={
+            <PageTransition><Products /></PageTransition>
+          } />
+          <Route path="/product/:id" element={
+            <PageTransition><ProductDetail /></PageTransition>
+          } />
+          <Route path="/login" element={
+            <PageTransition><Login /></PageTransition>
+          } />
+          <Route path="/checkout" element={
+            <PageTransition><Checkout /></PageTransition>
+          } />
 
-      {/* Admin Panel */}
-      <Route path="/admin/*" element={<AdminRoutes />} />
+          {/* Protected — login required */}
+          <Route path="/wishlist" element={
+            <PageTransition>
+              <ProtectedWishlist>
+                <Wishlist />
+              </ProtectedWishlist>
+            </PageTransition>
+          } />
 
-      {/* 404 */}
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+          {/* Admin Panel — no transition, it has its own layout */}
+          <Route path="/admin/*" element={<AdminRoutes />} />
+
+          {/* 404 */}
+          <Route path="*" element={
+            <PageTransition><NotFound /></PageTransition>
+          } />
+
+        </Routes>
+      </AnimatePresence>
+    </Suspense>
   )
 }
 

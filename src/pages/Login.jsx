@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { Helmet } from 'react-helmet-async'
 import { useAuth } from '../context/AuthContext'
 
 const TABS = { LOGIN: 'login', REGISTER: 'register', RESET: 'reset' }
@@ -77,6 +78,11 @@ function Login() {
 
   return (
     <main className="auth-page">
+      <Helmet>
+        <title>Sign In | Resilda's Boutique</title>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
+
       <div className="auth-card">
         <h1 className="auth-card__title">Resilda's Boutique</h1>
 

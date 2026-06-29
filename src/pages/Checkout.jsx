@@ -1,47 +1,53 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { Helmet } from 'react-helmet-async'
 import { useCart }  from '../context/CartContext'
 import { useAuth }  from '../context/AuthContext'
 import { formatPrice } from '../utils/formatPrice'
 
+const INDIAN_STATES = [
+  'Andhra Pradesh','Arunachal Pradesh','Assam','Bihar','Chhattisgarh',
+  'Goa','Gujarat','Haryana','Himachal Pradesh','Jharkhand','Karnataka',
+  'Kerala','Madhya Pradesh','Maharashtra','Manipur','Meghalaya','Mizoram',
+  'Nagaland','Odisha','Punjab','Rajasthan','Sikkim','Tamil Nadu','Telangana',
+  'Tripura','Uttar Pradesh','Uttarakhand','West Bengal',
+  'Andaman and Nicobar Islands','Chandigarh','Delhi','Jammu and Kashmir',
+  'Ladakh','Lakshadweep','Puducherry',
+]
+
 const EMPTY_ADDR = {
-  firstName: '', lastName: '', email: '', phone: '',
-  address: '', city: '', state: '', pincode: '',
+  fullName: '', phone: '', email: '',
+  address1: '', address2: '', city: '', state: '', pincode: '',
 }
 
 function Checkout() {
   const { cart, cartTotal, clearCart } = useCart()
-  const { user, isLoggedIn }           = useAuth()
+  const { user }                       = useAuth()
   const navigate                       = useNavigate()
 
-  const [addr, setAddr]         = useState({
+  const [addr, setAddr]             = useState({
     ...EMPTY_ADDR,
-    email: user?.email ?? '',
-    firstName: user?.displayName?.split(' ')[0] ?? '',
-    lastName:  user?.displayName?.split(' ').slice(1).join(' ') ?? '',
+    email:    user?.email ?? '',
+    fullName: user?.displayName ?? '',
   })
-  const [payment, setPayment]   = useState('cod')
   const [submitting, setSubmitting] = useState(false)
-  const [error, setError]       = useState('')
+  const [error, setError]           = useState('')
 
-  const handleChange = (e) => {
+  const handleChange = (e) =>
     setAddr((prev) => ({ ...prev, [e.target.name]: e.target.value }))
-  }
 
-  const shippingCost = cartTotal > 0 && cartTotal < 999 ? 99 : 0
-  const orderTotal   = cartTotal + shippingCost
+  const orderTotal = cartTotal  // shipping always free
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
     setSubmitting(true)
     try {
-      // TODO: Integrate Razorpay / payment gateway
-      // For now simulate order placement
+      // TODO: Integrate Razorpay
       await new Promise((r) => setTimeout(r, 1000))
       clearCart()
       navigate('/?order=success')
-    } catch (err) {
+    } catch {
       setError('Order could not be placed. Please try again.')
     } finally {
       setSubmitting(false)
@@ -51,6 +57,10 @@ function Checkout() {
   if (cart.length === 0) {
     return (
       <main className="container" style={{ padding: '4rem 1rem', textAlign: 'center' }}>
+        <Helmet>
+          <title>Checkout | Resilda's Boutique</title>
+          <meta name="robots" content="noindex, nofollow" />
+        </Helmet>
         <h1>Your cart is empty</h1>
         <p>Add items to your cart before checking out.</p>
         <Link to="/products" className="btn btn--primary" style={{ marginTop: '1.5rem', display: 'inline-block' }}>
@@ -62,115 +72,210 @@ function Checkout() {
 
   return (
     <main className="checkout-page">
-      <div className="container">
-        <h1 className="checkout-page__title">Checkout</h1>
+      <Helmet>
+        <title>Checkout | Resilda's Boutique</title>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
 
+      {/* Step indicator */}
+      <div className="checkout-steps">
+        <div className="checkout-step checkout-step--done">
+          <span className="checkout-step__num">1</span>
+          <span className="checkout-step__label">Cart</span>
+        </div>
+        <div className="checkout-step__line checkout-step__line--done" />
+        <div className="checkout-step checkout-step--active">
+          <span className="checkout-step__num">2</span>
+          <span className="checkout-step__label">Details</span>
+        </div>
+        <div className="checkout-step__line" />
+        <div className="checkout-step">
+          <span className="checkout-step__num">3</span>
+          <span className="checkout-step__label">Payment</span>
+        </div>
+      </div>
+
+      <div className="checkout-container">
         <div className="checkout-layout">
-          {/* Form */}
+
+          {/* Left — Form */}
           <form className="checkout-form" onSubmit={handleSubmit} noValidate>
-            <section className="checkout-section">
-              <h2 className="checkout-section__title">Delivery Details</h2>
+            <div className="checkout-card">
+
+              <h2 className="checkout-card__title">
+                <span className="checkout-card__icon">📍</span> Delivery Details
+              </h2>
+
+              {/* Full Name + Phone */}
               <div className="checkout-form__row">
                 <div className="form-group">
-                  <label htmlFor="firstName">First Name *</label>
-                  <input id="firstName" name="firstName" type="text" value={addr.firstName} onChange={handleChange} required />
+                  <label htmlFor="fullName">Full Name *</label>
+                  <input
+                    id="fullName" name="fullName" type="text"
+                    placeholder="Your full name"
+                    value={addr.fullName} onChange={handleChange} required
+                  />
                 </div>
                 <div className="form-group">
-                  <label htmlFor="lastName">Last Name *</label>
-                  <input id="lastName" name="lastName" type="text" value={addr.lastName} onChange={handleChange} required />
+                  <label htmlFor="phone">Phone Number *</label>
+                  <input
+                    id="phone" name="phone" type="tel"
+                    placeholder="+91 XXXXX XXXXX"
+                    value={addr.phone} onChange={handleChange} required
+                  />
                 </div>
               </div>
+
+              {/* Email */}
               <div className="form-group">
-                <label htmlFor="email">Email *</label>
-                <input id="email" name="email" type="email" value={addr.email} onChange={handleChange} required />
+                <label htmlFor="email">Email Address</label>
+                <input
+                  id="email" name="email" type="email"
+                  placeholder="your@email.com"
+                  value={addr.email} onChange={handleChange}
+                />
               </div>
+
+              {/* Address Line 1 */}
               <div className="form-group">
-                <label htmlFor="phone">Phone *</label>
-                <input id="phone" name="phone" type="tel" value={addr.phone} onChange={handleChange} required placeholder="10-digit mobile number" />
+                <label htmlFor="address1">Address Line 1 *</label>
+                <input
+                  id="address1" name="address1" type="text"
+                  placeholder="House no., Street name"
+                  value={addr.address1} onChange={handleChange} required
+                />
               </div>
+
+              {/* Address Line 2 */}
               <div className="form-group">
-                <label htmlFor="address">Address *</label>
-                <input id="address" name="address" type="text" value={addr.address} onChange={handleChange} required placeholder="House / flat / street" />
+                <label htmlFor="address2">Address Line 2</label>
+                <input
+                  id="address2" name="address2" type="text"
+                  placeholder="Landmark, Area (optional)"
+                  value={addr.address2} onChange={handleChange}
+                />
               </div>
+
+              {/* City + State */}
               <div className="checkout-form__row">
                 <div className="form-group">
                   <label htmlFor="city">City *</label>
-                  <input id="city" name="city" type="text" value={addr.city} onChange={handleChange} required />
+                  <input
+                    id="city" name="city" type="text"
+                    placeholder="City"
+                    value={addr.city} onChange={handleChange} required
+                  />
                 </div>
                 <div className="form-group">
                   <label htmlFor="state">State *</label>
-                  <input id="state" name="state" type="text" value={addr.state} onChange={handleChange} required />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="pincode">Pincode *</label>
-                  <input id="pincode" name="pincode" type="text" value={addr.pincode} onChange={handleChange} required placeholder="6 digits" maxLength={6} />
+                  <select id="state" name="state" value={addr.state} onChange={handleChange} required>
+                    <option value="">Select State</option>
+                    {INDIAN_STATES.map((s) => (
+                      <option key={s} value={s}>{s}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
-            </section>
 
-            <section className="checkout-section">
-              <h2 className="checkout-section__title">Payment Method</h2>
-              <div className="payment-options">
-                {[
-                  { val: 'cod',      label: 'Cash on Delivery' },
-                  { val: 'razorpay', label: 'Pay Online (UPI / Card / NetBanking)' },
-                ].map((opt) => (
-                  <label key={opt.val} className={`payment-option${payment === opt.val ? ' payment-option--active' : ''}`}>
-                    <input
-                      type="radio"
-                      name="payment"
-                      value={opt.val}
-                      checked={payment === opt.val}
-                      onChange={() => setPayment(opt.val)}
-                    />
-                    {opt.label}
-                  </label>
-                ))}
+              {/* Pincode */}
+              <div className="form-group form-group--half">
+                <label htmlFor="pincode">Pincode *</label>
+                <input
+                  id="pincode" name="pincode" type="text"
+                  placeholder="6-digit pincode"
+                  value={addr.pincode} onChange={handleChange}
+                  required maxLength={6}
+                />
               </div>
-            </section>
+
+              {/* Payment — online only */}
+              <h2 className="checkout-card__title" style={{ marginTop: '2rem' }}>
+                <span className="checkout-card__icon">💳</span> Payment Method
+              </h2>
+
+              <div className="payment-option payment-option--active">
+                <span className="payment-option__icon">💳</span>
+                <div>
+                  <strong>Pay Online</strong>
+                  <p>UPI, Cards, Net Banking via Razorpay</p>
+                </div>
+                <span className="payment-option__check">✔</span>
+              </div>
+
+            </div>
 
             {error && <p className="auth-error">{error}</p>}
 
-            <button type="submit" className="btn btn--primary checkout-submit" disabled={submitting}>
-              {submitting ? 'Placing Order…' : `Place Order — ${formatPrice(orderTotal)}`}
+            <button
+              type="submit"
+              className="checkout-submit"
+              disabled={submitting}
+            >
+              💳 {submitting ? 'Processing…' : 'Pay Now'}
             </button>
           </form>
 
-          {/* Order Summary */}
+          {/* Right — Order Summary */}
           <aside className="checkout-summary">
-            <h2 className="checkout-section__title">Order Summary</h2>
-            <ul className="checkout-summary__items">
-              {cart.map((item) => (
-                <li key={item.key} className="checkout-summary__item">
-                  <img src={item.product.images[0]} alt={item.product.name} className="checkout-summary__img" />
-                  <div className="checkout-summary__detail">
-                    <p className="checkout-summary__name">{item.product.name}</p>
-                    <p className="checkout-summary__meta">Size: {item.size} · Qty: {item.quantity}</p>
-                  </div>
-                  <span className="checkout-summary__price">
-                    {formatPrice(item.product.price * item.quantity)}
-                  </span>
-                </li>
-              ))}
-            </ul>
-            <div className="checkout-summary__totals">
-              <div className="checkout-summary__row">
-                <span>Subtotal</span>
-                <span>{formatPrice(cartTotal)}</span>
+            <div className="checkout-card">
+              <h2 className="checkout-card__title">
+                <span className="checkout-card__icon">🛍</span> Order Summary
+              </h2>
+
+              <ul className="checkout-summary__items">
+                {cart.map((item) => (
+                  <li key={item.key} className="checkout-summary__item">
+                    <div className="checkout-summary__img-wrap">
+                      {item.product.images?.[0]
+                        ? <img src={item.product.images[0]} alt={item.product.name} />
+                        : <span className="checkout-summary__img-placeholder">🖼</span>
+                      }
+                    </div>
+                    <div className="checkout-summary__detail">
+                      <p className="checkout-summary__name">
+                        {item.product.name}
+                        {item.size !== 'Free Size' && ` (${item.size})`}
+                      </p>
+                      <p className="checkout-summary__meta">Qty: {item.quantity}</p>
+                      <p className="checkout-summary__price">{formatPrice(item.product.price * item.quantity)}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="checkout-summary__totals">
+                <div className="checkout-summary__row">
+                  <span>Subtotal</span>
+                  <span>{formatPrice(cartTotal)}</span>
+                </div>
+                <div className="checkout-summary__row">
+                  <span>Shipping</span>
+                  <span className="checkout-summary__free">FREE</span>
+                </div>
+                <div className="checkout-summary__row checkout-summary__row--total">
+                  <span>Total</span>
+                  <span>{formatPrice(orderTotal)}</span>
+                </div>
               </div>
-              <div className="checkout-summary__row">
-                <span>Shipping</span>
-                <span>{shippingCost === 0 ? 'Free' : formatPrice(shippingCost)}</span>
-              </div>
-              {shippingCost === 0 && (
-                <p className="checkout-summary__free-note">🎉 Free shipping on orders above ₹999</p>
-              )}
-              <div className="checkout-summary__row checkout-summary__row--total">
-                <span>Total</span>
-                <span>{formatPrice(orderTotal)}</span>
+
+              {/* Trust badges */}
+              <div className="checkout-trust">
+                <div className="checkout-trust__item">
+                  <span>🛡</span>
+                  <p>Secure Payment</p>
+                </div>
+                <div className="checkout-trust__item">
+                  <span>🔄</span>
+                  <p>Damage Exchange</p>
+                </div>
+                <div className="checkout-trust__item">
+                  <span>🚚</span>
+                  <p>Fast Delivery</p>
+                </div>
               </div>
             </div>
           </aside>
+
         </div>
       </div>
     </main>

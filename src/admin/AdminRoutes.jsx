@@ -10,15 +10,21 @@ import AdminProducts from './AdminProducts';
 import ProductForm from './ProductForm';
 import './admin.css';
 
-// ── List your admin emails here ───────────────────────────────
-const ADMIN_EMAILS = ['maheswari.k1107@gmail.com'];
-
 function AdminGuard({ children }) {
-  const [state, setState] = useState({ loading: true, user: null });
+  const [state, setState] = useState({ loading: true, user: null, isAdmin: false });
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (user) => {
-      setState({ loading: false, user });
+    const unsub = onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        setState({ loading: false, user: null, isAdmin: false });
+        return;
+      }
+
+      // Temporary: env-based check until Blaze + custom claims are set up
+      const adminEmail = import.meta.env.VITE_ADMIN_EMAIL;
+      const isAdmin = user.email === adminEmail;
+
+      setState({ loading: false, user, isAdmin });
     });
     return unsub;
   }, []);
@@ -36,7 +42,7 @@ function AdminGuard({ children }) {
     return <Navigate to="/login" replace />;
   }
 
-  if (!ADMIN_EMAILS.includes(state.user.email)) {
+  if (!state.isAdmin) {
     return (
       <div className="access-denied admin-root">
         <h2>Access Denied</h2>

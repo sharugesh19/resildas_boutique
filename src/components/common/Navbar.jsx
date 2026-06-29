@@ -14,6 +14,7 @@ function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [activeSection, setActiveSection] = useState('')
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
@@ -23,12 +24,56 @@ function Navbar() {
 
   useEffect(() => { setMenuOpen(false) }, [location.pathname])
 
+  useEffect(() => {
+    if (location.pathname !== '/') {
+      setActiveSection('')
+      return
+    }
+
+    const sectionIds = [
+      'new-arrivals',
+      'categories',
+      'best-sellers',
+      'reviews',
+      'contact',
+      'find-us',
+    ]
+
+    const getActiveSection = () => {
+      if (window.scrollY < 50) {
+        setActiveSection('')
+        return
+      }
+
+      // FIX: measure navbar height dynamically instead of hardcoding 97
+      const navbarEl = document.querySelector('.navbar')
+      const navbarHeight = navbarEl ? navbarEl.getBoundingClientRect().height : 80
+      const offset = navbarHeight + 20
+
+      let found = ''
+      for (let i = sectionIds.length - 1; i >= 0; i--) {
+        const el = document.getElementById(sectionIds[i])
+        if (!el) continue
+        const top = el.getBoundingClientRect().top
+        if (top <= offset) {
+          found = sectionIds[i]
+          break
+        }
+      }
+      setActiveSection(found)
+    }
+
+    window.addEventListener('scroll', getActiveSection, { passive: true })
+    getActiveSection()
+
+    return () => window.removeEventListener('scroll', getActiveSection)
+  }, [location.pathname])
+
   const handleLogout = async () => {
     await logout()
     navigate('/')
   }
 
-  // Scroll to a section by id — navigates home first if on another page
   const scrollTo = useCallback((sectionId) => {
     setMenuOpen(false)
     const go = () => {
@@ -48,11 +93,8 @@ function Navbar() {
     scrollTo(sectionId)
   }, [scrollTo])
 
-  // Nav link definitions
-  // - type 'route'  → NavLink to a page route
-  // - type 'scroll' → smooth-scroll to sectionId on home page
   const navLinks = [
-    { label: 'Home',         type: 'route',  path: '/',              end: true },
+    { label: 'Home',         type: 'route',  path: '/',               end: true },
     { label: 'New Arrivals', type: 'scroll', sectionId: 'new-arrivals' },
     { label: 'Categories',   type: 'scroll', sectionId: 'categories' },
     { label: 'Best Sellers', type: 'scroll', sectionId: 'best-sellers' },
@@ -60,20 +102,30 @@ function Navbar() {
     { label: 'Contact',      type: 'scroll', sectionId: 'contact' },
   ]
 
+  const navSectionIds = ['new-arrivals', 'categories', 'best-sellers', 'reviews', 'contact', 'find-us']
+  const activeLinkSection = navSectionIds.includes(activeSection) ? activeSection : ''
+
   return (
     <>
       <nav className={`navbar${scrolled ? ' navbar--scrolled' : ''}`}>
-        {/* ── Announcement bar ── */}
         <div className="navbar__announcement">
           <span>FREE SHIPPING ON EVERY ORDER</span>
         </div>
 
         <div className="navbar__inner">
-          {/* ── Logo: circular emblem + brand name (left) ── */}
-          <Link to="/" className="navbar__logo">
+          <Link
+            to="/"
+            className="navbar__logo"
+            onClick={(e) => {
+              if (location.pathname === '/') {
+                e.preventDefault()
+                window.scrollTo({ top: 0, behavior: 'smooth' })
+              }
+            }}
+          >
             <div className="navbar__logo-emblem">
-              <img src="/images/logo.png" alt="" className="navbar__logo-img" />
-              <span className="navbar__logo-initial">R</span>
+              <img src="/assests/logo.png" alt="" className="navbar__logo-img" />
+              <span className="navbar__logo-initial"></span>
             </div>
             <div className="navbar__logo-text">
               <span className="navbar__logo-name">Resilda's</span>
@@ -81,7 +133,6 @@ function Navbar() {
             </div>
           </Link>
 
-          {/* ── Centered nav links ── */}
           <div className="navbar__links">
             {navLinks.map((link) => {
               if (link.type === 'route') {
@@ -91,19 +142,24 @@ function Navbar() {
                     to={link.path}
                     end={link.end}
                     className={({ isActive }) =>
-                      'navbar__nav-link' + (isActive ? ' navbar__nav-link--active' : '')
+                      'navbar__nav-link' +
+                      (isActive && !activeLinkSection && activeSection !== 'find-us'
+                        ? ' navbar__nav-link--active'
+                        : '')
                     }
                   >
                     {link.label}
                   </NavLink>
                 )
               }
-              // scroll link
               return (
                 <a
                   key={link.label}
                   href={`/#${link.sectionId}`}
-                  className="navbar__nav-link"
+                  className={
+                    'navbar__nav-link' +
+                    (activeLinkSection === link.sectionId ? ' navbar__nav-link--active' : '')
+                  }
                   onClick={(e) => handleHashClick(e, link.sectionId)}
                 >
                   {link.label}
@@ -112,9 +168,7 @@ function Navbar() {
             })}
           </div>
 
-          {/* ── Right: icon actions + Find Store ── */}
           <div className="navbar__actions">
-            {/* Search */}
             <button
               className="navbar__icon-btn"
               onClick={() => setSearchOpen(true)}
@@ -125,7 +179,6 @@ function Navbar() {
               </svg>
             </button>
 
-            {/* Wishlist */}
             <button
               className="navbar__icon-btn"
               onClick={() => navigate(isLoggedIn ? '/wishlist' : '/login?redirect=/wishlist')}
@@ -137,7 +190,6 @@ function Navbar() {
               {wishlistCount > 0 && <span className="navbar__badge">{wishlistCount}</span>}
             </button>
 
-            {/* Cart */}
             <button
               className="navbar__icon-btn"
               onClick={openCart}
@@ -151,7 +203,6 @@ function Navbar() {
               {cartCount > 0 && <span className="navbar__badge">{cartCount}</span>}
             </button>
 
-            {/* Auth */}
             {isLoggedIn ? (
               <button className="navbar__icon-btn" onClick={handleLogout} title="Logout">
                 <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -166,7 +217,6 @@ function Navbar() {
               </Link>
             )}
 
-            {/* Find Store — scrolls to #find-us */}
             <a
               href="/#find-us"
               className="navbar__find-store"
@@ -180,7 +230,6 @@ function Navbar() {
               <span>Find Store</span>
             </a>
 
-            {/* Hamburger (mobile) */}
             <button
               className={`navbar__hamburger${menuOpen ? ' open' : ''}`}
               onClick={() => setMenuOpen((o) => !o)}
@@ -192,7 +241,6 @@ function Navbar() {
         </div>
       </nav>
 
-      {/* ── Mobile menu ── */}
       <div className={`navbar__mobile-menu${menuOpen ? ' open' : ''}`}>
         {navLinks.map((link) => {
           if (link.type === 'route') {

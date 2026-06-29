@@ -3,10 +3,15 @@
    ============================================================ */
 
 /* ── Page offset for fixed navbar (inner 68px + announcement 28px) ── */
-.page-content {
-  margin-top: 96px; /* 68 inner + 28 announcement */
+main.page-content {
+  margin: 0;
+  padding: 0;
 }
-
+.page-content {
+  margin-top: 0;
+  padding-top: 0;
+  display: block;
+}
 /* ── Shared utilities ── */
 .container {
   max-width: var(--container-max);
@@ -322,7 +327,7 @@
    CATEGORY SECTION
    ═══════════════════════════════════════════════ */
 .category-section {
-  padding: var(--space-20) 0;
+  padding: var(--space-2) 0 var(--space-20);
   background: var(--color-white);
   margin-top: 0;
 }
@@ -664,10 +669,7 @@
 }
 
 .contact-premium__inner {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-16);
-  align-items: start;
+  display: block;
 }
 
 .contact-premium__info .eyebrow { margin-bottom: var(--space-2); }
@@ -1082,5 +1084,18 @@
 }
 /* Contact — info-only layout (form removed) */
 .contact-premium__info-only {
-  max-width: 600px;
+  max-width: 680px;
+}
+/* ADD this new rule in home.css */
+.contact-premium__info-only .contact-premium__items {
+  display: flex;
+  flex-direction: row;
+  gap: var(--space-10);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-8);
+}
+
+.contact-premium__info-only .contact-item {
+  flex: 1;
+  min-width: 180px;
 }

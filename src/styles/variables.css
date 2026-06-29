@@ -77,3 +77,13 @@
   --transition-base:   250ms ease;
   --transition-slow:   400ms ease;
 }
+body {
+  margin: 0;
+  padding: 0;
+}
+
+main {
+  margin: 0;
+  padding: 0;
+  display: block;
+}

@@ -1,0 +1,14 @@
+User-agent: *
+
+# Private / account pages — block from indexing
+Disallow: /checkout
+Disallow: /wishlist
+Disallow: /login
+Disallow: /admin
+Disallow: /orders
+Disallow: /profile
+
+# Allow everything else
+Allow: /
+
+Sitemap: https://resildas.com/sitemap.xml

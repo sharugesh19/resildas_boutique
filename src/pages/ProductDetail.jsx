@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { Helmet } from 'react-helmet-async'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { getProductById, getRelatedProducts, CATEGORY_LABELS } from '../data/productsData'
 import { useCart }      from '../context/CartContext'
@@ -8,7 +9,6 @@ import { formatPrice, calcDiscount } from '../utils/formatPrice'
 import { requireLogin } from '../utils/requireLogin'
 import ProductCard from '../components/product/ProductCard'
 
-// ── Category-specific highlights / specs (mirrors reference design) ────────
 const CATEGORY_DETAILS = {
   'unstitched-salwar': {
     showSize: false,
@@ -192,15 +192,16 @@ const SIZE_GUIDE = {
   ],
 }
 
+
 function ProductDetail() {
   const { id }       = useParams()
   const navigate     = useNavigate()
   const product      = getProductById(id)
 
-  const [activeImg, setActiveImg]     = useState(0)
-  const [selectedSize, setSelectedSize] = useState('')
-  const [qty, setQty]                 = useState(1)
-  const [activeTab, setActiveTab]     = useState('details')
+  const [activeImg, setActiveImg]         = useState(0)
+  const [selectedSize, setSelectedSize]   = useState('')
+  const [qty, setQty]                     = useState(1)
+  const [activeTab, setActiveTab]         = useState('details')
   const [showSizeGuide, setShowSizeGuide] = useState(false)
 
   const { addToCart }                    = useCart()
@@ -219,13 +220,13 @@ function ProductDetail() {
     )
   }
 
-  const related       = getRelatedProducts(product, 4)
-  const discount      = calcDiscount(product.price, product.originalPrice)
-  const wishlisted    = isWishlisted(product.id)
-  const catLabel      = CATEGORY_LABELS[product.category] ?? product.category
-  const catDetail     = CATEGORY_DETAILS[product.category] ?? null
-  const showSize      = catDetail?.showSize ?? true
-  const sizeBtns      = ['XS', 'S', 'M', 'L', 'XL', '2XL']
+  const related    = getRelatedProducts(product, 4)
+  const discount   = calcDiscount(product.price, product.originalPrice)
+  const wishlisted = isWishlisted(product.id)
+  const catLabel   = CATEGORY_LABELS[product.category] ?? product.category
+  const catDetail  = CATEGORY_DETAILS[product.category] ?? null
+  const showSize   = catDetail?.showSize ?? true
+  const sizeBtns   = ['XS', 'S', 'M', 'L', 'XL', '2XL']
 
   const handleAddToCart = () => {
     const size = showSize ? selectedSize : 'Free Size'
@@ -249,10 +250,55 @@ function ProductDetail() {
   const savings = product.originalPrice > product.price
     ? product.originalPrice - product.price
     : null
-
+const productUrl = `https://resildas.com/product/${product.id}`
+  const productImage = images[0] ?? ''
+  const productStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": product.name,
+    "description": product.description ?? `${product.name} - ${catLabel} at Resilda's Boutique`,
+    "image": productImage,
+    "brand": {
+      "@type": "Brand",
+      "name": "Resilda's Boutique"
+    },
+    "offers": {
+      "@type": "Offer",
+      "url": productUrl,
+      "priceCurrency": "INR",
+      "price": product.price,
+      "priceValidUntil": "2026-12-31",
+      "availability": product.inStock
+        ? "https://schema.org/InStock"
+        : "https://schema.org/OutOfStock",
+      "seller": {
+        "@type": "Organization",
+        "name": "Resilda's Boutique"
+      }
+    }
+  }
   return (
     <main className="pd-page">
+      <Helmet>
+        <title>{product.name} — {catLabel} | Resilda's Boutique</title>
+        <meta
+          name="description"
+          content={`Buy ${product.name} online at Resilda's Boutique. ${catLabel} starting at ${formatPrice(product.price)}. Free delivery on every order.`}
+        />
+        <link rel="canonical" href={productUrl} />
 
+        {/* Open Graph */}
+        <meta property="og:title" content={`${product.name} | Resilda's Boutique`} />
+        <meta property="og:description" content={`${catLabel} — ${formatPrice(product.price)}. Free delivery on every order.`} />
+        <meta property="og:type" content="product" />
+        <meta property="og:url" content={productUrl} />
+        {productImage && <meta property="og:image" content={productImage} />}
+
+        {/* Product structured data */}
+        <script type="application/ld+json">
+          {JSON.stringify(productStructuredData)}
+        </script>
+      </Helmet>
       {/* ── Breadcrumb ───────────────────────────────────── */}
       <div className="pd-breadcrumb-bar">
         <div className="pd-container">
@@ -273,8 +319,6 @@ function ProductDetail() {
 
           {/* LEFT — Gallery */}
           <div className="pd-gallery">
-
-            {/* Thumbnail strip */}
             <div className="pd-thumbs">
               {images.map((src, i) => (
                 <button
@@ -290,7 +334,6 @@ function ProductDetail() {
               ))}
             </div>
 
-            {/* Main image */}
             <div className="pd-main-img-wrap">
               <button className="pd-img-arrow pd-img-arrow--prev" onClick={() => setActiveImg((activeImg - 1 + images.length) % images.length)}>‹</button>
 
@@ -308,7 +351,6 @@ function ProductDetail() {
 
               <button className="pd-img-arrow pd-img-arrow--next" onClick={() => setActiveImg((activeImg + 1) % images.length)}>›</button>
 
-              {/* Dots */}
               <div className="pd-img-dots">
                 {images.map((_, i) => (
                   <button key={i} className={`pd-dot${i === activeImg ? ' pd-dot--active' : ''}`} onClick={() => setActiveImg(i)} />
@@ -382,15 +424,7 @@ function ProductDetail() {
               </button>
             </div>
 
-            <a
-              href="https://wa.me/91XXXXXXXXXX"
-              className="pd-whatsapp-btn"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              💬 Ask on WhatsApp
-            </a>
-
+            {/* Wishlist — WhatsApp button removed */}
             <button
               className={`pd-wishlist-btn${wishlisted ? ' pd-wishlist-btn--active' : ''}`}
               onClick={handleWishlist}
@@ -398,13 +432,13 @@ function ProductDetail() {
               {wishlisted ? '♥' : '♡'} {wishlisted ? 'Wishlisted' : 'Add to Wishlist'}
             </button>
 
-            {/* Delivery info */}
+            {/* Delivery info — hidden on mobile via CSS */}
             <div className="pd-delivery">
               <div className="pd-delivery-item">
                 <span className="pd-delivery-icon">🚚</span>
                 <div>
                   <strong>Free Delivery</strong>
-                  <p>On orders above ₹999</p>
+                  <p>On every order</p>
                 </div>
               </div>
               <div className="pd-delivery-item">
@@ -468,21 +502,18 @@ function ProductDetail() {
                   </table>
                 </>
               )}
-
-              {/* Fallback: show product description */}
               {!catDetail && (
                 <p style={{ color: 'var(--color-grey-700)', lineHeight: 1.8 }}>{product.description}</p>
               )}
             </div>
           )}
 
-          {/* Shipping tab */}
+          {/* Shipping tab — Easy Returns removed */}
           {activeTab === 'shipping' && (
             <div className="pd-tab-content">
               <div className="pd-shipping-list">
                 {[
-                  { icon: '🚚', title: 'Free Shipping', body: 'Free delivery on all orders above ₹999 across India. Standard delivery in 5–7 business days.' },
-                  { icon: '↩', title: 'Easy Returns', body: '7-day hassle-free returns. Item must be unused, unwashed and in original packaging with tags.' },
+                  { icon: '🚚', title: 'Free Shipping', body: 'Free delivery on all orders across India. Standard delivery in 5–7 business days.' },
                   { icon: '🔄', title: 'Exchange Policy', body: 'Size exchanges available within 7 days of delivery. Contact us on WhatsApp for quick exchange.' },
                   { icon: '📍', title: 'Track Your Order', body: "You'll receive a tracking link via SMS and email once your order is shipped." },
                 ].map((item) => (

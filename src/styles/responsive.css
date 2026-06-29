@@ -47,7 +47,10 @@
   .navbar__find-store span { display: none; }
   .navbar__find-store { padding: 6px 8px; }
 
-  .page-content { margin-top: 88px; }
+  .page-content {
+    padding-top: 0;
+    display: block;
+  }
 
   /* Hero — mobile */
   .hero { height: auto; min-height: auto; }
@@ -257,10 +260,12 @@
     border-color: rgba(255, 255, 255, 0.6);
     color: var(--color-black);
   }
-  
+  .new-arrivals-section {
+  padding: var(--space-6) 0 var(--space-10);  /* reduce top padding */
+}
 }
 @media (max-width: 768px) {
   .category-section {
-    padding-top: var(--space-10);
+    padding-top: var(--space-4);
   }
 }

@@ -1,5 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+import { Helmet } from 'react-helmet-async'
 import { useWishlist } from '../context/WishlistContext'
 import { getProductById } from '../data/productsData'
 import ProductCard from '../components/product/ProductCard'
@@ -13,6 +14,11 @@ function Wishlist() {
 
   return (
     <main className="wishlist-page">
+      <Helmet>
+        <title>My Wishlist{wishlistCount > 0 ? ` (${wishlistCount})` : ''} | Resilda's Boutique</title>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
+
       <div className="container">
         <h1 className="wishlist-page__title">
           My Wishlist {wishlistCount > 0 && <span>({wishlistCount})</span>}

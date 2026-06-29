@@ -1,9 +1,15 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+import { Helmet } from 'react-helmet-async'
 
 function NotFound() {
   return (
     <main className="not-found-page">
+      <Helmet>
+        <title>404 – Page Not Found | Resilda's Boutique</title>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
+
       <div className="container not-found-page__inner">
         <h1 className="not-found-page__code">404</h1>
         <h2 className="not-found-page__title">Page not found</h2>

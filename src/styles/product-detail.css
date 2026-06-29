@@ -28,6 +28,9 @@
   .pd-breadcrumb-bar {
     margin-top: 88px;
   }
+  .pd-delivery {
+    display: none;
+  }
 }
 
 .pd-breadcrumb-bar .pd-container {
@@ -723,6 +726,26 @@
   .pd-highlights-grid { grid-template-columns: repeat(2, 1fr); }
 
   .pd-tab-content { padding: 1.5rem 1rem; }
+  .pd-delivery {
+    display: none;        /* ← add this */
+  }
+  .pd-size-guide-modal {
+    width: 95%;
+    padding: 1.5rem 1rem;
+  }
+
+  .pd-spec-table {
+    font-size: 0.75rem;
+  }
+
+  .pd-spec-table th,
+  .pd-spec-table td {
+    padding: 0.5rem 0.5rem;
+  }
+
+  .pd-spec-key {
+    width: auto;
+  }
 }
 
 @media (max-width: 600px) {

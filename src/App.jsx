@@ -8,6 +8,7 @@ import Navbar from './components/common/Navbar'
 import Footer from './components/common/Footer'
 import CartDrawer from './components/common/CartDrawer'
 import Toast from './components/common/Toast'
+import ScrollToTop from './components/common/ScrollToTop'
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
       <AuthProvider>
         <CartProvider>
           <WishlistProvider>
+            <ScrollToTop />
             <Navbar />
             <AppRoutes />
             <Footer />

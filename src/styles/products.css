@@ -1,6 +1,5 @@
 /* ============================================================
    PRODUCTS PAGE — Resilda's Boutique
-   Matches the reference HTML/CSS design
    ============================================================ */
 
 /* ── Page Header ─────────────────────────────────────────── */
@@ -27,7 +26,7 @@
   align-items: center;
   gap: 8px;
   font-size: 13px;
-  color: var(--color-grey-500);
+  color: rgba(255, 255, 255, 0.55);   /* FIX: was var(--color-grey-500), invisible on black */
   margin-bottom: 12px;
 }
 
@@ -37,7 +36,10 @@
 }
 .products-page__breadcrumb a:hover { opacity: 0.8; }
 
-.products-page__breadcrumb-sep { font-size: 12px; }
+.products-page__breadcrumb-sep {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.35);   /* FIX: was inheriting grey */
+}
 
 .products-page__title {
   font-family: var(--font-display);
@@ -75,21 +77,11 @@
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
   max-height: calc(100vh - var(--navbar-height) - 40px);
   overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: var(--color-gold) transparent;
+  scrollbar-width: none;
 }
 
 .filters-sidebar::-webkit-scrollbar {
-  width: 4px;
-}
-
-.filters-sidebar::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.filters-sidebar::-webkit-scrollbar-thumb {
-  background: var(--color-gold);
-  border-radius: 4px;
+  display: none;
 }
 
 .filter-header {
@@ -509,6 +501,27 @@
 @media (max-width: 768px) {
   .products-page__body { grid-template-columns: 1fr; padding: 20px 16px 60px; }
 
+  /* FIX: reduce header space on mobile */
+  .products-page__header {
+    padding: 16px 0;
+  }
+  .products-page__title {
+    font-size: 24px;
+    margin-bottom: 4px;
+  }
+  .products-page__subtitle {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+  }
+  .products-page__breadcrumb {
+    margin-bottom: 8px;
+  }
+
+  /* FIX: remove gap after filter toggle */
+  .filters-toggle {
+    margin-bottom: 0;
+  }
+
   .filters-sidebar {
     position: static;
     margin-bottom: 16px;
@@ -527,6 +540,17 @@
   .tab-btn { flex-shrink: 0; font-size: 12px; padding: 6px 12px; }
 
   .product-card__placeholder span { font-size: 10px; }
+  .products-page__breadcrumb {
+    color: rgba(255, 255, 255, 0.6) !important;
+    margin-bottom: 8px;
+  }
+
+  .products-page__breadcrumb-sep {
+    color: rgba(255, 255, 255, 0.4) !important;
+  }
+   .products-area {
+    margin-top: -16px;   /* pull up to close gap */
+  }
 }
 
 @media (max-width: 480px) {
@@ -534,45 +558,46 @@
   .product-card__name { font-size: 13px; }
   .product-card__price { font-size: 13px; }
 }
+
 /* ── Mobile Filter Drawer ────────────────────────────────── */
 .filters-toggle {
   display: none;
 }
 
 @media (max-width: 768px) {
-  /* Hide sidebar from normal flow on mobile */
   .filters-sidebar {
-  position: fixed;
-  top: 88px;
-  left: -100%;
-  width: 85vw;
-  max-width: 320px;
-  height: calc(100vh - 88px);
-  overflow-y: auto;
-  z-index: 200;
-  border-radius: 0 12px 12px 0;
-  transition: left 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  margin-bottom: 0;
-  padding-bottom: 40px;
-}
+    position: fixed;
+    top: 88px;
+    left: -100%;
+    width: 85vw;
+    max-width: 320px;
+    height: calc(100vh - 88px);
+    overflow-y: auto;
+    scrollbar-width: none;
+    z-index: 200;
+    border-radius: 0 12px 12px 0;
+    transition: left 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    margin-bottom: 0;
+    padding-bottom: 40px;
+  }
+
+  .filters-sidebar::-webkit-scrollbar { display: none; }
 
   .filters-sidebar--open {
     left: 0;
   }
 
-  /* Overlay behind drawer */
   .filters-overlay {
-  position: fixed;
-  top: 88px;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 199;
-  backdrop-filter: blur(2px);
-}
+    position: fixed;
+    top: 88px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 199;
+    backdrop-filter: blur(2px);
+  }
 
-  /* Toggle button — shown on mobile */
   .filters-toggle {
     display: inline-flex;
     align-items: center;
@@ -586,7 +611,7 @@
     font-weight: 600;
     color: var(--color-black);
     cursor: pointer;
-    margin-bottom: 16px;
+    margin-bottom: 0;             /* FIX: was 16px */
     transition: all 0.2s;
     position: relative;
   }
@@ -612,7 +637,6 @@
     justify-content: center;
   }
 
-  /* Close button inside drawer */
   .filters-close {
     display: flex;
     align-items: center;
@@ -633,14 +657,12 @@
     border-color: var(--color-black);
   }
 
-  /* Products area takes full width */
   .products-page__body {
     grid-template-columns: 1fr !important;
   }
 }
 
 @media (min-width: 769px) {
-  /* Close button hidden on desktop */
   .filters-close { display: none; }
   .filters-overlay { display: none; }
 }

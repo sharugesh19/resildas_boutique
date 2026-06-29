@@ -1,8 +1,10 @@
 import React, { useMemo, useState, useEffect } from 'react'
+import { Helmet } from 'react-helmet-async'
 import { useParams, useSearchParams, Link } from 'react-router-dom'
 import products, { CATEGORY_LABELS, searchProducts } from '../data/productsData'
 import ProductGrid    from '../components/product/ProductGrid'
 import ProductFilters from '../components/product/ProductFilters'
+import FadeInUp       from '../components/common/FadeInUp'
 
 const CATEGORY_TABS = [
   { key: 'all',               label: 'All' },
@@ -21,7 +23,7 @@ const DEFAULT_FILTERS = {
   category:   '',
   sort:       'default',
   maxPrice:   10000,
-  collection: '', // 'bestseller' | 'new' | 'sale'
+  collection: '',
 }
 
 function applyFilters(base, filters) {
@@ -48,6 +50,18 @@ function applyFilters(base, filters) {
   }
 
   return result
+}
+
+const CATEGORY_DESCRIPTIONS = {
+  'unstitched-salwar': 'Shop premium unstitched salwar sets online. Beautiful prints and embroidery for daily and festive wear.',
+  'kurthi-set':        'Explore elegant kurthi sets in silk blend, cotton and more. Perfect for daily wear and festive occasions.',
+  'organza-saree':     'Buy designer organza sarees online with blouse. Embroidered and printed organza for party and festive wear.',
+  'tussar-saree':      'Shop traditional tussar silk sarees with zari border. Perfect for festivals and traditional occasions.',
+  'soft-silk-saree':   'Premium soft silk sarees with zari work for weddings and festive wear. Shop online at Resilda\'s Boutique.',
+  'cotton-saree':      'Handloom and printed cotton sarees for daily wear. Comfortable, stylish and affordable.',
+  'lightweight-saree': 'Designer party wear sarees in chiffon and georgette with sequin work. Perfect for receptions and events.',
+  'coord-sets':        'Trendy co-ord sets for women in premium fabric. Casual and party wear co-ord sets online.',
+  'new-arrival':       'Shop the latest new arrivals at Resilda\'s Boutique. Fresh ethnic wear styles added regularly.',
 }
 
 function Products() {
@@ -96,33 +110,69 @@ function Products() {
         ? 'New Arrivals'
         : 'All Products'
 
+  const metaTitle = q
+    ? `Search: "${q}" | Resilda's Boutique`
+    : filters.category
+      ? `${pageTitle} | Resilda's Boutique`
+      : `Shop All Ethnic Wear | Resilda's Boutique`
+
+  const metaDescription = q
+    ? `Search results for "${q}" at Resilda's Boutique. Premium ethnic wear with free delivery on every order.`
+    : filters.category
+      ? CATEGORY_DESCRIPTIONS[filters.category] ?? `Shop ${pageTitle} online at Resilda's Boutique. Free delivery on every order.`
+      : `Shop premium sarees, kurthi sets, co-ord sets and ethnic wear at Resilda's Boutique, Udumalaipettai. Free delivery on every order.`
+
+  const canonicalUrl = filters.category
+    ? `https://resildas.com/products/${filters.category}`
+    : `https://resildas.com/products`
+
   return (
     <main className="products-page">
 
-      {/* ── Page Header ── */}
-      <div className="products-page__header">
-        <div className="products-page__header-inner">
-          <nav className="products-page__breadcrumb">
-            <Link to="/">Home</Link>
-            <span className="products-page__breadcrumb-sep">›</span>
-            <span>{pageTitle}</span>
-          </nav>
-          <h1 className="products-page__title">{pageTitle}</h1>
-          <p className="products-page__subtitle">
-            Discover our complete collection of premium ethnic wear
-          </p>
+      <Helmet>
+        <title>{metaTitle}</title>
+        <meta name="description" content={metaDescription} />
+        <link rel="canonical" href={canonicalUrl} />
+        <meta property="og:title" content={metaTitle} />
+        <meta property="og:description" content={metaDescription} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={canonicalUrl} />
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home",    "item": "https://resildas.com" },
+            { "@type": "ListItem", "position": 2, "name": pageTitle, "item": canonicalUrl }
+          ]
+        })}</script>
+      </Helmet>
+
+      {/* Page Header */}
+      <FadeInUp duration={0.4}>
+        <div className="products-page__header">
+          <div className="products-page__header-inner">
+            <nav className="products-page__breadcrumb">
+              <Link to="/">Home</Link>
+              <span className="products-page__breadcrumb-sep">›</span>
+              <span>{pageTitle}</span>
+            </nav>
+            <h1 className="products-page__title">{pageTitle}</h1>
+            <p className="products-page__subtitle">
+              Discover our complete collection of premium ethnic wear
+            </p>
+          </div>
         </div>
-      </div>
+      </FadeInUp>
 
       <div className="products-page__body">
 
-        {/* ── Sidebar ── */}
+        {/* Sidebar */}
         <ProductFilters
           filters={filters}
           onChange={handleFilterChange}
         />
 
-        {/* ── Main Area ── */}
+        {/* Main Area */}
         <div className="products-area">
 
           {/* Top bar */}
@@ -145,10 +195,12 @@ function Products() {
             ))}
           </div>
 
-          {/* Products Grid */}
-          <ProductGrid products={displayed} />
-        </div>
+          {/* Products Grid — fades in when switching tabs too */}
+          <FadeInUp key={filters.category} duration={0.35}>
+            <ProductGrid products={displayed} />
+          </FadeInUp>
 
+        </div>
       </div>
     </main>
   )

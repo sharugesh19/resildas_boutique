@@ -1,60 +1,40 @@
-/**
- * HERO SLIDES
- * ─────────────────────────────────────────────────────────────
- * Each slide gets its own headline + tagline so the hero text
- * updates dynamically as the carousel advances — matching your
- * existing hero-sync.js behaviour.
- *
- * Images reference files in /public/images/
- * (hero-1.jpeg through hero-4.jpeg as per your folder structure)
- * ─────────────────────────────────────────────────────────────
- */
-
 const heroSlides = [
   {
-    id:          1,
-    image:       '/images/hero-1.jpeg',
-    headline:    'Draped in Tradition',
-    tagline:     'Curated Kanjivaram & Silk Sarees for Every Occasion',
-    cta: {
-      label: 'Shop Sarees',
-      path:  '/products/sarees',
-    },
-    overlayDark: true, // true = white text (photo is dark), false = dark text (photo is light)
+    id: 1,
+    image: '/assets/image2.jpeg',
+    label: 'Soft Silk Saree',
+    tag: '✦ New Collection 2025',
+    title: 'Elegance',
+    titleGold: 'Redefined',
+    tagline: 'Handpicked sarees & ethnic wear for every occasion',
   },
   {
-    id:          2,
-    image:       '/images/hero-2.jpeg',
-    headline:    'Effortless Elegance',
-    tagline:     'New Season Kurthi Sets — Where Comfort Meets Craft',
-    cta: {
-      label: 'Explore Kurthis',
-      path:  '/products/kurthi-sets',
-    },
-    overlayDark: true,
+    id: 2,
+    image: '/assets/image1.jpeg',
+    label: 'Organza Saree',
+    tag: '✦ New Collection 2025',
+    title: 'Sheer, draped',
+    titleGold: 'elegance',
+    tagline: 'Lightweight organza for festive evenings',
   },
   {
-    id:          3,
-    image:       '/images/hero-3.jpeg',
-    headline:    'Made to Match',
-    tagline:     "Co-ord Sets for the Modern Indian Woman",
-    cta: {
-      label: 'Shop Co-ords',
-      path:  '/products/coord-sets',
-    },
-    overlayDark: true,
+    id: 3,
+    image: '/assets/image3.jpeg',
+    label: 'Co-ord Set',
+    tag: '✦ New Collection 2025',
+    title: 'Effortless',
+    titleGold: 'co-ord style',
+    tagline: 'Matched sets for the modern drape',
   },
   {
-    id:          4,
-    image:       '/images/hero-4.jpeg',
-    headline:    'Festive Arrivals',
-    tagline:     'Handpicked Salwar Sets for the Season',
-    cta: {
-      label: 'Shop Salwar Sets',
-      path:  '/products/salwar-sets',
-    },
-    overlayDark: false,
+    id: 4,
+    image: '/assets/image4.jpeg',
+    label: 'Rose Gold Silk',
+    tag: '✦ New Collection 2025',
+    title: 'Rose gold,',
+    titleGold: 'redefined',
+    tagline: 'Our signature soft silk, in rose gold',
   },
-]
+];
 
-export default heroSlides
+export default heroSlides;
