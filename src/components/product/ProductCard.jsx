@@ -67,15 +67,13 @@ function ProductCard({ product }) {
 
           {/* Badges */}
           <div className="product-card__badges">
-            {product.isFeatured && (
+            {product.isFeatured ? (
               <span className="product-card__badge product-card__badge--bestseller">Best Seller</span>
-            )}
-            {product.isNewArrival && (
+            ) : product.isNewArrival ? (
               <span className="product-card__badge product-card__badge--new">New</span>
-            )}
-            {discount > 0 && !product.isFeatured && !product.isNewArrival && (
+            ) : discount > 0 ? (
               <span className="product-card__badge product-card__badge--sale">Sale</span>
-            )}
+            ) : null}
           </div>
 
           {/* Actions */}
@@ -90,12 +88,16 @@ function ProductCard({ product }) {
                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
               </svg>
             </motion.button>
-            <Link to={`/product/${product.id}`} className="product-card__eye" aria-label="Quick view">
+            <button
+              className="product-card__eye"
+              aria-label="Quick view"
+              onClick={(e) => { e.preventDefault(); navigate(`/product/${product.id}`) }}
+            >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
                 <circle cx="12" cy="12" r="3"/>
               </svg>
-            </Link>
+            </button>
           </div>
         </div>
 

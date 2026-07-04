@@ -749,7 +749,229 @@
 }
 
 @media (max-width: 600px) {
-  .pd-highlights-grid { grid-template-columns: 1fr; }
+  
   .pd-price { font-size: 1.625rem; }
   .pd-info__name { font-size: 1.5rem; }
+}
+/* ── Color Swatches ─────────────────────────────────────────────── */
+
+.pd-color-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.pd-color-swatch {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  position: relative;
+  outline: none;
+}
+
+.pd-color-swatch:hover {
+  transform: scale(1.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.pd-color-swatch--active {
+  border-color: var(--color-gold, #c2903a);
+  box-shadow: 0 0 0 2px var(--color-gold, #c2903a);
+  transform: scale(1.12);
+}
+
+.pd-color-swatch--outofstock {
+  opacity: 0.35;
+  cursor: not-allowed;
+  position: relative;
+}
+
+/* Diagonal strikethrough for out-of-stock swatches */
+.pd-color-swatch--outofstock::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 120%;
+  height: 1.5px;
+  background: rgba(255, 255, 255, 0.7);
+  transform: translate(-50%, -50%) rotate(-45deg);
+  pointer-events: none;
+}
+
+/* ── Color Name Pills ────────────────────────────────────────────── */
+
+.pd-color-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.6rem;
+}
+
+.pd-color-pill {
+  padding: 0.3rem 0.75rem;
+  border-radius: 20px;
+  border: 1.5px solid var(--color-grey-300, #d0d0d0);
+  background: transparent;
+  font-size: 0.78rem;
+  cursor: pointer;
+  color: var(--color-grey-700, #555);
+  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+  white-space: nowrap;
+}
+
+.pd-color-pill:hover {
+  border-color: var(--color-gold, #c2903a);
+  color: var(--color-gold, #c2903a);
+}
+
+.pd-color-pill--active {
+  border-color: var(--color-gold, #c2903a);
+  background: var(--color-gold, #c2903a);
+  color: #fff;
+  font-weight: 600;
+}
+
+.pd-color-pill--outofstock {
+  opacity: 0.45;
+  cursor: not-allowed;
+  text-decoration: line-through;
+}
+
+.pd-pill-oos {
+  font-size: 0.7rem;
+  opacity: 0.8;
+}
+
+/* ── Out of Stock badge ──────────────────────────────────────────── */
+
+.pd-out-stock {
+  color: #cc0000;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+/* ── Amazon-style Color Variant Selector ── */
+.pd-color-variants {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.625rem;
+  margin-top: 0.5rem;
+}
+
+.pd-color-variant-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 90px;
+  border: 2px solid rgba(0,0,0,0.12);
+  border-radius: var(--radius-md);
+  padding: 0;
+  background: #fff;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  overflow: hidden;
+  text-align: center;
+}
+
+.pd-color-variant-btn:hover {
+  border-color: var(--color-gold);
+  box-shadow: 0 2px 8px rgba(194,144,58,0.2);
+}
+
+.pd-color-variant-btn--active {
+  border-color: var(--color-gold);
+  box-shadow: 0 0 0 2px var(--color-gold);
+}
+
+.pd-color-variant-btn--oos {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.pd-color-variant-img {
+  width: 100%;
+  aspect-ratio: 3/4;
+  position: relative;
+  overflow: hidden;
+  background: #f5f5f5;
+}
+
+.pd-color-variant-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+  display: block;
+}
+
+.pd-color-variant-oos-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.05em;
+}
+
+.pd-color-variant-info {
+  padding: 0.375rem 0.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  width: 100%;
+}
+
+.pd-color-variant-name {
+  font-size: 0.68rem;
+  color: var(--color-black);
+  font-weight: 500;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0 0.25rem;
+}
+
+.pd-color-variant-price {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--color-black);
+}
+
+.pd-color-variant-mrp {
+  font-size: 0.65rem;
+  color: var(--color-grey-500);
+  text-decoration: line-through;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .pd-color-variant-btn {
+    width: 76px;
+  }
+}
+/* Mobile */
+@media (max-width: 600px) {
+  .pd-color-variant-btn {
+    width: 76px;
+  }
+}
+
+@media (max-width: 768px) {
+  .pd-tabs-section {
+    margin-bottom: 1.5rem;
+  }
+
+  .pd-related {
+    margin-top: 0;
+  }
 }

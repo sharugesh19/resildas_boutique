@@ -8,28 +8,34 @@ function CartDrawer() {
 
   return (
     <>
-      {/* Backdrop */}
       <div
         className={`cart-drawer-overlay${isOpen ? ' open' : ''}`}
         onClick={closeCart}
       />
 
-      {/* Drawer */}
       <aside className={`cart-drawer${isOpen ? ' open' : ''}`} aria-label="Shopping cart">
-        {/* Header */}
         <div className="cart-drawer__header">
           <h2 className="cart-drawer__title">
-            Cart {cartCount > 0 && <span style={{ color: 'var(--color-text-muted)', fontSize: 'var(--text-base)', fontFamily: 'var(--font-body)', fontWeight: 400 }}>({cartCount})</span>}
+            Cart {cartCount > 0 && <span className="cart-drawer__count">({cartCount})</span>}
           </h2>
-          <button className="cart-drawer__close" onClick={closeCart} aria-label="Close cart">✕</button>
+          <button className="cart-drawer__close" onClick={closeCart} aria-label="Close cart">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
         </div>
 
-        {/* Items */}
         {cart.length === 0 ? (
           <div className="cart-drawer__empty">
-            <span style={{ fontSize: '2.5rem' }}>🛍</span>
+            <div className="cart-drawer__empty-icon">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+                <line x1="3" y1="6" x2="21" y2="6"/>
+                <path d="M16 10a4 4 0 0 1-8 0"/>
+              </svg>
+            </div>
             <p>Your cart is empty</p>
-            <button onClick={closeCart} style={{ color: 'var(--color-gold)', fontSize: 'var(--text-sm)', fontWeight: 500, textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer' }}>
+            <button className="cart-drawer__continue" onClick={closeCart}>
               Continue Shopping
             </button>
           </div>
@@ -46,7 +52,6 @@ function CartDrawer() {
           </div>
         )}
 
-        {/* Footer */}
         {cart.length > 0 && (
           <div className="cart-drawer__footer">
             <div className="cart-drawer__total">
@@ -64,32 +69,31 @@ function CartDrawer() {
 }
 
 function CartItem({ item, onRemove, onQtyChange }) {
-  const { product, size, quantity } = item
+  const { product, size, quantity, color } = item
   return (
-    <div style={{ display: 'flex', gap: 'var(--space-4)' }}>
+    <div className="cart-drawer__item">
       <img
         src={product.images[0]}
         alt={product.name}
-        style={{ width: 72, height: 96, objectFit: 'cover', flexShrink: 0, background: 'var(--color-grey-100)' }}
+        className="cart-drawer__item-img"
       />
-      <div style={{ flex: 1 }}>
-        <p style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-lg)', fontWeight: 500, lineHeight: 1.3, marginBottom: 'var(--space-1)' }}>
-          {product.name}
-        </p>
-        <p style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 'var(--space-3)' }}>
-          Size: {size}
-        </p>
+      <div className="cart-drawer__item-body">
+        <p className="cart-drawer__item-name">{product.name}</p>
+        <p className="cart-drawer__item-meta">Size: {size}</p>
+        {color && <p className="cart-drawer__item-meta">Colour: {color}</p>}
 
-        {/* Qty control */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-2)' }}>
-          <button onClick={() => onQtyChange(quantity - 1)} style={{ width: 28, height: 28, border: '1px solid var(--color-border)', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 'var(--text-lg)' }}>−</button>
-          <span style={{ fontWeight: 600, minWidth: 20, textAlign: 'center' }}>{quantity}</span>
-          <button onClick={() => onQtyChange(quantity + 1)} style={{ width: 28, height: 28, border: '1px solid var(--color-border)', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 'var(--text-lg)' }}>+</button>
+        <div className="cart-drawer__qty">
+          <button className="cart-drawer__qty-btn" onClick={() => onQtyChange(quantity - 1)}>−</button>
+          <span className="cart-drawer__qty-val">{quantity}</span>
+          <button className="cart-drawer__qty-btn" onClick={() => onQtyChange(quantity + 1)}>+</button>
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span style={{ fontWeight: 600 }}>{formatPrice(product.price * quantity)}</span>
-          <button onClick={onRemove} style={{ fontSize: 'var(--text-xs)', color: 'var(--color-error)', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}>
+        <div className="cart-drawer__item-footer">
+          <span className="cart-drawer__item-price">{formatPrice(product.price * quantity)}</span>
+          <button className="cart-drawer__remove" onClick={onRemove}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+            </svg>
             Remove
           </button>
         </div>

@@ -95,7 +95,10 @@ export default function Hero() {
         {heroSlides.map((s, i) => (
           <div key={s.id} className={`rh-slide${i === current ? ' active' : ''}`}>
             <div className="rh-slide-fallback"></div>
-            <img src={s.image} alt={s.label} loading={i === 0 ? 'eager' : 'lazy'} />
+             <picture>
+                <source media="(max-width: 768px)" srcSet={s.mobileImage} />
+                <img src={s.image} alt={s.label} loading={i === 0 ? 'eager' : 'lazy'} />
+              </picture>
           </div>
         ))}
       </div>
@@ -108,11 +111,7 @@ export default function Hero() {
 
       {/* desktop text + CTAs */}
       <div className="rh-content">
-        <div className={`rh-text${fading ? ' is-fading' : ''}`}>
-          <div className="rh-accent-line"></div>
-          <p className="rh-tag">{slide.tag}</p>
-          <h1 className="rh-title">{slide.title} <span>{slide.titleGold}</span></h1>
-          <p className="rh-tagline">{slide.tagline}</p>
+        <div className={`rh-text${fading ? ' is-fading' : ''} rh-align-${slide.ctaAlign}`}>
           <div className="rh-ctas">
             <Link to="/products" className="rh-btn-primary">
               <BagIcon /> Shop Now
@@ -124,15 +123,6 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* mobile CTAs */}
-      <div className="rh-ctas-mobile">
-        <Link to="/products" className="rh-btn-primary">
-          <BagIcon /> Shop Now
-        </Link>
-        <a href={WA} className="rh-btn-whatsapp" target="_blank" rel="noreferrer">
-          <WAIcon /> Order on WhatsApp
-        </a>
-      </div>
 
       {/* slide label */}
       <div className="rh-label">{slide.label}</div>

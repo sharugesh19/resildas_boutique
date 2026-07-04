@@ -21,7 +21,7 @@ const EMPTY_ADDR = {
 }
 
 function Checkout() {
-  const { cart, cartTotal, clearCart } = useCart()
+  const { cart, cartTotal, clearCart, openCart } = useCart()
   const { user }                       = useAuth()
   const navigate                       = useNavigate()
 
@@ -37,6 +37,11 @@ function Checkout() {
     setAddr((prev) => ({ ...prev, [e.target.name]: e.target.value }))
 
   const orderTotal = cartTotal  // shipping always free
+
+  const handleGoToCart = () => {
+    navigate('/')
+    openCart()
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -79,7 +84,13 @@ function Checkout() {
 
       {/* Step indicator */}
       <div className="checkout-steps">
-        <div className="checkout-step checkout-step--done">
+        <div
+          className="checkout-step checkout-step--done checkout-step--clickable"
+          onClick={handleGoToCart}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => e.key === 'Enter' && handleGoToCart()}
+        >
           <span className="checkout-step__num">1</span>
           <span className="checkout-step__label">Cart</span>
         </div>

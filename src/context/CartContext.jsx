@@ -13,7 +13,8 @@ export function useCart() {
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 /** Unique key per product+size combo */
-const makeKey = (productId, size) => `${productId}__${size}`
+const makeKey = (productId, size, color) =>
+  `${productId}__${size}${color ? `__${color}` : ''}`
 
 function calcDiscount(price, originalPrice) {
   if (!originalPrice || originalPrice <= price) return 0
@@ -29,18 +30,16 @@ function cartReducer(state, action) {
     }
 
     case 'ADD': {
-      const { product, size, quantity = 1 } = action.payload
-      const key      = makeKey(product.id, size)
+      const { product, size, quantity = 1, color = null } = action.payload
+      const key = makeKey(product.id, size, color)
       const existing = state.find((i) => i.key === key)
-
       if (existing) {
         return state.map((i) =>
           i.key === key ? { ...i, quantity: i.quantity + quantity } : i
         )
       }
-      return [...state, { key, product, size, quantity }]
+     return [...state, { key, product, size, quantity, color }]
     }
-
     case 'REMOVE': {
       return state.filter((i) => i.key !== action.payload.key)
     }
@@ -83,10 +82,10 @@ export function CartProvider({ children }) {
 
   // ── Public API ────────────────────────────────────────────────────────────
 
-  const addToCart = (product, size, quantity = 1) => {
-    dispatch({ type: 'ADD', payload: { product, size, quantity } })
-    setIsOpen(true) // open drawer on add
-  }
+  const addToCart = (product, size, quantity = 1, color = null) => {
+  dispatch({ type: 'ADD', payload: { product, size, quantity, color } })
+  setIsOpen(true)
+}
 
   const removeFromCart = (key) => dispatch({ type: 'REMOVE', payload: { key } })
 

@@ -109,7 +109,16 @@ function Navbar() {
     <>
       <nav className={`navbar${scrolled ? ' navbar--scrolled' : ''}`}>
         <div className="navbar__announcement">
-          <span>FREE SHIPPING ON EVERY ORDER</span>
+          <div className="navbar__ticker">
+            <div className="navbar__ticker-track">
+              <span>🚚 Free Shipping on Every Order</span>
+              <span>✨ Exclusively for Women — Premium Quality Guaranteed</span>
+              <span>🌟 New Arrivals Every Week — Shop Fresh Styles</span>
+              <span>🚚 Free Shipping on Every Order</span>
+              <span>✨ Exclusively for Women — Premium Quality Guaranteed</span>
+              <span>🌟 New Arrivals Every Week — Shop Fresh Styles</span>
+            </div>
+          </div>
         </div>
 
         <div className="navbar__inner">
@@ -124,7 +133,7 @@ function Navbar() {
             }}
           >
             <div className="navbar__logo-emblem">
-              <img src="/assests/logo.png" alt="" className="navbar__logo-img" />
+              <img src="/assets/logo.png" alt="Resilda's Boutique" className="navbar__logo-img" />
               <span className="navbar__logo-initial"></span>
             </div>
             <div className="navbar__logo-text">

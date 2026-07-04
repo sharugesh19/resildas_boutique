@@ -1,7 +1,8 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { getProductById, getRelatedProducts, CATEGORY_LABELS } from '../data/productsData'
+import { CATEGORY_LABELS } from '../data/productsData'
+import { useProducts } from '../hooks/useProducts'
 import { useCart }      from '../context/CartContext'
 import { useWishlist }  from '../context/WishlistContext'
 import { useAuth }      from '../context/AuthContext'
@@ -137,7 +138,7 @@ const CATEGORY_DETAILS = {
       ['Care', 'Gentle hand wash recommended'],
     ],
   },
-  'lightweight-saree': {
+  'fancy-saree': {
     showSize: false,
     highlights: [
       ['Fabric', 'Chiffon / Georgette'],
@@ -192,12 +193,17 @@ const SIZE_GUIDE = {
   ],
 }
 
-
 function ProductDetail() {
   const { id }       = useParams()
   const navigate     = useNavigate()
-  const product      = getProductById(id)
+  const { products } = useProducts()
+  const product = products.find((p) => p.id === id) ?? null
 
+  const hasColors = product?.colors?.length > 0
+
+  const [selectedColor, setSelectedColor] = useState(() =>
+    hasColors ? product.colors[0] : null
+  )
   const [activeImg, setActiveImg]         = useState(0)
   const [selectedSize, setSelectedSize]   = useState('')
   const [qty, setQty]                     = useState(1)
@@ -208,6 +214,13 @@ function ProductDetail() {
   const { isWishlisted, toggleWishlist } = useWishlist()
   const { isLoggedIn }                   = useAuth()
 
+  // Reset image index when color changes
+  useEffect(() => {
+    setActiveImg(0)
+  }, [selectedColor])
+useEffect(() => {
+  setSelectedSize('')
+}, [product?.id])
   if (!product) {
     return (
       <main className="container" style={{ padding: '4rem 1rem', textAlign: 'center' }}>
@@ -220,24 +233,46 @@ function ProductDetail() {
     )
   }
 
-  const related    = getRelatedProducts(product, 4)
-  const discount   = calcDiscount(product.price, product.originalPrice)
+  // ── Derive active price / images / stock from selected color ──
+ // Replace these lines in ProductDetail.jsx
+  const activeColorData = product.colors?.find(c => c.name === selectedColor?.name) ?? null
+  const activePrice         = activeColorData?.price         ?? product.price
+  const activeOriginalPrice = activeColorData?.originalPrice ?? product.originalPrice
+  const activeInStock       = activeColorData?.inStock       ?? product.inStock
+  const activeImages        = (activeColorData?.images?.length ? activeColorData.images : product.images) ?? []
+  const images              = activeImages.length ? activeImages : [null]
+
+  const related = product
+  ? products.filter((p) => p.category === product.category && p.id !== product.id).slice(0, 4)
+  : []
+  const discount   = calcDiscount(activePrice, activeOriginalPrice)
   const wishlisted = isWishlisted(product.id)
   const catLabel   = CATEGORY_LABELS[product.category] ?? product.category
   const catDetail  = CATEGORY_DETAILS[product.category] ?? null
   const showSize   = catDetail?.showSize ?? true
-  const sizeBtns   = ['XS', 'S', 'M', 'L', 'XL', '2XL']
+  const sizeBtns   = product.sizes?.length ? product.sizes : []
+  const savings    = activeOriginalPrice > activePrice ? activeOriginalPrice - activePrice : null
 
   const handleAddToCart = () => {
     const size = showSize ? selectedSize : 'Free Size'
     if (showSize && !size) { alert('Please select a size'); return }
-    addToCart(product, size, qty)
+    addToCart(
+      { ...product, price: activePrice, images: activeImages },
+      size,
+      qty,
+      selectedColor?.name ?? null
+    )
   }
 
   const handleBuyNow = () => {
     const size = showSize ? selectedSize : 'Free Size'
     if (showSize && !size) { alert('Please select a size'); return }
-    addToCart(product, size, qty)
+    addToCart(
+      { ...product, price: activePrice, images: activeImages },
+      size,
+      qty,
+      selectedColor?.name ?? null
+    )
     navigate('/checkout')
   }
 
@@ -246,59 +281,46 @@ function ProductDetail() {
     await toggleWishlist(product.id)
   }
 
-  const images = product.images?.length ? product.images : [null]
-  const savings = product.originalPrice > product.price
-    ? product.originalPrice - product.price
-    : null
-const productUrl = `https://resildas.com/product/${product.id}`
+  const productUrl   = `https://resildas.com/product/${product.id}`
   const productImage = images[0] ?? ''
+
   const productStructuredData = {
     "@context": "https://schema.org",
     "@type": "Product",
     "name": product.name,
     "description": product.description ?? `${product.name} - ${catLabel} at Resilda's Boutique`,
     "image": productImage,
-    "brand": {
-      "@type": "Brand",
-      "name": "Resilda's Boutique"
-    },
+    "brand": { "@type": "Brand", "name": "Resilda's Boutique" },
     "offers": {
       "@type": "Offer",
       "url": productUrl,
       "priceCurrency": "INR",
-      "price": product.price,
+      "price": activePrice,
       "priceValidUntil": "2026-12-31",
-      "availability": product.inStock
+      "availability": activeInStock
         ? "https://schema.org/InStock"
         : "https://schema.org/OutOfStock",
-      "seller": {
-        "@type": "Organization",
-        "name": "Resilda's Boutique"
-      }
+      "seller": { "@type": "Organization", "name": "Resilda's Boutique" }
     }
   }
+
   return (
     <main className="pd-page">
       <Helmet>
         <title>{product.name} — {catLabel} | Resilda's Boutique</title>
         <meta
           name="description"
-          content={`Buy ${product.name} online at Resilda's Boutique. ${catLabel} starting at ${formatPrice(product.price)}. Free delivery on every order.`}
+          content={`Buy ${product.name} online at Resilda's Boutique. ${catLabel} starting at ${formatPrice(activePrice)}. Free delivery on every order.`}
         />
         <link rel="canonical" href={productUrl} />
-
-        {/* Open Graph */}
         <meta property="og:title" content={`${product.name} | Resilda's Boutique`} />
-        <meta property="og:description" content={`${catLabel} — ${formatPrice(product.price)}. Free delivery on every order.`} />
+        <meta property="og:description" content={`${catLabel} — ${formatPrice(activePrice)}. Free delivery on every order.`} />
         <meta property="og:type" content="product" />
         <meta property="og:url" content={productUrl} />
         {productImage && <meta property="og:image" content={productImage} />}
-
-        {/* Product structured data */}
-        <script type="application/ld+json">
-          {JSON.stringify(productStructuredData)}
-        </script>
+        <script type="application/ld+json">{JSON.stringify(productStructuredData)}</script>
       </Helmet>
+
       {/* ── Breadcrumb ───────────────────────────────────── */}
       <div className="pd-breadcrumb-bar">
         <div className="pd-container">
@@ -335,7 +357,10 @@ const productUrl = `https://resildas.com/product/${product.id}`
             </div>
 
             <div className="pd-main-img-wrap">
-              <button className="pd-img-arrow pd-img-arrow--prev" onClick={() => setActiveImg((activeImg - 1 + images.length) % images.length)}>‹</button>
+              <button
+                className="pd-img-arrow pd-img-arrow--prev"
+                onClick={() => setActiveImg((activeImg - 1 + images.length) % images.length)}
+              >‹</button>
 
               <div className="pd-main-img">
                 {images[activeImg]
@@ -349,11 +374,18 @@ const productUrl = `https://resildas.com/product/${product.id}`
                 }
               </div>
 
-              <button className="pd-img-arrow pd-img-arrow--next" onClick={() => setActiveImg((activeImg + 1) % images.length)}>›</button>
+              <button
+                className="pd-img-arrow pd-img-arrow--next"
+                onClick={() => setActiveImg((activeImg + 1) % images.length)}
+              >›</button>
 
               <div className="pd-img-dots">
                 {images.map((_, i) => (
-                  <button key={i} className={`pd-dot${i === activeImg ? ' pd-dot--active' : ''}`} onClick={() => setActiveImg(i)} />
+                  <button
+                    key={i}
+                    className={`pd-dot${i === activeImg ? ' pd-dot--active' : ''}`}
+                    onClick={() => setActiveImg(i)}
+                  />
                 ))}
               </div>
             </div>
@@ -366,15 +398,18 @@ const productUrl = `https://resildas.com/product/${product.id}`
             <h1 className="pd-info__name">{product.name}</h1>
 
             <div className="pd-info__stock">
-              <span className="pd-in-stock">✔ In Stock</span>
+              {activeInStock
+                ? <span className="pd-in-stock">✔ In Stock</span>
+                : <span className="pd-out-stock">✘ Out of Stock</span>
+              }
             </div>
 
             {/* Price */}
             <div className="pd-price-box">
-              <span className="pd-price">{formatPrice(product.price)}</span>
-              {product.originalPrice > product.price && (
+              <span className="pd-price">{formatPrice(activePrice)}</span>
+              {activeOriginalPrice > activePrice && (
                 <>
-                  <span className="pd-mrp">{formatPrice(product.originalPrice)}</span>
+                  <span className="pd-mrp">{formatPrice(activeOriginalPrice)}</span>
                   <span className="pd-discount">{discount}% off</span>
                 </>
               )}
@@ -382,6 +417,52 @@ const productUrl = `https://resildas.com/product/${product.id}`
                 <span className="pd-savings">You save {formatPrice(savings)}!</span>
               )}
             </div>
+
+            {/* ── Color Variant Selector ─────────────────── */}
+            {hasColors && (
+  <div className="pd-option-group">
+    <div className="pd-option-label">
+      <span>Colour: <strong>{selectedColor?.name}</strong></span>
+    </div>
+
+    {/* Amazon-style image variant selector */}
+    <div className="pd-color-variants">
+      {product.colors.map((color) => (
+        <button
+          key={color.name}
+          className={`pd-color-variant-btn
+            ${selectedColor?.name === color.name ? ' pd-color-variant-btn--active' : ''}
+            ${!color.inStock ? ' pd-color-variant-btn--oos' : ''}
+          `}
+          onClick={() => setSelectedColor(color)}
+          disabled={!color.inStock}
+          title={color.name}
+        >
+          <div className="pd-color-variant-img">
+            <img
+              src={color.images?.[0] ?? product.images?.[0]}
+              alt={color.name}
+            />
+            {!color.inStock && (
+              <div className="pd-color-variant-oos-overlay">OOS</div>
+            )}
+          </div>
+          <div className="pd-color-variant-info">
+            <span className="pd-color-variant-name">{color.name}</span>
+            <span className="pd-color-variant-price">
+              ₹{(color.price ?? product.price).toLocaleString('en-IN')}
+            </span>
+            {color.originalPrice > color.price && (
+              <span className="pd-color-variant-mrp">
+                ₹{color.originalPrice.toLocaleString('en-IN')}
+              </span>
+            )}
+          </div>
+        </button>
+      ))}
+    </div>
+  </div>
+)}
 
             {/* Size Selector */}
             {showSize && (
@@ -416,15 +497,15 @@ const productUrl = `https://resildas.com/product/${product.id}`
 
             {/* CTA */}
             <div className="pd-cta">
-              <button className="pd-btn-cart" onClick={handleAddToCart} disabled={!product.inStock}>
+              <button className="pd-btn-cart" onClick={handleAddToCart} disabled={!activeInStock}>
                 🛍 Add to Cart
               </button>
-              <button className="pd-btn-buy" onClick={handleBuyNow} disabled={!product.inStock}>
+              <button className="pd-btn-buy" onClick={handleBuyNow} disabled={!activeInStock}>
                 ⚡ Buy Now
               </button>
             </div>
 
-            {/* Wishlist — WhatsApp button removed */}
+            {/* Wishlist */}
             <button
               className={`pd-wishlist-btn${wishlisted ? ' pd-wishlist-btn--active' : ''}`}
               onClick={handleWishlist}
@@ -432,7 +513,7 @@ const productUrl = `https://resildas.com/product/${product.id}`
               {wishlisted ? '♥' : '♡'} {wishlisted ? 'Wishlisted' : 'Add to Wishlist'}
             </button>
 
-            {/* Delivery info — hidden on mobile via CSS */}
+            {/* Delivery info */}
             <div className="pd-delivery">
               <div className="pd-delivery-item">
                 <span className="pd-delivery-icon">🚚</span>
@@ -471,7 +552,6 @@ const productUrl = `https://resildas.com/product/${product.id}`
             </button>
           </div>
 
-          {/* Details tab */}
           {activeTab === 'details' && (
             <div className="pd-tab-content">
               {catDetail && (
@@ -488,7 +568,6 @@ const productUrl = `https://resildas.com/product/${product.id}`
                       </div>
                     ))}
                   </div>
-
                   <h3 className="pd-tab-heading">{catDetail.specTitle}</h3>
                   <table className="pd-spec-table">
                     <tbody>
@@ -508,7 +587,6 @@ const productUrl = `https://resildas.com/product/${product.id}`
             </div>
           )}
 
-          {/* Shipping tab — Easy Returns removed */}
           {activeTab === 'shipping' && (
             <div className="pd-tab-content">
               <div className="pd-shipping-list">

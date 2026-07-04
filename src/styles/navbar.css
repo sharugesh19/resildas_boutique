@@ -67,9 +67,6 @@
   position: relative;
   width: 42px;
   height: 42px;
-  border-radius: 50%;
-  border: 1.5px solid var(--color-gold);
-  background: rgba(194, 144, 58, 0.08);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -363,4 +360,28 @@
   text-transform: uppercase;
   font-weight: 700 !important;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+}
+.navbar__ticker {
+  overflow: hidden;
+  width: 100%;
+}
+
+.navbar__ticker-track {
+  display: flex;
+  gap: 80px;
+  width: max-content;
+  animation: ticker-scroll 18s linear infinite;
+}
+
+.navbar__ticker-track span {
+  white-space: nowrap;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
+
+@keyframes ticker-scroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }

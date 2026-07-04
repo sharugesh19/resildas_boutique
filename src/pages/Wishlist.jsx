@@ -2,15 +2,16 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { useWishlist } from '../context/WishlistContext'
-import { getProductById } from '../data/productsData'
+import { useProducts } from '../hooks/useProducts'
 import ProductCard from '../components/product/ProductCard'
 
 function Wishlist() {
   const { wishlist, wishlistCount } = useWishlist()
+  const { products: allProducts }   = useProducts()
 
   const products = wishlist
-    .map((id) => getProductById(id))
-    .filter(Boolean) // skip any stale ids not in data
+    .map((id) => allProducts.find((p) => p.id === id))
+    .filter(Boolean)
 
   return (
     <main className="wishlist-page">
@@ -18,12 +19,10 @@ function Wishlist() {
         <title>My Wishlist{wishlistCount > 0 ? ` (${wishlistCount})` : ''} | Resilda's Boutique</title>
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
-
       <div className="container">
         <h1 className="wishlist-page__title">
           My Wishlist {wishlistCount > 0 && <span>({wishlistCount})</span>}
         </h1>
-
         {products.length === 0 ? (
           <div className="wishlist-page__empty">
             <span style={{ fontSize: '3rem' }}>♡</span>

@@ -1,7 +1,8 @@
 import React, { useMemo, useState, useEffect } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { useParams, useSearchParams, Link } from 'react-router-dom'
-import products, { CATEGORY_LABELS, searchProducts } from '../data/productsData'
+import { CATEGORY_LABELS } from '../data/productsData'
+import { useProducts } from '../hooks/useProducts'
 import ProductGrid    from '../components/product/ProductGrid'
 import ProductFilters from '../components/product/ProductFilters'
 import FadeInUp       from '../components/common/FadeInUp'
@@ -15,7 +16,7 @@ const CATEGORY_TABS = [
   { key: 'tussar-saree',      label: 'Tussar' },
   { key: 'soft-silk-saree',   label: 'Soft Silk' },
   { key: 'cotton-saree',      label: 'Cotton' },
-  { key: 'lightweight-saree', label: 'Light Weight' },
+  { key: 'fancy-saree',       label: 'Fancy Weight' },
   { key: 'coord-sets',        label: 'Co-ord Sets' },
 ]
 
@@ -59,15 +60,16 @@ const CATEGORY_DESCRIPTIONS = {
   'tussar-saree':      'Shop traditional tussar silk sarees with zari border. Perfect for festivals and traditional occasions.',
   'soft-silk-saree':   'Premium soft silk sarees with zari work for weddings and festive wear. Shop online at Resilda\'s Boutique.',
   'cotton-saree':      'Handloom and printed cotton sarees for daily wear. Comfortable, stylish and affordable.',
-  'lightweight-saree': 'Designer party wear sarees in chiffon and georgette with sequin work. Perfect for receptions and events.',
+  'fancy-saree':       'Designer party wear sarees in chiffon and georgette with sequin work. Perfect for receptions and events.',
   'coord-sets':        'Trendy co-ord sets for women in premium fabric. Casual and party wear co-ord sets online.',
   'new-arrival':       'Shop the latest new arrivals at Resilda\'s Boutique. Fresh ethnic wear styles added regularly.',
 }
 
 function Products() {
-  const { category }     = useParams()
-  const [searchParams]   = useSearchParams()
-  const q                = searchParams.get('q') || ''
+  const { category }          = useParams()
+  const [searchParams]        = useSearchParams()
+  const q                     = searchParams.get('q') || ''
+  const { products, loading } = useProducts()
 
   const [filters, setFilters] = useState({
     ...DEFAULT_FILTERS,
@@ -83,9 +85,17 @@ function Products() {
   }, [category])
 
   const base = useMemo(() => {
-    if (q) return searchProducts(q)
+    if (q) {
+      const query = q.toLowerCase()
+      return products.filter((p) =>
+        p.name?.toLowerCase().includes(query) ||
+        p.category?.toLowerCase().includes(query) ||
+        (p.fabric ?? '').toLowerCase().includes(query) ||
+        (p.occasion ?? []).some((o) => o.toLowerCase().includes(query))
+      )
+    }
     return products
-  }, [q])
+  }, [q, products])
 
   const displayed = useMemo(() => applyFilters(base, filters), [base, filters])
 
@@ -125,6 +135,16 @@ function Products() {
   const canonicalUrl = filters.category
     ? `https://resildas.com/products/${filters.category}`
     : `https://resildas.com/products`
+
+  if (loading) {
+    return (
+      <main className="products-page">
+        <div style={{ textAlign: 'center', padding: '8rem 1rem', color: 'var(--color-grey-500)' }}>
+          Loading products...
+        </div>
+      </main>
+    )
+  }
 
   return (
     <main className="products-page">
@@ -195,7 +215,7 @@ function Products() {
             ))}
           </div>
 
-          {/* Products Grid — fades in when switching tabs too */}
+          {/* Products Grid */}
           <FadeInUp key={filters.category} duration={0.35}>
             <ProductGrid products={displayed} />
           </FadeInUp>

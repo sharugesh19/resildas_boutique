@@ -58,7 +58,7 @@ const categoryLinks = [
   { label: 'Tussar Saree',          path: '/products/tussar-saree' },
   { label: 'Soft Silk Saree',       path: '/products/soft-silk-saree' },
   { label: 'Cotton Saree',          path: '/products/cotton-saree' },
-  { label: 'Light Weight Saree',    path: '/products/lightweight-saree' },
+  { label: 'Fancy Saree',    path: '/products/fancy-saree' },
   { label: 'Co-ord Sets',           path: '/products/coord-sets' },
 ]
 

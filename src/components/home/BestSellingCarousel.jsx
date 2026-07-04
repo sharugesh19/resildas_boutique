@@ -1,14 +1,16 @@
 import React, { useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { getFeaturedProducts } from '../../data/productsData'
+import { useProducts } from '../../hooks/useProducts'
 import ProductCard from '../product/ProductCard'
 
 function BestSellingCarousel() {
-  const products = getFeaturedProducts()
-  const [activeIndex, setActiveIndex] = useState(1) // start on 2nd card so prev is visible
+  const { products: all, loading } = useProducts()
+  const [activeIndex, setActiveIndex] = useState(1)
   const trackRef = useRef(null)
 
-  if (products.length === 0) return null
+  const products = all.filter(p => p.isFeatured)
+
+  if (loading || products.length === 0) return null
 
   const prev = () => setActiveIndex((i) => Math.max(0, i - 1))
   const next = () => setActiveIndex((i) => Math.min(products.length - 1, i + 1))
@@ -31,7 +33,6 @@ function BestSellingCarousel() {
       </div>
 
       <div className="bs-carousel" ref={trackRef}>
-        {/* Prev button */}
         <button
           className="bs-carousel__btn bs-carousel__btn--prev"
           onClick={prev}
@@ -75,7 +76,6 @@ function BestSellingCarousel() {
           })}
         </div>
 
-        {/* Next button */}
         <button
           className="bs-carousel__btn bs-carousel__btn--next"
           onClick={next}
@@ -88,7 +88,6 @@ function BestSellingCarousel() {
         </button>
       </div>
 
-      {/* Dots */}
       <div className="bs-carousel__dots">
         {products.map((_, i) => (
           <button

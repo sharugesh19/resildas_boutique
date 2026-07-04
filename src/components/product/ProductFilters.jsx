@@ -17,7 +17,7 @@ const CATEGORY_OPTIONS = [
   { value: 'tussar-saree',      label: 'Tussar Saree',         count: 4 },
   { value: 'soft-silk-saree',   label: 'Soft Silk Saree',      count: 4 },
   { value: 'cotton-saree',      label: 'Cotton Saree',         count: 4 },
-  { value: 'lightweight-saree', label: 'Light Weight Saree',   count: 4 },
+  { value: 'fancy-saree',       label: 'Fancy Saree',   count: 4 },
   { value: 'coord-sets',        label: 'Co-ord Sets',          count: 4 },
 ]
 

@@ -426,6 +426,29 @@ main.page-content {
   background: var(--color-off-white);
 }
 
+.new-arrivals-section .section-header-row {
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-4);
+}
+
+.new-arrivals-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.new-arrivals-top-row .eyebrow {
+  margin-bottom: 0;
+}
+
+.new-arrivals-section .section-title {
+  text-align: center;
+  width: 100%;
+}
+
+
 .arrivals-grid-premium {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -1098,4 +1121,47 @@ main.page-content {
 .contact-premium__info-only .contact-item {
   flex: 1;
   min-width: 180px;
+}
+.arrivals-grid-premium {
+  align-items: stretch;
+}
+
+.arrival-card-wrap {
+  display: flex;
+  flex-direction: column;
+}
+
+.arrival-card-wrap .product-card {
+  flex: 1;
+}
+@media (max-width: 768px) {
+  .new-arrivals-section {
+    padding-top: var(--space-8);
+  }
+
+  .new-arrivals-section .section-header-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+    margin-bottom: var(--space-6);
+  }
+
+  .new-arrivals-top-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .new-arrivals-top-row .eyebrow {
+    margin-bottom: 0;
+    white-space: nowrap;
+  }
+
+  .new-arrivals-section .section-title {
+    font-size: 1.4rem;
+    margin-bottom: 0;
+    text-align: center;
+    width: 100%;
+  }
 }
