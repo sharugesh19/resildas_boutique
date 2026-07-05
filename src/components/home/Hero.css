@@ -5,27 +5,33 @@
 .rh-hero {
   position: relative;
   width: 100%;
-  height: calc(100vh - 97px);
+  height: 100vh;
   min-height: 520px;
   overflow: hidden;
   background: #0a0a0a;
   display: block;
   margin: 0;
   padding: 0;
+  padding-top: var(--navbar-height);
   border: none;
-  margin-top: 97px;
 }
 
 /* ── Photo slider ───────────────────────── */
 .rh-slider {
   position: absolute;
-  inset: 0;
+  top: var(--navbar-height);
+  left: 0;
+  right: 0;
+  bottom: 0;
   z-index: 0;
 }
 
 .rh-slide {
   position: absolute;
-  inset: 0;
+  top: var(--navbar-height);
+  left: 0;
+  right: 0;
+  bottom: 0;
   opacity: 0;
   transition: opacity 1.1s ease;
   overflow: hidden;
@@ -36,6 +42,12 @@
   position: absolute;
   inset: 0;
   background: linear-gradient(135deg, #1a1000 0%, #0a0a0a 50%, #1a1000 100%);
+}
+
+.rh-slide picture {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .rh-slide img {
@@ -52,9 +64,10 @@
 /* ── Gold particles ─────────────────────── */
 .rh-particles {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+  top: var(--navbar-height);
+  left: 0;
+  right: 0;
+  bottom: 0;
   pointer-events: none;
   z-index: 2;
 }
@@ -80,9 +93,20 @@
 
 
 /* ── Text block ─────────────────────────── */
+.rh-overlay {
+  position: absolute;
+  top: var(--navbar-height);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  background: rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+}
+
 .rh-content {
   position: absolute;
-  top: 0;
+  top: var(--navbar-height);
   left: 0;
   right: 0;
   bottom: 110px;
@@ -321,15 +345,16 @@
 ══════════════════════════════════════════ */
 @media (max-width: 768px) {
   .rh-hero {
-    margin-top: 70px;
-    height: 45svh;       /* was 58svh */
-    min-height: 320px;   /* was 380px */
-    max-height: 400px;   /* was 480px */
+    margin-top: 0;
+    padding-top: var(--navbar-height);
+    height: calc(45svh + var(--navbar-height));
+    min-height: calc(320px + var(--navbar-height));
+    max-height: calc(400px + var(--navbar-height));
   }
 
   /* FIX: center text vertically like image 2 */
   .rh-content {
-    top: 0;
+    top: var(--navbar-height);
     bottom: 110px;
     align-items: center;        /* FIX: was flex-start */
     padding-top: 24px;             /* FIX: was 16px */
@@ -409,10 +434,11 @@
 
 @media (max-width: 420px) {
   .rh-hero {
-    margin-top: 65px;
-    height: 45svh;       /* was 58svh */
-    min-height: 300px;   /* was 360px */
-    max-height: 380px;   /* was 460px */
+    margin-top: 0;
+    padding-top: var(--navbar-height);
+    height: calc(45svh + var(--navbar-height));
+    min-height: calc(300px + var(--navbar-height));
+    max-height: calc(380px + var(--navbar-height));
   }
 
   .rh-title { font-size: 24px; }

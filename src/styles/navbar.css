@@ -30,7 +30,10 @@
   font-weight: 700;
   letter-spacing: 0.13em;
   text-transform: uppercase;
-  padding: 7px var(--container-pad);
+  height: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   line-height: 1;
 }
 
