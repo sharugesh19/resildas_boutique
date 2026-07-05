@@ -28,14 +28,14 @@ const categoryCards = [
     key:    'tussar-saree',
     label:  'Tussar Saree',
     sub:    'Natural texture, pure grace',
-    image:  '/images/categories/sarees.jpg',
+    image:  '/assets/category/tussar-saree.jpg',
     path:   '/products/tussar-saree',
   },
   {
     key:    'soft-silk-saree',
     label:  'Soft Silk Saree',
     sub:    'Timeless silk elegance',
-    image:  '/images/categories/sarees.jpg',
+    image:  '/assets/category/soft-silk-saree.jpg',
     path:   '/products/soft-silk-saree',
   },
   {
@@ -49,14 +49,14 @@ const categoryCards = [
     key:    'fancy-saree',
     label:  'Fancy Saree',
     sub:    'Breezy all-day drapes',
-    image:  '/images/categories/sarees.jpg',
+    image:  '/assets/category/fancy-saree.jpg',
     path:   '/products/lightweight-saree',
   },
   {
     key:    'coord-sets',
     label:  'Co-ord Sets',
     sub:    'Perfectly matched sets',
-    image:  '/images/categories/coord-sets.jpg',
+    image:  '/assets/category/coord-sets.jpg',
     path:   '/products/coord-sets',
   },
 ]
