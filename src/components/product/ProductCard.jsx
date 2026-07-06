@@ -14,6 +14,7 @@ function ProductCard({ product }) {
   const { isLoggedIn }                   = useAuth()
   const navigate                         = useNavigate()
   const [imgError, setImgError]          = useState(false)
+  const [pressed, setPressed]            = useState(false)
 
   const discount      = calcDiscount(product.price, product.originalPrice)
   const wishlisted    = isWishlisted(product.id)
@@ -37,9 +38,7 @@ function ProductCard({ product }) {
   return (
     <motion.article
       className="product-card"
-      /* Subtle lift on hover */
       whileHover={{ y: -4, transition: { duration: 0.2, ease: 'easeOut' } }}
-      /* Slight press on click */
       whileTap={{ scale: 0.98, transition: { duration: 0.1 } }}
     >
       <Link to={`/product/${product.id}`} className="product-card__link">
@@ -76,7 +75,7 @@ function ProductCard({ product }) {
             ) : null}
           </div>
 
-          {/* Actions */}
+          {/* Actions — wishlist + quick view ONLY (no Add to Cart here) */}
           <div className="product-card__actions">
             <motion.button
               className={`product-card__wishlist${wishlisted ? ' product-card__wishlist--active' : ''}`}
@@ -117,11 +116,18 @@ function ProductCard({ product }) {
         </div>
       </Link>
 
+      {/* The ONE real Add to Cart button — outside the Link, at the bottom */}
       <motion.button
-        className="product-card__add"
+        className={`product-card__add${pressed ? ' product-card__add--pressed' : ''}`}
         onClick={handleAddToCart}
         disabled={!product.inStock}
         whileTap={{ scale: 0.97, transition: { duration: 0.1 } }}
+        onPointerDown={(e) => {
+          e.currentTarget.setPointerCapture(e.pointerId)
+          setPressed(true)
+        }}
+        onPointerUp={() => setPressed(false)}
+        onPointerCancel={() => setPressed(false)}
       >
         {product.inStock ? 'Add to Cart' : 'Out of Stock'}
       </motion.button>

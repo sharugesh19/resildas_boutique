@@ -472,7 +472,13 @@
   transition: all 0.2s;
   border-top: 1px solid rgba(0,0,0,0.06);
 }
-.product-card__add:hover:not(:disabled) {
+.product-card__add:hover:not(:disabled),
+.product-card__add:active:not(:disabled) {
+  background: var(--color-black);
+  color: var(--color-gold);
+  border-color: var(--color-black);
+}
+.product-card__add--pressed:not(:disabled) {
   background: var(--color-black);
   color: var(--color-gold);
   border-color: var(--color-black);

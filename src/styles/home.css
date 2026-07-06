@@ -1165,3 +1165,17 @@ main.page-content {
     width: 100%;
   }
 }
+@media (max-width: 768px) {
+  .category-section {
+    padding-bottom: var(--space-8);
+  }
+
+  .bestsellers-section {
+    padding-top: var(--space-6);
+    padding-bottom: var(--space-10);
+  }
+
+  .bestsellers-section .container {
+    margin-bottom: var(--space-6);
+  }
+}

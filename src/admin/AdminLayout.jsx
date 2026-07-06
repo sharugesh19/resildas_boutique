@@ -37,6 +37,7 @@ const NAV = [
       },
       {
         to: '/admin/products',
+        end: true, // ← added: without this, /admin/products/add also matched, lighting up both links
         icon: (
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
             <path d="M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z" />

@@ -306,61 +306,95 @@
 .navbar__mobile-menu {
   display: none;
   position: fixed;
-  /* announcement 29px + inner 68px */
   top: 97px;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(18, 18, 18, 0.6);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+  background: #0d0d0d;
   z-index: 999;
   flex-direction: column;
-  padding: var(--space-6) var(--container-pad);
+  padding: var(--space-8) var(--container-pad);
   gap: 0;
   overflow-y: auto;
-  border-top: 1px solid rgba(194, 144, 58, 0.25);
+  border-top: 1px solid rgba(194, 144, 58, 0.2);
 }
 
 .navbar__mobile-menu.open {
   display: flex;
+  animation: mobileMenuFadeIn 250ms ease;
+}
+
+@keyframes mobileMenuFadeIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 .navbar__mobile-menu a,
 .navbar__mobile-menu button {
   font-family: var(--font-display);
-  font-size: var(--text-2xl);
+  font-size: 1.35rem;
   font-weight: 400;
-  color: rgba(255, 255, 255, 0.82);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  padding: var(--space-5) 0;
-  letter-spacing: 0.02em;
-  transition: color 150ms ease;
+  color: rgba(255, 255, 255, 0.9);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: var(--space-5) 2px;
+  letter-spacing: 0.01em;
+  transition: color 150ms ease, padding-left 150ms ease;
   background: none;
   text-align: left;
   width: 100%;
   cursor: pointer;
   text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.navbar__mobile-menu a::after,
+.navbar__mobile-menu button::after {
+  content: '→';
+  font-size: 1rem;
+  color: rgba(194, 144, 58, 0.4);
+  transition: color 150ms ease, transform 150ms ease;
 }
 
 .navbar__mobile-menu a:hover,
 .navbar__mobile-menu button:hover {
   color: var(--color-gold);
+  padding-left: 8px;
 }
 
+.navbar__mobile-menu a:hover::after,
+.navbar__mobile-menu button:hover::after {
+  color: var(--color-gold);
+  transform: translateX(4px);
+}
+
+/* Find Store row inside mobile menu */
 /* Find Store row inside mobile menu */
 .navbar__mobile-findstore {
   display: flex !important;
   align-items: center;
+  justify-content: flex-start !important;
   gap: var(--space-3);
   color: var(--color-gold) !important;
   font-family: var(--font-body) !important;
-  font-size: var(--text-base) !important;
-  letter-spacing: 0.06em !important;
+  font-size: 0.85rem !important;
+  letter-spacing: 0.08em !important;
   text-transform: uppercase;
   font-weight: 700 !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  margin-top: var(--space-4);
 }
+
+.navbar__mobile-findstore svg {
+  flex-shrink: 0;
+}
+
+.navbar__mobile-findstore::after {
+  display: none;
+}
+
+
 .navbar__ticker {
   overflow: hidden;
   width: 100%;
@@ -384,4 +418,9 @@
 @keyframes ticker-scroll {
   0%   { transform: translateX(0); }
   100% { transform: translateX(-50%); }
+}
+@media (min-width: 769px) {
+  .navbar__inner {
+    height: 72px;
+  }
 }

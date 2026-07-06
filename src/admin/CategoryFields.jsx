@@ -1,30 +1,18 @@
 // src/admin/CategoryFields.jsx
 
-/**
- * Renders category-specific spec fields.
- * Props:
- *   category: string
- *   specs: object
- *   onChange: (key, value) => void
- *   sizes: string[]
- *   onSizesChange: (sizes) => void
- */
+const SIZES_PRESET = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'Free Size'];
 
-const SIZES_ALL = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
-
-function Field({ label, name, value, onChange, type = 'text' }) {
+function Field({ label, name, value, onChange }) {
   return (
     <div className="form-group">
       <label>{label}</label>
-      {type === 'select' ? null : (
-        <input
-          className="form-control"
-          type="text"
-          value={value || ''}
-          placeholder={label}
-          onChange={(e) => onChange(name, e.target.value)}
-        />
-      )}
+      <input
+        className="form-control"
+        type="text"
+        value={value || ''}
+        placeholder={label}
+        onChange={(e) => onChange(name, e.target.value)}
+      />
     </div>
   );
 }
@@ -52,11 +40,19 @@ function SizePicker({ sizes, onChange }) {
     const next = sizes.includes(s) ? sizes.filter((x) => x !== s) : [...sizes, s];
     onChange(next);
   };
+
+  const addCustom = () => {
+    const val = window.prompt('Enter a custom size label (e.g. "L (36")"):');
+    if (val && val.trim() && !sizes.includes(val.trim())) {
+      onChange([...sizes, val.trim()]);
+    }
+  };
+
   return (
     <div className="form-group form-control-full">
       <label>Available Sizes</label>
       <div className="sizes-grid">
-        {SIZES_ALL.map((s) => (
+        {SIZES_PRESET.map((s) => (
           <div
             key={s}
             className={`size-chip ${sizes.includes(s) ? 'active' : ''}`}
@@ -65,6 +61,20 @@ function SizePicker({ sizes, onChange }) {
             {s}
           </div>
         ))}
+        {/* Any custom sizes already saved that aren't in the preset list */}
+        {sizes.filter((s) => !SIZES_PRESET.includes(s)).map((s) => (
+          <div
+            key={s}
+            className="size-chip active"
+            onClick={() => toggle(s)}
+            title="Click to remove"
+          >
+            {s} ✕
+          </div>
+        ))}
+        <div className="size-chip" onClick={addCustom} style={{ borderStyle: 'dashed' }}>
+          + Custom
+        </div>
       </div>
     </div>
   );
@@ -73,102 +83,101 @@ function SizePicker({ sizes, onChange }) {
 const f = (label, name) => ({ label, name });
 const sf = (label, name, options) => ({ label, name, options });
 
+// Keys now match the SLUGS used in Firestore (product.category),
+// same as CATEGORY_LABELS in src/data/productsData.js
 const CATEGORY_CONFIG = {
-  'Unstitched Salwar Set': {
+  'unstitched-salwar': {
     hasSizes: false,
     fields: [
       f('Top Fabric', 'topFabric'),
       f('Bottom Fabric', 'bottomFabric'),
-      f('Dupatta Fabric', 'dupattaFabric'),
-      f('Work Type', 'workType'),
+      f('Dupatta', 'dupatta'),
       f('Fabric Length', 'fabricLength'),
-      sf('Occasion', 'occasion', ['Casual', 'Festive', 'Wedding', 'Party', 'Daily Wear']),
-      sf('Wash Care', 'washCare', ['Dry Clean Only', 'Hand Wash', 'Machine Wash Cold', 'Gentle Wash']),
-      f('Package Contents', 'packageContents'),
+      f('Set Includes', 'setIncludes'),
+      sf('Occasion', 'occasion', ['Regular Wear', 'Party Wear', 'Festival', 'Wedding']),
+      f('Wash Care', 'washCare'),
     ],
   },
-  'Kurthi Set': {
+  'kurthi-set': {
     hasSizes: true,
     fields: [
       f('Fabric', 'fabric'),
-      sf('Neck Type', 'neckType', ['Round Neck', 'V Neck', 'Mandarin', 'Square Neck', 'Sweetheart']),
-      sf('Sleeve Type', 'sleeveType', ['Full Sleeve', 'Half Sleeve', '3/4 Sleeve', 'Sleeveless', 'Bell Sleeve']),
-      sf('Length', 'length', ['Short', 'Knee Length', 'Calf Length', 'Full Length', 'Tunic']),
-      sf('Fit', 'fit', ['Regular Fit', 'Slim Fit', 'Relaxed Fit', 'Flared']),
+      sf('Neck Type', 'neckType', ['Round Neck', 'V Neck', 'U Neck', 'Closed Collar Neck', 'Mandarin']),
+      sf('Sleeve Type', 'sleeveType', ['Full Sleeve', 'Half Sleeve', '3/4th Sleeve', 'Sleeveless']),
+      f('Length', 'length'),
       f('Pattern', 'pattern'),
-      sf('Occasion', 'occasion', ['Casual', 'Festive', 'Office Wear', 'Party', 'Daily Wear']),
-      sf('Wash Care', 'washCare', ['Dry Clean Only', 'Hand Wash', 'Machine Wash Cold', 'Gentle Wash']),
+      f('Set Includes', 'setIncludes'),
+      sf('Occasion', 'occasion', ['Regular Wear', 'Office Wear', 'Festival', 'Party Wear']),
+      f('Wash Care', 'washCare'),
     ],
   },
-  'Organza Saree': {
+  'organza-saree': {
     hasSizes: false,
     fields: [
-      f('Saree Fabric', 'sareeFabric'),
-      sf('Blouse Piece Included', 'blousePiece', ['Yes', 'No']),
+      f('Fabric', 'fabric'),
+      sf('Blouse Included', 'blouseIncluded', ['Yes', 'No']),
       f('Saree Length', 'sareeLength'),
       f('Blouse Length', 'blouseLength'),
       f('Border Type', 'borderType'),
-      f('Work Type', 'workType'),
-      sf('Occasion', 'occasion', ['Casual', 'Festive', 'Wedding', 'Party', 'Daily Wear']),
-      f('Care Instructions', 'careInstructions'),
+      sf('Occasion', 'occasion', ['Party Wear', 'Wedding', 'Festival', 'Regular Wear']),
+      f('Wash Care', 'washCare'),
     ],
   },
-  'Tussar Saree': {
+  'tussar-saree': {
     hasSizes: false,
     fields: [
-      f('Saree Fabric', 'sareeFabric'),
+      f('Fabric', 'fabric'),
       f('Weave Type', 'weaveType'),
-      sf('Blouse Piece Included', 'blousePiece', ['Yes', 'No']),
+      sf('Blouse Included', 'blouseIncluded', ['Yes', 'No']),
       f('Saree Length', 'sareeLength'),
       f('Border Type', 'borderType'),
-      sf('Occasion', 'occasion', ['Casual', 'Festive', 'Wedding', 'Party', 'Daily Wear']),
-      f('Care Instructions', 'careInstructions'),
+      sf('Occasion', 'occasion', ['Festival', 'Wedding', 'Party Wear', 'Regular Wear']),
+      f('Wash Care', 'washCare'),
     ],
   },
-  'Soft Silk Saree': {
+  'soft-silk-saree': {
     hasSizes: false,
     fields: [
       sf('Silk Type', 'silkType', ['Kanjivaram', 'Mysore Silk', 'Banarasi', 'Gadwal', 'Patola', 'Pure Silk']),
       f('Saree Length', 'sareeLength'),
-      sf('Blouse Piece Included', 'blousePiece', ['Yes', 'No']),
+      sf('Blouse Included', 'blouseIncluded', ['Yes', 'No']),
       sf('Zari Work', 'zariWork', ['Pure Zari', 'Half Fine Zari', 'Tested Zari', 'No Zari']),
-      sf('Occasion', 'occasion', ['Wedding', 'Festive', 'Party', 'Casual']),
-      f('Care Instructions', 'careInstructions'),
+      sf('Occasion', 'occasion', ['Wedding', 'Festival', 'Party Wear']),
+      f('Wash Care', 'washCare'),
     ],
   },
-  'Cotton Saree': {
+  'cotton-saree': {
     hasSizes: false,
     fields: [
       f('Fabric', 'fabric'),
       f('Saree Length', 'sareeLength'),
-      sf('Blouse Piece Included', 'blousePiece', ['Yes', 'No']),
-      f('Weave Pattern', 'weavePattern'),
-      sf('Occasion', 'occasion', ['Casual', 'Daily Wear', 'Office Wear', 'Festive']),
-      f('Care Instructions', 'careInstructions'),
+      sf('Blouse Included', 'blouseIncluded', ['Yes', 'No']),
+      f('Border Type', 'borderType'),
+      sf('Occasion', 'occasion', ['Regular Wear', 'Office Wear', 'Party Wear', 'Puja']),
+      f('Wash Care', 'washCare'),
     ],
   },
-  'Party Wear Saree': {
+  'fancy-saree': {
     hasSizes: false,
     fields: [
       f('Fabric', 'fabric'),
       f('Embellishment', 'embellishment'),
-      sf('Sequins / Stone Work', 'sequinsWork', ['Heavy', 'Medium', 'Light', 'None']),
-      sf('Blouse Piece Included', 'blousePiece', ['Yes', 'No']),
+      sf('Blouse Included', 'blouseIncluded', ['Yes', 'No']),
       f('Saree Length', 'sareeLength'),
-      sf('Occasion', 'occasion', ['Party', 'Wedding', 'Festive', 'Reception']),
-      f('Care Instructions', 'careInstructions'),
+      sf('Occasion', 'occasion', ['Party Wear', 'Wedding', 'Reception', 'Festival']),
+      f('Wash Care', 'washCare'),
     ],
   },
-  'Co-ord Sets': {
+  'coord-sets': {
     hasSizes: true,
     fields: [
       f('Fabric', 'fabric'),
       f('Top Length', 'topLength'),
       f('Bottom Length', 'bottomLength'),
       sf('Fit Type', 'fitType', ['Regular Fit', 'Slim Fit', 'Relaxed Fit', 'Oversized']),
-      sf('Sleeve Type', 'sleeveType', ['Full Sleeve', 'Half Sleeve', '3/4 Sleeve', 'Sleeveless', 'Cap Sleeve']),
-      sf('Occasion', 'occasion', ['Casual', 'Party', 'Festive', 'Beach', 'Office Wear']),
-      f('Care Instructions', 'careInstructions'),
+      sf('Sleeve Type', 'sleeveType', ['Full Sleeve', 'Half Sleeve', '3/4th Sleeve', 'Sleeveless']),
+      sf('Occasion', 'occasion', ['Casual', 'Party Wear', 'Festival']),
+      f('Wash Care', 'washCare'),
     ],
   },
 };

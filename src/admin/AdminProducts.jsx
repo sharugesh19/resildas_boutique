@@ -6,22 +6,15 @@ import { db, storage } from '../firebase/firebaseConfig';
 import { Link } from 'react-router-dom';
 
 const CATEGORIES = [
-  'Unstitched Salwar Set',
-  'Kurthi Set',
-  'Organza Saree',
-  'Tussar Saree',
-  'Soft Silk Saree',
-  'Cotton Saree',
-  'Party Wear Saree',
-  'Co-ord Sets',
+  { value: 'unstitched-salwar', label: 'Unstitched Salwar Set' },
+  { value: 'kurthi-set',        label: 'Kurthi Set' },
+  { value: 'organza-saree',     label: 'Organza Saree' },
+  { value: 'tussar-saree',      label: 'Tussar Saree' },
+  { value: 'soft-silk-saree',   label: 'Soft Silk Saree' },
+  { value: 'cotton-saree',      label: 'Cotton Saree' },
+  { value: 'fancy-saree',       label: 'Fancy Saree' },
+  { value: 'coord-sets',        label: 'Co-ord Sets' },
 ];
-
-const BADGE_CLASS = {
-  new: 'pill-new',
-  bestseller: 'pill-bestseller',
-  sale: 'pill-sale',
-  none: 'pill-none',
-};
 
 export default function AdminProducts() {
   const [products, setProducts] = useState([]);
@@ -42,11 +35,7 @@ export default function AdminProducts() {
     if (catFilter) list = list.filter((p) => p.category === catFilter);
     if (search) {
       const s = search.toLowerCase();
-      list = list.filter(
-        (p) =>
-          (p.name || '').toLowerCase().includes(s) ||
-          (p.sku || '').toLowerCase().includes(s)
-      );
+      list = list.filter((p) => (p.name || '').toLowerCase().includes(s));
     }
     setFiltered(list);
   }, [products, search, catFilter]);
@@ -57,8 +46,7 @@ export default function AdminProducts() {
       const snap = await getDocs(
         query(collection(db, 'products'), orderBy('createdAt', 'desc'))
       );
-      const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-      setProducts(list);
+      setProducts(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
     } finally {
       setLoading(false);
     }
@@ -68,15 +56,11 @@ export default function AdminProducts() {
     if (!deleteTarget) return;
     setDeleting(true);
     try {
-      // Try deleting images from storage
       const images = deleteTarget.images || [];
       for (const url of images) {
         try {
-          const imgRef = ref(storage, url);
-          await deleteObject(imgRef);
-        } catch (_) {
-          // ignore missing images
-        }
+          await deleteObject(ref(storage, url));
+        } catch (_) { /* ignore missing images */ }
       }
       await deleteDoc(doc(db, 'products', deleteTarget.id));
       setProducts((prev) => prev.filter((p) => p.id !== deleteTarget.id));
@@ -94,8 +78,8 @@ export default function AdminProducts() {
     setTimeout(() => setMsg(null), 3500);
   }
 
-  const fmt = (n) =>
-    '₹' + Number(n || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 });
+  const fmt = (n) => '₹' + Number(n || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 });
+  const categoryLabel = (slug) => CATEGORIES.find((c) => c.value === slug)?.label || slug;
 
   return (
     <>
@@ -109,7 +93,6 @@ export default function AdminProducts() {
 
       {msg && <div className={`admin-alert ${msg.type}`}>{msg.text}</div>}
 
-      {/* Filters */}
       <div className="filters-bar">
         <div className="search-input-wrap">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -117,7 +100,7 @@ export default function AdminProducts() {
           </svg>
           <input
             className="form-control"
-            placeholder="Search by name or SKU…"
+            placeholder="Search by name…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -129,12 +112,11 @@ export default function AdminProducts() {
           onChange={(e) => setCatFilter(e.target.value)}
         >
           <option value="">All Categories</option>
-          {CATEGORIES.map((c) => <option key={c}>{c}</option>)}
+          {CATEGORIES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
         </select>
         <button onClick={fetchProducts} className="btn btn-ghost">↻</button>
       </div>
 
-      {/* Table */}
       <div className="admin-card">
         <div className="admin-table-wrap">
           <table className="admin-table">
@@ -144,7 +126,7 @@ export default function AdminProducts() {
                 <th>Name</th>
                 <th>Category</th>
                 <th>Price</th>
-                <th>Stock</th>
+                <th>Stock Status</th>
                 <th>Badge</th>
                 <th>Actions</th>
               </tr>
@@ -159,55 +141,38 @@ export default function AdminProducts() {
               {filtered.map((p) => (
                 <tr key={p.id}>
                   <td>
-                    {p.mainImage || (p.images && p.images[0]) ? (
-                      <img
-                        src={p.mainImage || p.images[0]}
-                        alt={p.name}
-                        className="product-thumb"
-                      />
+                    {p.images?.[0] ? (
+                      <img src={p.images[0]} alt={p.name} className="product-thumb" />
                     ) : (
                       <div className="product-thumb" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, color: 'var(--admin-text-muted)' }}>
                         No img
                       </div>
                     )}
                   </td>
-                  <td>
-                    <strong>{p.name}</strong>
-                    {p.sku && (
-                      <div style={{ fontSize: 11, color: 'var(--admin-text-muted)', marginTop: 2 }}>
-                        SKU: {p.sku}
-                      </div>
-                    )}
-                  </td>
-                  <td>{p.category}</td>
+                  <td><strong>{p.name}</strong></td>
+                  <td>{categoryLabel(p.category)}</td>
                   <td>
                     <strong>{fmt(p.price)}</strong>
-                    {p.originalPrice && p.originalPrice > p.price && (
+                    {p.originalPrice > p.price && (
                       <div style={{ fontSize: 11, color: 'var(--admin-text-muted)', textDecoration: 'line-through' }}>
                         {fmt(p.originalPrice)}
                       </div>
                     )}
                   </td>
-                  <td className={p.stock < 5 ? 'low-stock' : ''}>{p.stock ?? '—'}</td>
                   <td>
-                    <span className={`pill ${BADGE_CLASS[p.badge] || 'pill-none'}`}>
-                      {p.badge || 'none'}
+                    <span className={`pill ${p.inStock ? 'pill-delivered' : 'pill-cancelled'}`}>
+                      {p.inStock ? 'In Stock' : 'Out of Stock'}
+                    </span>
+                  </td>
+                  <td>
+                    <span className={`pill ${p.isFeatured ? 'pill-bestseller' : p.isNewArrival ? 'pill-new' : 'pill-none'}`}>
+                      {p.isFeatured ? 'Best Seller' : p.isNewArrival ? 'New' : 'None'}
                     </span>
                   </td>
                   <td>
                     <div style={{ display: 'flex', gap: 6 }}>
-                      <Link
-                        to={`/admin/products/edit/${p.id}`}
-                        className="btn btn-ghost btn-sm"
-                      >
-                        Edit
-                      </Link>
-                      <button
-                        onClick={() => setDeleteTarget(p)}
-                        className="btn btn-danger btn-sm"
-                      >
-                        Delete
-                      </button>
+                      <Link to={`/admin/products/edit/${p.id}`} className="btn btn-ghost btn-sm">Edit</Link>
+                      <button onClick={() => setDeleteTarget(p)} className="btn btn-danger btn-sm">Delete</button>
                     </div>
                   </td>
                 </tr>
@@ -217,7 +182,6 @@ export default function AdminProducts() {
         </div>
       </div>
 
-      {/* Delete Confirm Modal */}
       {deleteTarget && (
         <div className="modal-overlay">
           <div className="modal-box">
@@ -226,14 +190,8 @@ export default function AdminProducts() {
               This will permanently delete <strong style={{ color: 'var(--admin-text)' }}>{deleteTarget.name}</strong> and all its images from Storage. This cannot be undone.
             </p>
             <div className="modal-actions">
-              <button onClick={() => setDeleteTarget(null)} className="btn btn-ghost">
-                Cancel
-              </button>
-              <button
-                onClick={handleDelete}
-                className="btn btn-danger"
-                disabled={deleting}
-              >
+              <button onClick={() => setDeleteTarget(null)} className="btn btn-ghost">Cancel</button>
+              <button onClick={handleDelete} className="btn btn-danger" disabled={deleting}>
                 {deleting ? 'Deleting…' : 'Yes, Delete'}
               </button>
             </div>

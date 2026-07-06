@@ -58,7 +58,7 @@ export default function AdminDashboard() {
         });
 
         setRecentOrders(orders.slice(0, 6));
-        setLowStock(products.filter((p) => (p.stock ?? 0) < 5).slice(0, 6));
+        setLowStock(products.filter((p) => p.inStock === false).slice(0, 6));
       } finally {
         setLoading(false);
       }
@@ -161,7 +161,7 @@ export default function AdminDashboard() {
                 <tr>
                   <th>Product</th>
                   <th>Category</th>
-                  <th>Stock</th>
+                  <th>Status</th>
                 </tr>
               </thead>
               <tbody>
@@ -179,7 +179,7 @@ export default function AdminDashboard() {
                   <tr key={p.id}>
                     <td><strong>{p.name}</strong></td>
                     <td>{p.category}</td>
-                    <td className="low-stock">{p.stock ?? 0}</td>
+                    <td className="low-stock">Out of Stock</td>
                   </tr>
                 ))}
               </tbody>
