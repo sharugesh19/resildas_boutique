@@ -70,6 +70,8 @@ function CartDrawer() {
 
 function CartItem({ item, onRemove, onQtyChange }) {
   const { product, size, quantity, color } = item
+  const maxQty = typeof product.stock === 'number' && product.stock > 0 ? product.stock : 10
+
   return (
     <div className="cart-drawer__item">
       <img
@@ -85,8 +87,20 @@ function CartItem({ item, onRemove, onQtyChange }) {
         <div className="cart-drawer__qty">
           <button className="cart-drawer__qty-btn" onClick={() => onQtyChange(quantity - 1)}>−</button>
           <span className="cart-drawer__qty-val">{quantity}</span>
-          <button className="cart-drawer__qty-btn" onClick={() => onQtyChange(quantity + 1)}>+</button>
+          <button
+            className="cart-drawer__qty-btn"
+            onClick={() => onQtyChange(Math.min(maxQty, quantity + 1))}
+            disabled={quantity >= maxQty}
+          >
+            +
+          </button>
         </div>
+
+        {quantity >= maxQty && typeof product.stock === 'number' && (
+          <p style={{ fontSize: '0.7rem', color: '#cc0000', marginTop: '-4px', marginBottom: '8px' }}>
+            Max available reached
+          </p>
+        )}
 
         <div className="cart-drawer__item-footer">
           <span className="cart-drawer__item-price">{formatPrice(product.price * quantity)}</span>

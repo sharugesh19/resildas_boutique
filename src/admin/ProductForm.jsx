@@ -13,6 +13,8 @@ import { db } from '../firebase/firebaseConfig';
 import CategoryFields from './CategoryFields';
 import ColorVariants from './ColorVariants';
 import ImageUploader from './ImageUploader';
+import SizeStockEditor from './SizeStockEditor';
+import { normalizeSizes } from '../utils/normalizeSizes';
 
 // value = slug stored in Firestore (matches CATEGORY_LABELS in src/data/productsData.js)
 // label = shown to the admin
@@ -90,9 +92,12 @@ export default function ProductForm() {
           inStock: data.inStock ?? true,
           badge,
           description: data.description || '',
-          sizes: data.sizes || [],
+          sizes: normalizeSizes(data.sizes),  
           images: data.images || [],
-          colors: data.colors || [],
+          colors: (data.colors || []).map((c) => ({           // ← was: data.colors || []
+            ...c,
+            sizes: normalizeSizes(c.sizes),
+          })),
           specs,
         });
       }
@@ -111,26 +116,26 @@ export default function ProductForm() {
   // Colors need number coercion + blank-price fallback before saving,
   // since the inputs are free-text/number fields that default to ''.
   function cleanColors(colors) {
-    return colors
-      .filter((c) => c.name && c.name.trim())
-      .map((c) => ({
+  return colors
+    .filter((c) => c.name && c.name.trim())
+    .map((c) => {
+      const cleanSizes = (c.sizes || []).map((s) => ({
+        size: s.size,
+        stock: Number(s.stock) || 0,
+      }));
+      const clean = {
         name: c.name.trim(),
         colorCode: c.colorCode || '#000000',
-        price: c.price === '' || c.price == null ? undefined : Number(c.price),
-        originalPrice: c.originalPrice === '' || c.originalPrice == null ? undefined : Number(c.originalPrice),
         images: c.images || [],
-        inStock: Boolean(c.inStock),
-      }))
-      // Drop undefined keys so Firestore doesn't store literal `undefined`
-      // (it would actually throw) — omit price/originalPrice entirely when
-      // blank, so ProductDetail.jsx's `?? product.price` fallback kicks in.
-      .map((c) => {
-        const clean = { ...c };
-        if (clean.price === undefined) delete clean.price;
-        if (clean.originalPrice === undefined) delete clean.originalPrice;
-        return clean;
-      });
-  }
+        sizes: cleanSizes,
+        // derived — true if ANY size has stock > 0
+        inStock: cleanSizes.some((s) => s.stock > 0),
+      };
+      if (c.price !== '' && c.price != null) clean.price = Number(c.price);
+      if (c.originalPrice !== '' && c.originalPrice != null) clean.originalPrice = Number(c.originalPrice);
+      return clean;
+    });
+}
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -146,21 +151,23 @@ export default function ProductForm() {
     setSaving(true);
     try {
       const payload = {
-        name: form.name.trim(),
-        category: form.category,          // slug — matches storefront
-        price: Number(form.price),
-        originalPrice: Number(form.originalPrice) || 0,
-        stock: form.stock === '' ? null : Number(form.stock),
-        inStock: Boolean(form.inStock),    // ← storefront's Add to Cart reads this
-        isFeatured: form.badge === 'bestseller',
-        isNewArrival: form.badge === 'new',
-        description: form.description.trim(),
-        sizes: form.sizes,
-        images: form.images,
-        colors: cleanColors(form.colors), // ← per-color price/images/stock overrides
-        ...form.specs,                     // ← flattened, matches ProductDetail.jsx reads
-        updatedAt: serverTimestamp(),
-      };
+  name: form.name.trim(),
+  category: form.category,
+  price: Number(form.price),
+  originalPrice: Number(form.originalPrice) || 0,
+  inStock: form.colors.length > 0
+    ? undefined // colors carry their own inStock now; base inStock unused when colored
+    : (form.sizes.some((s) => Number(s.stock) > 0)),
+  isFeatured: form.badge === 'bestseller',
+  isNewArrival: form.badge === 'new',
+  description: form.description.trim(),
+  sizes: form.colors.length > 0 ? [] : form.sizes, // avoid stale sizes when colored
+  images: form.images,
+  colors: cleanColors(form.colors),
+  ...form.specs,
+  updatedAt: serverTimestamp(),
+};
+if (payload.inStock === undefined) delete payload.inStock;
 
       if (isEdit) {
         await updateDoc(doc(db, 'products', id), payload);
@@ -260,63 +267,59 @@ export default function ProductForm() {
         </div>
 
         {/* ── Pricing & Stock ─────────────────── */}
-        <div className="form-section">
-          <div className="form-section-header"><h3>Pricing & Inventory (base / default color)</h3></div>
-          <div className="form-section-body">
-            <div className="form-row-3">
-              <div className="form-group">
-                <label>Selling Price (₹) *</label>
-                <input
-                  className="form-control"
-                  type="number"
-                  min={0}
-                  value={form.price}
-                  onChange={(e) => set('price', e.target.value)}
-                  placeholder="1299"
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label>Original Price (₹)</label>
-                <input
-                  className="form-control"
-                  type="number"
-                  min={0}
-                  value={form.originalPrice}
-                  onChange={(e) => set('originalPrice', e.target.value)}
-                  placeholder="1799 (leave blank if no discount)"
-                />
-              </div>
-              <div className="form-group">
-                <label>Stock Qty (optional)</label>
-                <input
-                  className="form-control"
-                  type="number"
-                  min={0}
-                  value={form.stock}
-                  onChange={(e) => set('stock', e.target.value)}
-                  placeholder="10"
-                />
-              </div>
-            </div>
+        {/* ── Pricing & Inventory ─────────────────── */}
+<div className="form-section">
+  <div className="form-section-header"><h3>Pricing (base / default color)</h3></div>
+  <div className="form-section-body">
+    <div className="form-row">
+      <div className="form-group">
+        <label>Selling Price (₹) *</label>
+        <input
+          className="form-control"
+          type="number"
+          min={0}
+          value={form.price}
+          onChange={(e) => set('price', e.target.value)}
+          placeholder="1299"
+          required
+        />
+      </div>
+      <div className="form-group">
+        <label>Original Price (₹)</label>
+        <input
+          className="form-control"
+          type="number"
+          min={0}
+          value={form.originalPrice}
+          onChange={(e) => set('originalPrice', e.target.value)}
+          placeholder="1799 (leave blank if no discount)"
+        />
+      </div>
+    </div>
+    <p style={{ fontSize: 13, color: 'var(--admin-text-muted)' }}>
+      If this product has color variants below, each variant's own price
+      overrides these base values on the product page.
+    </p>
+  </div>
+</div>
 
-            <div className="form-group">
-              <label>In Stock — shown as buyable on the store? *</label>
-              <select
-                className="form-control"
-                value={form.inStock ? 'yes' : 'no'}
-                onChange={(e) => set('inStock', e.target.value === 'yes')}
-              >
-                <option value="yes">Yes — customers can buy it</option>
-                <option value="no">No — Out of Stock</option>
-              </select>
-            </div>
-            <p style={{ fontSize: 13, color: 'var(--admin-text-muted)' }}>
-              If this product has color variants below, each variant's own price
-              and stock status will override these base values on the product page.
-            </p>
-          </div>
-        </div>
+{/* ── Sizes & Stock ────────────────────────── */}
+<div className="form-section">
+  <div className="form-section-header"><h3>Sizes & Stock</h3></div>
+  <div className="form-section-body" style={{ display: 'block' }}>
+    {form.colors.length > 0 ? (
+      <p style={{ fontSize: 13, color: 'var(--admin-text-muted)' }}>
+        This product has color variants — sizes and stock are managed
+        <strong> per color</strong> in the Color Variants section below instead.
+      </p>
+    ) : (
+      <SizeStockEditor
+        sizes={form.sizes}
+        onChange={(sizes) => set('sizes', sizes)}
+      />
+    )}
+  </div>
+</div>
 
         {/* ── Images ──────────────────────────── */}
         <div className="form-section">
@@ -347,8 +350,8 @@ export default function ProductForm() {
                 category={form.category}
                 specs={form.specs}
                 onChange={setSpec}
-                sizes={form.sizes}
-                onSizesChange={(s) => set('sizes', s)}
+                //sizes={form.sizes}
+                //onSizesChange={(s) => set('sizes', s)}
               />
             </div>
           </div>

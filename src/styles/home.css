@@ -1179,3 +1179,44 @@ main.page-content {
     margin-bottom: var(--space-6);
   }
 }
+/* ═══════════════════════════════════════════════
+   WISHLIST PAGE
+   ═══════════════════════════════════════════════ */
+.wishlist-page {
+  padding-top: 96px; /* clears fixed navbar (68px) + announcement ticker (28px) */
+  min-height: 60vh;
+  background: var(--color-off-white);
+}
+
+.wishlist-page .container {
+  padding-top: var(--space-10);
+  padding-bottom: var(--space-16);
+}
+
+.wishlist-page__title {
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 3.5vw, 2.6rem);
+  font-weight: 500;
+  color: var(--color-black);
+  margin-bottom: var(--space-10);
+}
+
+.wishlist-page__title span {
+  color: var(--color-gold);
+  font-weight: 400;
+}
+
+.wishlist-page__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--space-20) 0;
+  color: var(--color-text-muted);
+}
+
+.wishlist-page__empty p {
+  margin: var(--space-4) 0 var(--space-6);
+  font-size: var(--text-base);
+}

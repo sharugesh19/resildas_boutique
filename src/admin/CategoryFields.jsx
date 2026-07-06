@@ -1,6 +1,9 @@
 // src/admin/CategoryFields.jsx
-
-const SIZES_PRESET = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'Free Size'];
+//
+// Renders category-specific spec fields only. Sizes/stock are handled
+// entirely by the "Sizes & Stock" section in ProductForm.jsx (via
+// SizeStockEditor), both at product level and per color — so this file
+// no longer touches sizes at all.
 
 function Field({ label, name, value, onChange }) {
   return (
@@ -35,59 +38,13 @@ function SelectField({ label, name, value, onChange, options }) {
   );
 }
 
-function SizePicker({ sizes, onChange }) {
-  const toggle = (s) => {
-    const next = sizes.includes(s) ? sizes.filter((x) => x !== s) : [...sizes, s];
-    onChange(next);
-  };
-
-  const addCustom = () => {
-    const val = window.prompt('Enter a custom size label (e.g. "L (36")"):');
-    if (val && val.trim() && !sizes.includes(val.trim())) {
-      onChange([...sizes, val.trim()]);
-    }
-  };
-
-  return (
-    <div className="form-group form-control-full">
-      <label>Available Sizes</label>
-      <div className="sizes-grid">
-        {SIZES_PRESET.map((s) => (
-          <div
-            key={s}
-            className={`size-chip ${sizes.includes(s) ? 'active' : ''}`}
-            onClick={() => toggle(s)}
-          >
-            {s}
-          </div>
-        ))}
-        {/* Any custom sizes already saved that aren't in the preset list */}
-        {sizes.filter((s) => !SIZES_PRESET.includes(s)).map((s) => (
-          <div
-            key={s}
-            className="size-chip active"
-            onClick={() => toggle(s)}
-            title="Click to remove"
-          >
-            {s} ✕
-          </div>
-        ))}
-        <div className="size-chip" onClick={addCustom} style={{ borderStyle: 'dashed' }}>
-          + Custom
-        </div>
-      </div>
-    </div>
-  );
-}
-
 const f = (label, name) => ({ label, name });
 const sf = (label, name, options) => ({ label, name, options });
 
-// Keys now match the SLUGS used in Firestore (product.category),
+// Keys match the SLUGS used in Firestore (product.category),
 // same as CATEGORY_LABELS in src/data/productsData.js
 const CATEGORY_CONFIG = {
   'unstitched-salwar': {
-    hasSizes: false,
     fields: [
       f('Top Fabric', 'topFabric'),
       f('Bottom Fabric', 'bottomFabric'),
@@ -99,7 +56,6 @@ const CATEGORY_CONFIG = {
     ],
   },
   'kurthi-set': {
-    hasSizes: true,
     fields: [
       f('Fabric', 'fabric'),
       sf('Neck Type', 'neckType', ['Round Neck', 'V Neck', 'U Neck', 'Closed Collar Neck', 'Mandarin']),
@@ -112,7 +68,6 @@ const CATEGORY_CONFIG = {
     ],
   },
   'organza-saree': {
-    hasSizes: false,
     fields: [
       f('Fabric', 'fabric'),
       sf('Blouse Included', 'blouseIncluded', ['Yes', 'No']),
@@ -124,7 +79,6 @@ const CATEGORY_CONFIG = {
     ],
   },
   'tussar-saree': {
-    hasSizes: false,
     fields: [
       f('Fabric', 'fabric'),
       f('Weave Type', 'weaveType'),
@@ -136,7 +90,6 @@ const CATEGORY_CONFIG = {
     ],
   },
   'soft-silk-saree': {
-    hasSizes: false,
     fields: [
       sf('Silk Type', 'silkType', ['Kanjivaram', 'Mysore Silk', 'Banarasi', 'Gadwal', 'Patola', 'Pure Silk']),
       f('Saree Length', 'sareeLength'),
@@ -147,7 +100,6 @@ const CATEGORY_CONFIG = {
     ],
   },
   'cotton-saree': {
-    hasSizes: false,
     fields: [
       f('Fabric', 'fabric'),
       f('Saree Length', 'sareeLength'),
@@ -158,7 +110,6 @@ const CATEGORY_CONFIG = {
     ],
   },
   'fancy-saree': {
-    hasSizes: false,
     fields: [
       f('Fabric', 'fabric'),
       f('Embellishment', 'embellishment'),
@@ -169,7 +120,6 @@ const CATEGORY_CONFIG = {
     ],
   },
   'coord-sets': {
-    hasSizes: true,
     fields: [
       f('Fabric', 'fabric'),
       f('Top Length', 'topLength'),
@@ -182,15 +132,12 @@ const CATEGORY_CONFIG = {
   },
 };
 
-export default function CategoryFields({ category, specs, onChange, sizes, onSizesChange }) {
+export default function CategoryFields({ category, specs, onChange }) {
   const config = CATEGORY_CONFIG[category];
   if (!config) return null;
 
   return (
     <>
-      {config.hasSizes && (
-        <SizePicker sizes={sizes} onChange={onSizesChange} />
-      )}
       {config.fields.map((field) =>
         field.options ? (
           <SelectField

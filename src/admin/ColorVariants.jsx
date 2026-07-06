@@ -1,13 +1,13 @@
 // src/admin/ColorVariants.jsx
 //
-// Manages product.colors — matches the real schema used in productsData.js:
-// { name, colorCode, price, originalPrice, images: [], inStock }
+// Manages product.colors. Each color now carries its own per-size stock:
+// { name, colorCode, price, originalPrice, images: [], sizes: [{ size, stock }] }
 //
-// Each color variant can have its own price/originalPrice/images/stock,
-// independent of the base product (e.g. SAL002's "Olive Green" vs "Red",
-// or ORG001 where "Golden Yellow" is priced higher than the other colors).
+// Matches the migrated Firestore schema (see migrateColorSizes.js) and what
+// ProductDetail.jsx already reads via normalizeSizes()/sizeOptions.
 
 import ImageUploader from './ImageUploader';
+import SizeStockEditor from './SizeStockEditor';
 
 const EMPTY_COLOR = {
   name: '',
@@ -15,7 +15,7 @@ const EMPTY_COLOR = {
   price: '',
   originalPrice: '',
   images: [],
-  inStock: true,
+  sizes: [],
 };
 
 export default function ColorVariants({ colors, onChange }) {
@@ -42,9 +42,9 @@ export default function ColorVariants({ colors, onChange }) {
       <div className="form-section-body" style={{ display: 'block' }}>
         <p style={{ fontSize: 13, color: 'var(--admin-text-muted)', marginBottom: 16 }}>
           Add a color variant only if this product comes in multiple colors with
-          separate images. Leave empty for single-color products — price and images
-          set above will be used as-is. Each variant can have its own price and
-          stock status, overriding the base product's price for that color.
+          separate images. Leave empty for single-color products — sizes/stock
+          set in the section below will be used instead. Each color has its own
+          sizes and stock counts, independent of the other colors.
         </p>
 
         {list.map((color, i) => (
@@ -99,7 +99,7 @@ export default function ColorVariants({ colors, onChange }) {
               </div>
             </div>
 
-            <div className="form-row-3">
+            <div className="form-row">
               <div className="form-group">
                 <label>Price for this color (₹)</label>
                 <input
@@ -122,17 +122,15 @@ export default function ColorVariants({ colors, onChange }) {
                   placeholder="Leave blank to use base price"
                 />
               </div>
-              <div className="form-group">
-                <label>Stock Status</label>
-                <select
-                  className="form-control"
-                  value={color.inStock ? 'yes' : 'no'}
-                  onChange={(e) => updateColor(i, 'inStock', e.target.value === 'yes')}
-                >
-                  <option value="yes">In Stock</option>
-                  <option value="no">Out of Stock</option>
-                </select>
-              </div>
+            </div>
+
+            {/* ── Per-size stock for THIS color ── */}
+            <div className="form-group form-control-full" style={{ marginTop: 8 }}>
+              <label>Sizes & Stock for {color.name || 'this color'}</label>
+              <SizeStockEditor
+                sizes={color.sizes || []}
+                onChange={(sizes) => updateColor(i, 'sizes', sizes)}
+              />
             </div>
 
             <div className="form-group form-control-full" style={{ marginTop: 8 }}>

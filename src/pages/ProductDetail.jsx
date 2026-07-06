@@ -192,6 +192,12 @@ const SIZE_GUIDE = {
     ['2XL', '44', '38', '46', '49'],
   ],
 }
+function normalizeSizes(sizesRaw) {
+  if (!sizesRaw) return []
+  return sizesRaw.map((s) =>
+    typeof s === 'string' ? { size: s, stock: null } : s
+  )
+}
 
 function ProductDetail() {
   const { id }       = useParams()
@@ -216,11 +222,14 @@ function ProductDetail() {
 
   // Reset image index when color changes
   useEffect(() => {
-    setActiveImg(0)
-  }, [selectedColor])
-useEffect(() => {
+  setActiveImg(0)
   setSelectedSize('')
-}, [product?.id])
+}, [selectedColor])
+
+  useEffect(() => {
+    setSelectedSize('')
+  }, [product?.id])
+
   if (!product) {
     return (
       <main className="container" style={{ padding: '4rem 1rem', textAlign: 'center' }}>
@@ -234,7 +243,6 @@ useEffect(() => {
   }
 
   // ── Derive active price / images / stock from selected color ──
- // Replace these lines in ProductDetail.jsx
   const activeColorData = product.colors?.find(c => c.name === selectedColor?.name) ?? null
   const activePrice         = activeColorData?.price         ?? product.price
   const activeOriginalPrice = activeColorData?.originalPrice ?? product.originalPrice
@@ -243,15 +251,20 @@ useEffect(() => {
   const images              = activeImages.length ? activeImages : [null]
 
   const related = product
-  ? products.filter((p) => p.category === product.category && p.id !== product.id).slice(0, 4)
-  : []
+    ? products.filter((p) => p.category === product.category && p.id !== product.id).slice(0, 4)
+    : []
   const discount   = calcDiscount(activePrice, activeOriginalPrice)
   const wishlisted = isWishlisted(product.id)
   const catLabel   = CATEGORY_LABELS[product.category] ?? product.category
   const catDetail  = CATEGORY_DETAILS[product.category] ?? null
   const showSize   = catDetail?.showSize ?? true
-  const sizeBtns   = product.sizes?.length ? product.sizes : []
+  const rawSizes    = hasColors ? (selectedColor?.sizes ?? []) : (product.sizes ?? [])
+  const sizeOptions = normalizeSizes(rawSizes)
+  const selectedSizeData = sizeOptions.find((s) => s.size === selectedSize)
   const savings    = activeOriginalPrice > activePrice ? activeOriginalPrice - activePrice : null
+  const maxQty = selectedSizeData?.stock != null
+  ? selectedSizeData.stock
+  : (typeof product.stock === 'number' && product.stock > 0 ? product.stock : 10)
 
   const handleAddToCart = () => {
     const size = showSize ? selectedSize : 'Free Size'
@@ -259,7 +272,7 @@ useEffect(() => {
     addToCart(
       { ...product, price: activePrice, images: activeImages },
       size,
-      qty,
+      Math.min(qty, maxQty),
       selectedColor?.name ?? null
     )
   }
@@ -270,7 +283,7 @@ useEffect(() => {
     addToCart(
       { ...product, price: activePrice, images: activeImages },
       size,
-      qty,
+      Math.min(qty, maxQty),
       selectedColor?.name ?? null
     )
     navigate('/checkout')
@@ -420,49 +433,49 @@ useEffect(() => {
 
             {/* ── Color Variant Selector ─────────────────── */}
             {hasColors && (
-  <div className="pd-option-group">
-    <div className="pd-option-label">
-      <span>Colour: <strong>{selectedColor?.name}</strong></span>
-    </div>
+              <div className="pd-option-group">
+                <div className="pd-option-label">
+                  <span>Colour: <strong>{selectedColor?.name}</strong></span>
+                </div>
 
-    {/* Amazon-style image variant selector */}
-    <div className="pd-color-variants">
-      {product.colors.map((color) => (
-        <button
-          key={color.name}
-          className={`pd-color-variant-btn
-            ${selectedColor?.name === color.name ? ' pd-color-variant-btn--active' : ''}
-            ${!color.inStock ? ' pd-color-variant-btn--oos' : ''}
-          `}
-          onClick={() => setSelectedColor(color)}
-          disabled={!color.inStock}
-          title={color.name}
-        >
-          <div className="pd-color-variant-img">
-            <img
-              src={color.images?.[0] ?? product.images?.[0]}
-              alt={color.name}
-            />
-            {!color.inStock && (
-              <div className="pd-color-variant-oos-overlay">OOS</div>
+                {/* Amazon-style image variant selector */}
+                <div className="pd-color-variants">
+                  {product.colors.map((color) => (
+                    <button
+                      key={color.name}
+                      className={`pd-color-variant-btn
+                        ${selectedColor?.name === color.name ? ' pd-color-variant-btn--active' : ''}
+                        ${!color.inStock ? ' pd-color-variant-btn--oos' : ''}
+                      `}
+                      onClick={() => setSelectedColor(color)}
+                      disabled={!color.inStock}
+                      title={color.name}
+                    >
+                      <div className="pd-color-variant-img">
+                        <img
+                          src={color.images?.[0] ?? product.images?.[0]}
+                          alt={color.name}
+                        />
+                        {!color.inStock && (
+                          <div className="pd-color-variant-oos-overlay">OOS</div>
+                        )}
+                      </div>
+                      <div className="pd-color-variant-info">
+                        <span className="pd-color-variant-name">{color.name}</span>
+                        <span className="pd-color-variant-price">
+                          ₹{(color.price ?? product.price).toLocaleString('en-IN')}
+                        </span>
+                        {color.originalPrice > color.price && (
+                          <span className="pd-color-variant-mrp">
+                            ₹{color.originalPrice.toLocaleString('en-IN')}
+                          </span>
+                        )}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
             )}
-          </div>
-          <div className="pd-color-variant-info">
-            <span className="pd-color-variant-name">{color.name}</span>
-            <span className="pd-color-variant-price">
-              ₹{(color.price ?? product.price).toLocaleString('en-IN')}
-            </span>
-            {color.originalPrice > color.price && (
-              <span className="pd-color-variant-mrp">
-                ₹{color.originalPrice.toLocaleString('en-IN')}
-              </span>
-            )}
-          </div>
-        </button>
-      ))}
-    </div>
-  </div>
-)}
 
             {/* Size Selector */}
             {showSize && (
@@ -472,28 +485,44 @@ useEffect(() => {
                   <button className="pd-size-guide-btn" onClick={() => setShowSizeGuide(true)}>📏 Size Guide</button>
                 </div>
                 <div className="pd-size-btns">
-                  {sizeBtns.map((s) => (
-                    <button
-                      key={s}
-                      className={`pd-size-btn${selectedSize === s ? ' pd-size-btn--active' : ''}`}
-                      onClick={() => setSelectedSize(s)}
-                    >
-                      {s}
-                    </button>
-                  ))}
+                  {sizeOptions.map(({ size, stock }) => {
+                    const oos = stock === 0
+                    return (
+                      <button
+                        key={size}
+                        className={`pd-size-btn${selectedSize === size ? ' pd-size-btn--active' : ''}${oos ? ' pd-size-btn--oos' : ''}`}
+                        onClick={() => !oos && setSelectedSize(size)}
+                        disabled={oos}
+                        title={oos ? 'Out of stock' : (stock != null ? `${stock} left` : '')}
+                      >
+                        {size}
+                      </button>
+                    )
+                  })}
                 </div>
               </div>
             )}
 
             {/* Quantity */}
-            <div className="pd-option-group">
-              <div className="pd-option-label"><span>Quantity</span></div>
-              <div className="pd-qty">
-                <button className="pd-qty-btn" onClick={() => setQty(Math.max(1, qty - 1))}>−</button>
-                <span className="pd-qty-val">{qty}</span>
-                <button className="pd-qty-btn" onClick={() => setQty(Math.min(10, qty + 1))}>+</button>
-              </div>
-            </div>
+<div className="pd-option-group">
+  <div className="pd-option-label"><span>Quantity</span></div>
+  <div className="pd-qty">
+    <button className="pd-qty-btn" onClick={() => setQty(Math.max(1, qty - 1))}>−</button>
+    <span className="pd-qty-val">{qty}</span>
+    <button
+      className="pd-qty-btn"
+      onClick={() => setQty(Math.min(maxQty, qty + 1))}
+      disabled={qty >= maxQty}
+    >
+      +
+    </button>
+  </div>
+  {selectedSizeData?.stock != null && selectedSizeData.stock > 0 && selectedSizeData.stock <= 5 && (
+    <p style={{ fontSize: '0.75rem', color: '#cc0000', marginTop: '4px' }}>
+      Only {selectedSizeData.stock} left in stock!
+    </p>
+  )}
+</div>
 
             {/* CTA */}
             <div className="pd-cta">

@@ -975,3 +975,8 @@
     margin-top: 0;
   }
 }
+.pd-size-btn--oos {
+  opacity: 0.35;
+  cursor: not-allowed;
+  text-decoration: line-through;
+}

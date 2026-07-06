@@ -9,6 +9,7 @@ import {
   updateProfile,
 } from 'firebase/auth'
 import { auth, googleProvider } from '../firebase/firebaseConfig'
+import Loader from '../components/common/Loader'
 
 const AuthContext = createContext(null)
 
@@ -59,7 +60,7 @@ export function AuthProvider({ children }) {
   }
 
   // Don't render children until Firebase has resolved auth state
-  if (loading) return null
+  if (loading) return <Loader />
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

@@ -142,7 +142,6 @@ function Footer() {
       {/* ── Bottom bar ── */}
       <div className="footer__bottom">
         <span>© 2025 Resilda's Boutique. All rights reserved.</span>
-        <span className="footer__bottom-heart">Designed with 💛 in Chennai</span>
       </div>
     </footer>
   )

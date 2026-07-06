@@ -2,6 +2,7 @@ import React, { Suspense, lazy } from 'react'
 import { Routes, Route, useLocation } from 'react-router-dom'
 import { AnimatePresence } from 'framer-motion'
 import PageTransition from '../components/common/PageTransition'
+import Loader from '../components/common/Loader'
 
 const Home              = lazy(() => import('../pages/Home'))
 const Products          = lazy(() => import('../pages/Products'))
@@ -14,20 +15,7 @@ const ProtectedWishlist = lazy(() => import('../components/common/ProtectedWishl
 const AdminRoutes       = lazy(() => import('../admin/AdminRoutes'))
 
 function PageLoader() {
-  return (
-    <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      minHeight: '60vh',
-      fontSize: '1rem',
-      color: '#c2903a',
-      fontFamily: 'Jost, sans-serif',
-      letterSpacing: '0.1em',
-    }}>
-      Loading…
-    </div>
-  )
+  return <Loader fullScreen={false} />
 }
 
 function AppRoutes() {
