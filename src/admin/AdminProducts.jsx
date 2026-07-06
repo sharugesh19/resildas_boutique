@@ -4,6 +4,7 @@ import { collection, getDocs, deleteDoc, doc, orderBy, query } from 'firebase/fi
 import { ref, deleteObject } from 'firebase/storage';
 import { db, storage } from '../firebase/firebaseConfig';
 import { Link } from 'react-router-dom';
+import { RefreshIcon } from '../components/common/Icons';
 
 const CATEGORIES = [
   { value: 'unstitched-salwar', label: 'Unstitched Salwar Set' },
@@ -60,7 +61,7 @@ export default function AdminProducts() {
       for (const url of images) {
         try {
           await deleteObject(ref(storage, url));
-        } catch (_) { /* ignore missing images */ }
+        } catch{ /* ignore missing images */ }
       }
       await deleteDoc(doc(db, 'products', deleteTarget.id));
       setProducts((prev) => prev.filter((p) => p.id !== deleteTarget.id));
@@ -114,7 +115,7 @@ export default function AdminProducts() {
           <option value="">All Categories</option>
           {CATEGORIES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
         </select>
-        <button onClick={fetchProducts} className="btn btn-ghost">↻</button>
+        <button onClick={fetchProducts} className="btn btn-ghost"><RefreshIcon size={16} /></button>
       </div>
 
       <div className="admin-card">

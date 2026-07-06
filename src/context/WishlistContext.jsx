@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
 import {
   doc,
   onSnapshot,
@@ -7,7 +7,7 @@ import {
   arrayRemove,
 } from 'firebase/firestore'
 import { db } from '../firebase/firebaseConfig'
-import { useAuth } from './AuthContext'
+import { useAuth } from '../hooks/useAuth'
 
 const WishlistContext = createContext(null)
 

@@ -10,18 +10,7 @@ import AdminProducts from './AdminProducts';
 import ProductForm from './ProductForm';
 import './admin.css';
 
-// VITE_ADMIN_EMAILS is comma-separated, e.g.:
-//   VITE_ADMIN_EMAILS=maheswari.k1107@gmail.com,friend@gmail.com
-// To add/remove an admin later, just edit this one env var — no code change.
-// Falls back to the old singular VITE_ADMIN_EMAIL too, so nothing breaks if
-// that's still the only var set somewhere (e.g. Vercel not yet updated).
-function getAdminEmails() {
-  const list = import.meta.env.VITE_ADMIN_EMAILS || import.meta.env.VITE_ADMIN_EMAIL || '';
-  return list
-    .split(',')
-    .map((e) => e.trim().toLowerCase())
-    .filter(Boolean);
-}
+
 
 function AdminGuard({ children }) {
   const [state, setState] = useState({ loading: true, user: null, isAdmin: false });
@@ -34,8 +23,8 @@ function AdminGuard({ children }) {
       }
 
       // Temporary: env-based check until Blaze + custom claims are set up
-      const adminEmails = getAdminEmails();
-      const isAdmin = adminEmails.includes((user.email || '').toLowerCase());
+      const tokenResult = await user.getIdTokenResult(true);
+      const isAdmin = tokenResult.claims.admin === true;
 
       setState({ loading: false, user, isAdmin });
     });

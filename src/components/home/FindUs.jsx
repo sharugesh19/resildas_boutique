@@ -1,4 +1,4 @@
-import React from 'react'
+
 
 function FindUs() {
   return (
@@ -19,9 +19,12 @@ function FindUs() {
               <div>
                 <p className="find-us__info-label">Address</p>
                 <p className="find-us__info-val">
-                  123, Textile Market Road<br />
-                  Coimbatore – 641 001<br />
-                  Tamil Nadu, India
+                  Resilda's Boutique<br />
+                  1st Floor, 11, 2nd Street,
+                  near UK Hospital,<br />
+                  Aishwarya Nagar,
+                  Udumalaipettai,<br/>
+                  Tamil Nadu 642154
                 </p>
               </div>
             </div>

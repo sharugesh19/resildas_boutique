@@ -1,7 +1,7 @@
-import React from 'react'
 import { Link } from 'react-router-dom'
 import { useCart }     from '../../context/CartContext'
 import { formatPrice } from '../../utils/formatPrice'
+import { ImagePlaceholderIcon } from './Icons'
 
 function CartDrawer() {
   const { cart, cartTotal, cartCount, isOpen, closeCart, removeFromCart, setQuantity } = useCart()
@@ -74,11 +74,17 @@ function CartItem({ item, onRemove, onQtyChange }) {
 
   return (
     <div className="cart-drawer__item">
-      <img
-        src={product.images[0]}
-        alt={product.name}
-        className="cart-drawer__item-img"
-      />
+      {product.images?.[0] ? (
+  <img
+    src={product.images[0]}
+    alt={product.name}
+    className="cart-drawer__item-img"
+  />
+) : (
+  <div className="cart-drawer__item-img cart-drawer__item-img--placeholder">
+    <span style={{ display: 'inline-flex', alignItems: 'center' }}><ImagePlaceholderIcon size={20} /></span>
+  </div>
+)}
       <div className="cart-drawer__item-body">
         <p className="cart-drawer__item-name">{product.name}</p>
         <p className="cart-drawer__item-meta">Size: {size}</p>

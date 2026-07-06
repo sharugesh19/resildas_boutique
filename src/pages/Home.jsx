@@ -1,4 +1,3 @@
-import React from 'react'
 import { Helmet } from 'react-helmet-async'
 import Hero                from '../components/home/Hero'
 import CategorySection     from '../components/home/CategorySection'
@@ -46,8 +45,7 @@ function Home() {
               "longitude": "77.2500"
             },
             "openingHours": "Mo-Sa 09:00-20:00",
-            "priceRange": "₹₹",
-            "servesCuisine": "Ethnic Wear"
+            "priceRange": "₹₹"
           }
         `}</script>
       </Helmet>

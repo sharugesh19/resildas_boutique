@@ -1,7 +1,8 @@
-import React, { useState } from 'react'
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { useState } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
-import { useAuth } from '../context/AuthContext'
+import { useAuth } from '../hooks/useAuth'
+import { ArrowLeftIcon } from '../components/common/Icons'
 
 const TABS = { LOGIN: 'login', REGISTER: 'register', RESET: 'reset' }
 
@@ -227,8 +228,9 @@ function Login() {
               type="button"
               className="auth-form__forgot"
               onClick={() => { setTab(TABS.LOGIN); clearMessages() }}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}
             >
-              ← Back to Sign In
+              <ArrowLeftIcon size={14} /> Back to Sign In
             </button>
           </form>
         )}

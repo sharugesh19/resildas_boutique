@@ -16,10 +16,7 @@ export function useCart() {
 const makeKey = (productId, size, color) =>
   `${productId}__${size}${color ? `__${color}` : ''}`
 
-function calcDiscount(price, originalPrice) {
-  if (!originalPrice || originalPrice <= price) return 0
-  return Math.round(((originalPrice - price) / originalPrice) * 100)
-}
+
 
 // ── Reducer ──────────────────────────────────────────────────────────────────
 

@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { useParams, useSearchParams, Link } from 'react-router-dom'
 import { CATEGORY_LABELS } from '../data/productsData'
@@ -16,7 +16,7 @@ const CATEGORY_TABS = [
   { key: 'tussar-saree',      label: 'Tussar' },
   { key: 'soft-silk-saree',   label: 'Soft Silk' },
   { key: 'cotton-saree',      label: 'Cotton' },
-  { key: 'fancy-saree',       label: 'Fancy Weight' },
+  { key: 'fancy-saree',       label: 'Fancy Saree' },
   { key: 'coord-sets',        label: 'Co-ord Sets' },
 ]
 
@@ -69,7 +69,7 @@ function Products() {
   const { category }          = useParams()
   const [searchParams]        = useSearchParams()
   const q                     = searchParams.get('q') || ''
-  const { products, loading } = useProducts()
+ const { products, loading, error } = useProducts()
 
   const [filters, setFilters] = useState({
     ...DEFAULT_FILTERS,
@@ -141,6 +141,33 @@ function Products() {
       <main className="products-page">
         <div style={{ textAlign: 'center', padding: '8rem 1rem', color: 'var(--color-grey-500)' }}>
           Loading products...
+        </div>
+      </main>
+    )
+  }
+
+  if (error) {
+    return (
+      <main className="products-page">
+        <div style={{ textAlign: 'center', padding: '8rem 1rem' }}>
+          <p style={{ color: 'var(--color-grey-500)', marginBottom: 16 }}>
+            We couldn't load products right now. Please check your connection and try again.
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="btn"
+            style={{
+              padding: '0.75rem 2rem',
+              background: 'var(--color-gold)',
+              color: '#000',
+              border: 'none',
+              borderRadius: 8,
+              fontWeight: 600,
+              cursor: 'pointer',
+            }}
+          >
+            Retry
+          </button>
         </div>
       </main>
     )

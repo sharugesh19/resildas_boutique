@@ -1,14 +1,19 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { CATEGORY_LABELS } from '../data/productsData'
 import { useProducts } from '../hooks/useProducts'
 import { useCart }      from '../context/CartContext'
 import { useWishlist }  from '../context/WishlistContext'
-import { useAuth }      from '../context/AuthContext'
+import { useAuth } from '../hooks/useAuth'
 import { formatPrice, calcDiscount } from '../utils/formatPrice'
 import { requireLogin } from '../utils/requireLogin'
 import ProductCard from '../components/product/ProductCard'
+import {
+  ImagePlaceholderIcon, CheckIcon, XCircleIcon, RulerIcon,
+  BagIcon, BoltIcon, HeartIcon, TruckIcon, ExchangeIcon,
+  LockIcon, MapPinIcon, ChevronLeftIcon, ChevronRightIcon, CloseIcon
+} from '../components/common/Icons'
 
 const CATEGORY_DETAILS = {
   'unstitched-salwar': {
@@ -193,7 +198,7 @@ const SIZE_GUIDE = {
   ],
 }
 function normalizeSizes(sizesRaw) {
-  if (!sizesRaw) return []
+  if (!Array.isArray(sizesRaw)) return []
   return sizesRaw.map((s) =>
     typeof s === 'string' ? { size: s, stock: null } : s
   )
@@ -202,7 +207,7 @@ function normalizeSizes(sizesRaw) {
 function ProductDetail() {
   const { id }       = useParams()
   const navigate     = useNavigate()
-  const { products } = useProducts()
+  const { products, loading, error } = useProducts()
   const product = products.find((p) => p.id === id) ?? null
 
   const hasColors = product?.colors?.length > 0
@@ -222,13 +227,38 @@ function ProductDetail() {
 
   // Reset image index when color changes
   useEffect(() => {
-  setActiveImg(0)
-  setSelectedSize('')
-}, [selectedColor])
+    setActiveImg(0)
+    setSelectedSize('')
+  }, [selectedColor])
 
   useEffect(() => {
     setSelectedSize('')
   }, [product?.id])
+
+  if (loading) {
+    return (
+      <main className="container" style={{ padding: '8rem 1rem', textAlign: 'center' }}>
+        <p style={{ color: 'var(--color-grey-500)' }}>Loading product...</p>
+      </main>
+    )
+  }
+
+  if (error) {
+    return (
+      <main className="container" style={{ padding: '4rem 1rem', textAlign: 'center' }}>
+        <p style={{ color: 'var(--color-grey-500)', marginBottom: 16 }}>
+          We couldn't load this product right now. Please check your connection and try again.
+        </p>
+        <button
+          onClick={() => window.location.reload()}
+          className="btn btn--primary"
+          style={{ padding: '0.75rem 2rem', border: 'none', borderRadius: 8, cursor: 'pointer' }}
+        >
+          Retry
+        </button>
+      </main>
+    )
+  }
 
   if (!product) {
     return (
@@ -263,8 +293,8 @@ function ProductDetail() {
   const selectedSizeData = sizeOptions.find((s) => s.size === selectedSize)
   const savings    = activeOriginalPrice > activePrice ? activeOriginalPrice - activePrice : null
   const maxQty = selectedSizeData?.stock != null
-  ? selectedSizeData.stock
-  : (typeof product.stock === 'number' && product.stock > 0 ? product.stock : 10)
+    ? selectedSizeData.stock
+    : (typeof product.stock === 'number' && product.stock > 0 ? product.stock : 10)
 
   const handleAddToCart = () => {
     const size = showSize ? selectedSize : 'Free Size'
@@ -363,7 +393,7 @@ function ProductDetail() {
                 >
                   {src
                     ? <img src={src} alt={`${product.name} view ${i + 1}`} />
-                    : <span className="pd-thumb-placeholder">🖼</span>
+                    : <span className="pd-thumb-placeholder"><ImagePlaceholderIcon size={20} /></span>
                   }
                 </button>
               ))}
@@ -373,14 +403,16 @@ function ProductDetail() {
               <button
                 className="pd-img-arrow pd-img-arrow--prev"
                 onClick={() => setActiveImg((activeImg - 1 + images.length) % images.length)}
-              >‹</button>
+              >
+                <ChevronLeftIcon size={20} />
+              </button>
 
               <div className="pd-main-img">
                 {images[activeImg]
                   ? <img src={images[activeImg]} alt={product.name} />
                   : (
                     <div className="pd-img-placeholder">
-                      <span style={{ fontSize: '4rem' }}>🖼</span>
+                      <ImagePlaceholderIcon size={64} />
                       <span style={{ fontSize: '0.9rem', color: '#aaa' }}>No Image Available</span>
                     </div>
                   )
@@ -390,7 +422,9 @@ function ProductDetail() {
               <button
                 className="pd-img-arrow pd-img-arrow--next"
                 onClick={() => setActiveImg((activeImg + 1) % images.length)}
-              >›</button>
+              >
+                <ChevronRightIcon size={20} />
+              </button>
 
               <div className="pd-img-dots">
                 {images.map((_, i) => (
@@ -412,8 +446,8 @@ function ProductDetail() {
 
             <div className="pd-info__stock">
               {activeInStock
-                ? <span className="pd-in-stock">✔ In Stock</span>
-                : <span className="pd-out-stock">✘ Out of Stock</span>
+                ? <span className="pd-in-stock" style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><CheckIcon size={14} /> In Stock</span>
+                : <span className="pd-out-stock" style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><XCircleIcon size={14} /> Out of Stock</span>
               }
             </div>
 
@@ -482,7 +516,9 @@ function ProductDetail() {
               <div className="pd-option-group">
                 <div className="pd-option-label">
                   <span>Select Size</span>
-                  <button className="pd-size-guide-btn" onClick={() => setShowSizeGuide(true)}>📏 Size Guide</button>
+                  <button className="pd-size-guide-btn" onClick={() => setShowSizeGuide(true)} style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                    <RulerIcon size={14} /> Size Guide
+                  </button>
                 </div>
                 <div className="pd-size-btns">
                   {sizeOptions.map(({ size, stock }) => {
@@ -504,33 +540,33 @@ function ProductDetail() {
             )}
 
             {/* Quantity */}
-<div className="pd-option-group">
-  <div className="pd-option-label"><span>Quantity</span></div>
-  <div className="pd-qty">
-    <button className="pd-qty-btn" onClick={() => setQty(Math.max(1, qty - 1))}>−</button>
-    <span className="pd-qty-val">{qty}</span>
-    <button
-      className="pd-qty-btn"
-      onClick={() => setQty(Math.min(maxQty, qty + 1))}
-      disabled={qty >= maxQty}
-    >
-      +
-    </button>
-  </div>
-  {selectedSizeData?.stock != null && selectedSizeData.stock > 0 && selectedSizeData.stock <= 5 && (
-    <p style={{ fontSize: '0.75rem', color: '#cc0000', marginTop: '4px' }}>
-      Only {selectedSizeData.stock} left in stock!
-    </p>
-  )}
-</div>
+            <div className="pd-option-group">
+              <div className="pd-option-label"><span>Quantity</span></div>
+              <div className="pd-qty">
+                <button className="pd-qty-btn" onClick={() => setQty(Math.max(1, qty - 1))}>−</button>
+                <span className="pd-qty-val">{qty}</span>
+                <button
+                  className="pd-qty-btn"
+                  onClick={() => setQty(Math.min(maxQty, qty + 1))}
+                  disabled={qty >= maxQty}
+                >
+                  +
+                </button>
+              </div>
+              {selectedSizeData?.stock != null && selectedSizeData.stock > 0 && selectedSizeData.stock <= 5 && (
+                <p style={{ fontSize: '0.75rem', color: '#cc0000', marginTop: '4px' }}>
+                  Only {selectedSizeData.stock} left in stock!
+                </p>
+              )}
+            </div>
 
             {/* CTA */}
             <div className="pd-cta">
-              <button className="pd-btn-cart" onClick={handleAddToCart} disabled={!activeInStock}>
-                🛍 Add to Cart
+              <button className="pd-btn-cart" onClick={handleAddToCart} disabled={!activeInStock} style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                <BagIcon size={16} /> Add to Cart
               </button>
-              <button className="pd-btn-buy" onClick={handleBuyNow} disabled={!activeInStock}>
-                ⚡ Buy Now
+              <button className="pd-btn-buy" onClick={handleBuyNow} disabled={!activeInStock} style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                <BoltIcon size={16} /> Buy Now
               </button>
             </div>
 
@@ -538,28 +574,29 @@ function ProductDetail() {
             <button
               className={`pd-wishlist-btn${wishlisted ? ' pd-wishlist-btn--active' : ''}`}
               onClick={handleWishlist}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
             >
-              {wishlisted ? '♥' : '♡'} {wishlisted ? 'Wishlisted' : 'Add to Wishlist'}
+              <HeartIcon size={16} filled={wishlisted} /> {wishlisted ? 'Wishlisted' : 'Add to Wishlist'}
             </button>
 
             {/* Delivery info */}
             <div className="pd-delivery">
               <div className="pd-delivery-item">
-                <span className="pd-delivery-icon">🚚</span>
+                <span className="pd-delivery-icon"><TruckIcon size={22} /></span>
                 <div>
                   <strong>Free Delivery</strong>
                   <p>On every order</p>
                 </div>
               </div>
               <div className="pd-delivery-item">
-                <span className="pd-delivery-icon">↩</span>
+                <span className="pd-delivery-icon"><ExchangeIcon size={22} /></span>
                 <div>
                   <strong>Damage Protection</strong>
                   <p>Exchange only for damaged products</p>
                 </div>
               </div>
               <div className="pd-delivery-item">
-                <span className="pd-delivery-icon">🔒</span>
+                <span className="pd-delivery-icon"><LockIcon size={22} /></span>
                 <div>
                   <strong>Secure Payment</strong>
                   <p>100% safe &amp; encrypted</p>
@@ -589,7 +626,7 @@ function ProductDetail() {
                   <div className="pd-highlights-grid">
                     {catDetail.highlights.map(([key, val]) => (
                       <div key={key} className="pd-highlight-item">
-                        <span className="pd-highlight-check">✓</span>
+                        <span className="pd-highlight-check"><CheckIcon size={14} /></span>
                         <div>
                           <strong>{key}</strong>
                           <span>{val}</span>
@@ -620,9 +657,9 @@ function ProductDetail() {
             <div className="pd-tab-content">
               <div className="pd-shipping-list">
                 {[
-                  { icon: '🚚', title: 'Free Shipping', body: 'Free delivery on all orders across India. Standard delivery in 5–7 business days.' },
-                  { icon: '🔄', title: 'Exchange Policy', body: 'Size exchanges available within 7 days of delivery. Contact us on WhatsApp for quick exchange.' },
-                  { icon: '📍', title: 'Track Your Order', body: "You'll receive a tracking link via SMS and email once your order is shipped." },
+                  { icon: <TruckIcon size={22} />, title: 'Free Shipping', body: 'Free delivery on all orders across India. Standard delivery in 5–7 business days.' },
+                  { icon: <ExchangeIcon size={22} />, title: 'Exchange Policy', body: 'Size exchanges available within 7 days of delivery. Contact us on WhatsApp for quick exchange.' },
+                  { icon: <MapPinIcon size={22} />, title: 'Track Your Order', body: "You'll receive a tracking link via SMS and email once your order is shipped." },
                 ].map((item) => (
                   <div key={item.title} className="pd-shipping-item">
                     <span className="pd-shipping-icon">{item.icon}</span>
@@ -656,7 +693,9 @@ function ProductDetail() {
         <>
           <div className="pd-modal-overlay" onClick={() => setShowSizeGuide(false)} />
           <div className="pd-size-guide-modal">
-            <button className="pd-modal-close" onClick={() => setShowSizeGuide(false)}>✕</button>
+            <button className="pd-modal-close" onClick={() => setShowSizeGuide(false)}>
+              <CloseIcon size={16} />
+            </button>
             <h3>Size Guide</h3>
             <table className="pd-spec-table">
               <thead>

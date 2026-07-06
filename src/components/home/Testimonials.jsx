@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
+import { StarIcon } from '../common/Icons'
 
 const testimonials = [
   {
@@ -62,28 +63,38 @@ function Testimonials() {
   const gridRef = useRef(null)
   const isMobile = () => window.innerWidth <= 768
 
+
+ const scrollToCard = useCallback((index) => {
+  if (!gridRef.current || !isMobile()) return
+
+  const cards = gridRef.current.querySelectorAll('.testimonial-card')
+
+  if (cards[index]) {
+    const card = cards[index]
+    const grid = gridRef.current
+    const scrollLeft =
+      card.offsetLeft - grid.offsetWidth / 2 + card.offsetWidth / 2
+
+    grid.scrollTo({
+      left: scrollLeft,
+      behavior: 'smooth',
+    })
+  }
+}, [])
+
   // Auto-advance
   useEffect(() => {
-    const t = setInterval(() => {
-      setActive((a) => {
-        const next = (a + 1) % testimonials.length
-        scrollToCard(next)
-        return next
-      })
-    }, 5000)
-    return () => clearInterval(t)
-  }, [])
+  const t = setInterval(() => {
+    setActive((a) => {
+      const next = (a + 1) % testimonials.length
+      scrollToCard(next)
+      return next
+    })
+  }, 5000)
 
-  const scrollToCard = (index) => {
-    if (!gridRef.current || !isMobile()) return
-    const cards = gridRef.current.querySelectorAll('.testimonial-card')
-    if (cards[index]) {
-      const card = cards[index]
-      const grid = gridRef.current
-      const scrollLeft = card.offsetLeft - (grid.offsetWidth / 2) + (card.offsetWidth / 2)
-      grid.scrollTo({ left: scrollLeft, behavior: 'smooth' })
-    }
-  }
+  return () => clearInterval(t)
+}, [scrollToCard])
+  
 
   const handleDotClick = (i) => {
     setActive(i)
@@ -113,7 +124,7 @@ function Testimonials() {
         <div className="testimonials-section__head">
           <span className="eyebrow eyebrow--light">Our Customers</span>
           <h2 className="section-title section-title--light">Love Stories</h2>
-          <p className="section-sub section-sub--light">4.8★ average across 4,000+ happy customers</p>
+          <p className="section-sub section-sub--light"><span style={{ display: 'inline-flex', alignItems: 'center', gap: 2 }}>4.8<StarIcon size={14} filled /></span> average across 4,000+ happy customers</p>
         </div>
 
         <div className="testimonials-grid" ref={gridRef} onScroll={handleScroll}>

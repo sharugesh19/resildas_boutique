@@ -818,3 +818,7 @@ select.form-control {
 
 /* ── Low Stock Warning ────────────────────────────────────── */
 .low-stock { color: var(--admin-danger) !important; font-weight: 600; }
+.low-stock-warning {
+  color: #c78a1e; /* amber, distinct from the red "out of stock" */
+  font-weight: 600;
+}

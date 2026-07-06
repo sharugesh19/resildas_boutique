@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 
 function ProductGallery({ images = [], name = '' }) {
   const [active, setActive] = useState(0)

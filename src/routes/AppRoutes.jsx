@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from 'react'
+import { Suspense, lazy } from 'react'
 import { Routes, Route, useLocation } from 'react-router-dom'
 import { AnimatePresence } from 'framer-motion'
 import PageTransition from '../components/common/PageTransition'
@@ -8,6 +8,7 @@ const Home              = lazy(() => import('../pages/Home'))
 const Products          = lazy(() => import('../pages/Products'))
 const ProductDetail     = lazy(() => import('../pages/ProductDetail'))
 const Wishlist          = lazy(() => import('../pages/Wishlist'))
+const Account           = lazy(() => import('../pages/Account'))
 const Login             = lazy(() => import('../pages/Login'))
 const Checkout          = lazy(() => import('../pages/Checkout'))
 const NotFound          = lazy(() => import('../pages/NotFound'))
@@ -56,6 +57,13 @@ function AppRoutes() {
             <PageTransition>
               <ProtectedWishlist>
                 <Wishlist />
+              </ProtectedWishlist>
+            </PageTransition>
+          } />
+           <Route path="/account" element={
+            <PageTransition>
+              <ProtectedWishlist>
+                <Account />
               </ProtectedWishlist>
             </PageTransition>
           } />

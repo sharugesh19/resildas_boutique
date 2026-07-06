@@ -5,7 +5,6 @@ import {
   getDocs,
   query,
   orderBy,
-  limit,
 } from 'firebase/firestore';
 import { db } from '../firebase/firebaseConfig';
 import { Link } from 'react-router-dom';
@@ -18,6 +17,38 @@ const STATUS_CLASS = {
   cancelled: 'pill-cancelled',
 };
 
+const LOW_STOCK_THRESHOLD = 5;
+
+// Aggregates real stock across all colors/sizes for a product.
+// Falls back to the old top-level `stock`/`inStock` fields for
+// single-color products that don't use the colors/sizes schema.
+function getTotalStock(product) {
+  if (Array.isArray(product.colors) && product.colors.length > 0) {
+    return product.colors.reduce((sum, color) => {
+      if (Array.isArray(color.sizes) && color.sizes.length > 0) {
+        // New schema: each size has its own stock number
+        return sum + color.sizes.reduce((s, sz) => s + (Number(sz.stock) || 0), 0);
+      }
+      // Old schema fallback: colors without per-size stock — can't
+      // determine a real number, so don't count them either way
+      return sum;
+    }, 0);
+  }
+
+  // No colors at all — single-color product using top-level fields
+  if (typeof product.stock === 'number') return product.stock;
+
+  // No numeric stock tracked at all — fall back to the boolean flag
+  return product.inStock === false ? 0 : null; // null = "not tracked numerically"
+}
+
+function getStockStatus(product) {
+  const total = getTotalStock(product);
+  if (total === null) return null; // not trackable numerically, skip
+  if (total === 0) return { label: 'Out of Stock', level: 'out', qty: total };
+  if (total <= LOW_STOCK_THRESHOLD) return { label: `Low Stock (${total} left)`, level: 'low', qty: total };
+  return null; // healthy stock, don't show in the alert list
+}
 export default function AdminDashboard() {
   const [stats, setStats] = useState({
     products: 0,
@@ -58,7 +89,18 @@ export default function AdminDashboard() {
         });
 
         setRecentOrders(orders.slice(0, 6));
-        setLowStock(products.filter((p) => p.inStock === false).slice(0, 6));
+
+const flagged = products
+  .map((p) => ({ product: p, status: getStockStatus(p) }))
+  .filter((entry) => entry.status !== null)
+  // Out of stock first, then low stock, both sorted by lowest qty
+  .sort((a, b) => {
+    if (a.status.level !== b.status.level) return a.status.level === 'out' ? -1 : 1;
+    return a.status.qty - b.status.qty;
+  })
+  .slice(0, 6);
+
+setLowStock(flagged);
       } finally {
         setLoading(false);
       }
@@ -175,13 +217,15 @@ export default function AdminDashboard() {
                     <td colSpan={3}>All products well-stocked ✓</td>
                   </tr>
                 )}
-                {lowStock.map((p) => (
-                  <tr key={p.id}>
-                    <td><strong>{p.name}</strong></td>
-                    <td>{p.category}</td>
-                    <td className="low-stock">Out of Stock</td>
-                  </tr>
-                ))}
+                {lowStock.map(({ product: p, status }) => (
+  <tr key={p.id}>
+    <td><strong>{p.name}</strong></td>
+    <td>{p.category}</td>
+    <td className={status.level === 'out' ? 'low-stock' : 'low-stock-warning'}>
+      {status.label}
+    </td>
+  </tr>
+))}
               </tbody>
             </table>
           </div>

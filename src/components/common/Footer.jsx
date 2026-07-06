@@ -1,4 +1,3 @@
-import React from 'react'
 import { Link } from 'react-router-dom'
 
 const socialLinks = [
@@ -63,12 +62,8 @@ const categoryLinks = [
 ]
 
 const customerCareLinks = [
-  { label: 'My Account',        path: '/login' },
+  { label: 'My Account',        path: '/account' },
   { label: 'My Wishlist',       path: '/wishlist' },
-  { label: 'Track Order',       path: '/#contact' },
-  { label: 'Returns & Exchange',path: '/#contact' },
-  { label: 'Privacy Policy',    path: '/#contact' },
-  { label: 'Terms & Conditions',path: '/#contact' },
 ]
 
 function Footer() {
@@ -141,7 +136,7 @@ function Footer() {
 
       {/* ── Bottom bar ── */}
       <div className="footer__bottom">
-        <span>© 2025 Resilda's Boutique. All rights reserved.</span>
+        <span>Resilda's Boutique</span>
       </div>
     </footer>
   )

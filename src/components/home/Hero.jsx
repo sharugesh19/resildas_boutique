@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import heroSlides from '../../data/heroSlides';
 import './Hero.css';
-
+import { StarIcon } from '../common/Icons';
 export default function Hero() {
   const [current, setCurrent] = useState(0);
   const [fading, setFading] = useState(false);
@@ -149,7 +149,7 @@ export default function Hero() {
         <div className="rh-stat-divider"></div>
         <div className="rh-stat"><span>8</span><p>Categories</p></div>
         <div className="rh-stat-divider"></div>
-        <div className="rh-stat"><span>4.8★</span><p>Avg Rating</p></div>
+        <div className="rh-stat"><span><span style={{ display: 'inline-flex', alignItems: 'center', gap: 2 }}>4.8<StarIcon size={14} /></span></span><p>Avg Rating</p></div>
       </div>
 
     </section>

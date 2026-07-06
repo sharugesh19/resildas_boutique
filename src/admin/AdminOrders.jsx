@@ -1,5 +1,5 @@
 // src/admin/AdminOrders.jsx
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import {
   collection,
   getDocs,
@@ -25,6 +25,30 @@ export default function AdminOrders() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(null);
   const [msg, setMsg] = useState(null);
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+
+  const filteredOrders = useMemo(() => {
+    return orders.filter((o) => {
+      const matchesStatus =
+        statusFilter === 'all' || (o.orderStatus || 'placed') === statusFilter;
+
+      if (!matchesStatus) return false;
+
+      if (!search.trim()) return true;
+
+      const term = search.trim().toLowerCase();
+      const customerName = (o.customerName || o.name || '').toLowerCase();
+      const phone = (o.phone || '').toLowerCase();
+      const orderId = o.id.toLowerCase();
+
+      return (
+        customerName.includes(term) ||
+        phone.includes(term) ||
+        orderId.includes(term)
+      );
+    });
+  }, [orders, search, statusFilter]);
 
   useEffect(() => {
     fetchOrders();
@@ -79,11 +103,46 @@ export default function AdminOrders() {
       <div className="page-header">
         <div>
           <h2>Orders</h2>
-          <p>{orders.length} orders total</p>
+          <p>
+            {filteredOrders.length === orders.length
+              ? `${orders.length} orders total`
+              : `Showing ${filteredOrders.length} of ${orders.length} orders`}
+          </p>
         </div>
         <button onClick={fetchOrders} className="btn btn-ghost">
           ↻ Refresh
         </button>
+      </div>
+
+      <div
+        style={{
+          display: 'flex',
+          gap: 12,
+          marginBottom: 16,
+          flexWrap: 'wrap',
+        }}
+      >
+        <input
+          className="form-control"
+          type="text"
+          placeholder="Search by customer name, phone, or order ID…"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          style={{ maxWidth: 320 }}
+        />
+        <select
+          className="form-control status-select"
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          style={{ maxWidth: 200 }}
+        >
+          <option value="all">All Statuses</option>
+          {ORDER_STATUSES.map((s) => (
+            <option key={s} value={s}>
+              {s.charAt(0).toUpperCase() + s.slice(1)}
+            </option>
+          ))}
+        </select>
       </div>
 
       {msg && <div className={`admin-alert ${msg.type}`}>{msg.text}</div>}
@@ -109,12 +168,16 @@ export default function AdminOrders() {
                   <td colSpan={8}>Loading orders…</td>
                 </tr>
               )}
-              {!loading && orders.length === 0 && (
+              {!loading && filteredOrders.length === 0 && (
                 <tr className="loading-row">
-                  <td colSpan={8}>No orders found.</td>
+                  <td colSpan={8}>
+                    {orders.length === 0
+                      ? 'No orders found.'
+                      : 'No orders match your search/filter.'}
+                  </td>
                 </tr>
               )}
-              {orders.map((o) => (
+              {filteredOrders.map((o) => (
                 <tr key={o.id}>
                   <td>
                     <code style={{ fontSize: 11, color: 'var(--admin-text-muted)' }}>

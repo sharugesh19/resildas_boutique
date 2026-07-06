@@ -1,5 +1,3 @@
-import React from 'react'
-
 function SizeSelector({ sizes = [], selected, onChange }) {
   if (sizes.length === 0) return null
 

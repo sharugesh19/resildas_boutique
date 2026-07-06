@@ -1,9 +1,9 @@
-import React from 'react'
 import { Link } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { useWishlist } from '../context/WishlistContext'
 import { useProducts } from '../hooks/useProducts'
 import ProductCard from '../components/product/ProductCard'
+import { HeartIcon } from '../components/common/Icons'
 
 function Wishlist() {
   const { wishlist, wishlistCount } = useWishlist()
@@ -25,7 +25,7 @@ function Wishlist() {
         </h1>
         {products.length === 0 ? (
           <div className="wishlist-page__empty">
-            <span style={{ fontSize: '3rem' }}>♡</span>
+            <HeartIcon size={48} />
             <p>Your wishlist is empty.</p>
             <Link to="/products" className="btn btn--primary">Start Shopping</Link>
           </div>

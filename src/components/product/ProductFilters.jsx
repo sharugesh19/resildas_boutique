@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { CATEGORIES, CATEGORY_LABELS } from '../../data/productsData'
+import { useState } from 'react'
+
 
 const SORT_OPTIONS = [
   { value: 'default',    label: 'Default' },
@@ -7,18 +7,6 @@ const SORT_OPTIONS = [
   { value: 'price-high', label: 'Price: High to Low' },
   { value: 'newest',     label: 'Newest First' },
   { value: 'popular',    label: 'Most Popular' },
-]
-
-const CATEGORY_OPTIONS = [
-  { value: '',                  label: 'All Categories',       count: 32 },
-  { value: 'unstitched-salwar', label: 'Unstitched Salwar Set', count: 4 },
-  { value: 'kurthi-set',        label: 'Kurthi Set',           count: 4 },
-  { value: 'organza-saree',     label: 'Organza Saree',        count: 4 },
-  { value: 'tussar-saree',      label: 'Tussar Saree',         count: 4 },
-  { value: 'soft-silk-saree',   label: 'Soft Silk Saree',      count: 4 },
-  { value: 'cotton-saree',      label: 'Cotton Saree',         count: 4 },
-  { value: 'fancy-saree',       label: 'Fancy Saree',   count: 4 },
-  { value: 'coord-sets',        label: 'Co-ord Sets',          count: 4 },
 ]
 
 const COLLECTION_OPTIONS = [

@@ -2,6 +2,7 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { signOut } from 'firebase/auth';
 import { auth } from '../firebase/firebaseConfig';
+import { useAuth } from '../hooks/useAuth';
 
 const NAV = [
   {
@@ -63,6 +64,7 @@ const NAV = [
 
 export default function AdminLayout() {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const handleLogout = async () => {
     await signOut(auth);
@@ -114,7 +116,9 @@ export default function AdminLayout() {
       <header className="admin-topbar">
         <span className="topbar-title">Admin Panel</span>
         <div className="topbar-right">
-          <span className="topbar-admin-badge">● Administrator</span>
+          <span className="topbar-admin-badge">
+             ● {user?.email || 'Administrator'}
+          </span>
         </div>
       </header>
 

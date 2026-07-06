@@ -1,9 +1,10 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { useCart }  from '../context/CartContext'
-import { useAuth }  from '../context/AuthContext'
+import { useAuth } from '../hooks/useAuth'
 import { formatPrice } from '../utils/formatPrice'
+import { MapPinIcon, CreditCardIcon, BagIcon, ImagePlaceholderIcon, LockIcon, ExchangeIcon, TruckIcon } from '../components/common/Icons'
 
 const INDIAN_STATES = [
   'Andhra Pradesh','Arunachal Pradesh','Assam','Bihar','Chhattisgarh',
@@ -20,6 +21,9 @@ const EMPTY_ADDR = {
   address1: '', address2: '', city: '', state: '', pincode: '',
 }
 
+const PHONE_REGEX = /^(\+91[\-\s]?)?[0]?(91)?[6789]\d{9}$/
+const PINCODE_REGEX = /^[1-9][0-9]{5}$/ // 6 digits, doesn't start with 0
+
 function Checkout() {
   const { cart, cartTotal, clearCart, openCart } = useCart()
   const { user }                       = useAuth()
@@ -33,8 +37,16 @@ function Checkout() {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError]           = useState('')
 
-  const handleChange = (e) =>
-    setAddr((prev) => ({ ...prev, [e.target.name]: e.target.value }))
+  const handleChange = (e) => {
+  const { name, value } = e.target
+  if (name === 'pincode') {
+    // strip anything that isn't a digit, cap at 6 characters
+    const digitsOnly = value.replace(/\D/g, '').slice(0, 6)
+    setAddr((prev) => ({ ...prev, pincode: digitsOnly }))
+    return
+  }
+  setAddr((prev) => ({ ...prev, [name]: value }))
+}
 
   const orderTotal = cartTotal  // shipping always free
 
@@ -44,20 +56,30 @@ function Checkout() {
   }
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setError('')
-    setSubmitting(true)
-    try {
-      // TODO: Integrate Razorpay
-      await new Promise((r) => setTimeout(r, 1000))
-      clearCart()
-      navigate('/?order=success')
-    } catch {
-      setError('Order could not be placed. Please try again.')
-    } finally {
-      setSubmitting(false)
-    }
+  e.preventDefault()
+  setError('')
+
+  if (!PHONE_REGEX.test(addr.phone.trim())) {
+    setError('Please enter a valid 10-digit Indian mobile number.')
+    return
   }
+  if (!PINCODE_REGEX.test(addr.pincode.trim())) {
+    setError('Please enter a valid 6-digit pincode.')
+    return
+  }
+
+  setSubmitting(true)
+  try {
+    // TODO: Integrate Razorpay
+    await new Promise((r) => setTimeout(r, 1000))
+    clearCart()
+    navigate('/?order=success')
+  } catch {
+    setError('Order could not be placed. Please try again.')
+  } finally {
+    setSubmitting(false)
+  }
+}
 
   if (cart.length === 0) {
     return (
@@ -114,7 +136,7 @@ function Checkout() {
             <div className="checkout-card">
 
               <h2 className="checkout-card__title">
-                <span className="checkout-card__icon">📍</span> Delivery Details
+                <span className="checkout-card__icon" style={{ display: 'inline-flex', alignItems: 'center' }}><MapPinIcon size={18} /></span> Delivery Details
               </h2>
 
               {/* Full Name + Phone */}
@@ -133,6 +155,7 @@ function Checkout() {
                     id="phone" name="phone" type="tel"
                     placeholder="+91 XXXXX XXXXX"
                     value={addr.phone} onChange={handleChange} required
+                    pattern="^(\+91[\-\s]?)?[0]?(91)?[6789]\d{9}$"
                   />
                 </div>
               </div>
@@ -196,16 +219,19 @@ function Checkout() {
                   placeholder="6-digit pincode"
                   value={addr.pincode} onChange={handleChange}
                   required maxLength={6}
+                  inputMode="numeric"
                 />
               </div>
 
               {/* Payment — online only */}
               <h2 className="checkout-card__title" style={{ marginTop: '2rem' }}>
-                <span className="checkout-card__icon">💳</span> Payment Method
+                <span className="checkout-card__icon" style={{ display: 'inline-flex', alignItems: 'center' }}><CreditCardIcon size={16} /></span> Payment Method
               </h2>
 
               <div className="payment-option payment-option--active">
-                <span className="payment-option__icon">💳</span>
+                <span className="payment-option__icon" style={{ display: 'inline-flex', alignItems: 'center' }}>
+                  <CreditCardIcon size={16} />
+                </span>
                 <div>
                   <strong>Pay Online</strong>
                   <p>UPI, Cards, Net Banking via Razorpay</p>
@@ -221,8 +247,9 @@ function Checkout() {
               type="submit"
               className="checkout-submit"
               disabled={submitting}
+              style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
             >
-              💳 {submitting ? 'Processing…' : 'Pay Now'}
+              <CreditCardIcon size={16} /> {submitting ? 'Processing…' : 'Pay Now'}
             </button>
           </form>
 
@@ -230,7 +257,7 @@ function Checkout() {
           <aside className="checkout-summary">
             <div className="checkout-card">
               <h2 className="checkout-card__title">
-                <span className="checkout-card__icon">🛍</span> Order Summary
+                <span className="checkout-card__icon" style={{ display: 'inline-flex', alignItems: 'center' }}><BagIcon size={16} /></span> Order Summary
               </h2>
 
               <ul className="checkout-summary__items">
@@ -239,7 +266,7 @@ function Checkout() {
                     <div className="checkout-summary__img-wrap">
                       {item.product.images?.[0]
                         ? <img src={item.product.images[0]} alt={item.product.name} />
-                        : <span className="checkout-summary__img-placeholder">🖼</span>
+                        : <span className="checkout-summary__img-placeholder" style={{ display: 'inline-flex', alignItems: 'center' }}><ImagePlaceholderIcon size={20} /></span>
                       }
                     </div>
                     <div className="checkout-summary__detail">
@@ -272,15 +299,15 @@ function Checkout() {
               {/* Trust badges */}
               <div className="checkout-trust">
                 <div className="checkout-trust__item">
-                  <span>🛡</span>
+                  <span style={{ display: 'inline-flex', justifyContent: 'center', alignItems: 'center' }}><LockIcon size={18} /></span>
                   <p>Secure Payment</p>
                 </div>
                 <div className="checkout-trust__item">
-                  <span>🔄</span>
+                  <span style={{ display: 'inline-flex', justifyContent: 'center', alignItems: 'center' }}><ExchangeIcon size={18} /></span>
                   <p>Damage Exchange</p>
                 </div>
                 <div className="checkout-trust__item">
-                  <span>🚚</span>
+                  <span style={{ display: 'inline-flex', justifyContent: 'center', alignItems: 'center' }}><TruckIcon size={18} /></span>
                   <p>Fast Delivery</p>
                 </div>
               </div>

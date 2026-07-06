@@ -2,6 +2,7 @@
 import { useRef, useState } from 'react';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { storage } from '../firebase/firebaseConfig';
+import { ArrowLeftIcon, ArrowRightIcon, CloseIcon } from '../components/common/Icons';
 
 /**
  * Props:
@@ -127,7 +128,7 @@ export default function ImageUploader({ images = [], onChange, folder = 'product
                     title="Move left"
                     onClick={() => moveImage(idx, -1)}
                   >
-                    ←
+                    <ArrowLeftIcon size={12} />
                   </button>
                 )}
                 {idx < images.length - 1 && (
@@ -137,7 +138,7 @@ export default function ImageUploader({ images = [], onChange, folder = 'product
                     title="Move right"
                     onClick={() => moveImage(idx, 1)}
                   >
-                    →
+                    <ArrowRightIcon size={12} />
                   </button>
                 )}
                 <button
@@ -146,7 +147,7 @@ export default function ImageUploader({ images = [], onChange, folder = 'product
                   title="Remove"
                   onClick={() => removeImage(idx)}
                 >
-                  ✕
+                  <CloseIcon size={12} />
                 </button>
               </div>
             </div>

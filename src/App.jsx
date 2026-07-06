@@ -1,4 +1,3 @@
-import React from 'react'
 import { BrowserRouter, useLocation } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import { CartProvider } from './context/CartContext'
@@ -9,6 +8,7 @@ import Footer from './components/common/Footer'
 import CartDrawer from './components/common/CartDrawer'
 import Toast from './components/common/Toast'
 import ScrollToTop from './components/common/ScrollToTop'
+import ErrorBoundary from './components/common/ErrorBoundary'
 
 // useLocation() only works inside <BrowserRouter>, so the check has to live
 // in a component rendered *inside* it — App() itself renders BrowserRouter,
@@ -32,13 +32,15 @@ function AppShell() {
 function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <CartProvider>
-          <WishlistProvider>
-            <AppShell />
-          </WishlistProvider>
-        </CartProvider>
-      </AuthProvider>
+      <ErrorBoundary>
+        <AuthProvider>
+          <CartProvider>
+            <WishlistProvider>
+              <AppShell />
+            </WishlistProvider>
+          </CartProvider>
+        </AuthProvider>
+      </ErrorBoundary>
     </BrowserRouter>
   )
 }

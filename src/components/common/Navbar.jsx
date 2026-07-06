@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom'
-import { useAuth }     from '../../context/AuthContext'
+import { useAuth } from '../../hooks/useAuth'
 import { useCart }     from '../../context/CartContext'
 import { useWishlist } from '../../context/WishlistContext'
 import SearchBar       from './SearchBar'
@@ -212,19 +212,15 @@ function Navbar() {
               {cartCount > 0 && <span className="navbar__badge">{cartCount}</span>}
             </button>
 
-            {isLoggedIn ? (
-              <button className="navbar__icon-btn" onClick={handleLogout} title="Logout">
-                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
-                </svg>
-              </button>
-            ) : (
-              <Link to="/login" className="navbar__icon-btn" title="Login">
-                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
-                </svg>
-              </Link>
-            )}
+            <Link
+  to={isLoggedIn ? '/account' : '/login'}
+  className="navbar__icon-btn"
+  title={isLoggedIn ? 'My Account' : 'Login'}
+>
+  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+  </svg>
+</Link>
 
             <a
               href="/#find-us"
@@ -282,11 +278,12 @@ function Navbar() {
           Find Store
         </a>
 
-        {isLoggedIn ? (
-          <button onClick={() => { handleLogout(); setMenuOpen(false) }}>Logout</button>
-        ) : (
-          <Link to="/login" onClick={() => setMenuOpen(false)}>Login</Link>
-        )}
+        <Link
+  to={isLoggedIn ? '/account' : '/login'}
+  onClick={() => setMenuOpen(false)}
+>
+  {isLoggedIn ? 'My Account' : 'Login'}
+</Link>
       </div>
 
       {searchOpen && <SearchBar onClose={() => setSearchOpen(false)} />}
