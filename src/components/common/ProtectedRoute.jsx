@@ -6,7 +6,7 @@ import { useAuth } from '../../hooks/useAuth'
  * Redirects to /login with a `redirect` param so the user is
  * sent back to their original destination after logging in.
  */
-function ProtectedWishlist({ children }) {
+function ProtectedRoute({ children }) {
   const { isLoggedIn } = useAuth()
   const location       = useLocation()
 
@@ -22,4 +22,4 @@ function ProtectedWishlist({ children }) {
   return children
 }
 
-export default ProtectedWishlist
+export default ProtectedRoute

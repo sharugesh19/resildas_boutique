@@ -1,5 +1,5 @@
 // src/admin/ImageUploader.jsx
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { storage } from '../firebase/firebaseConfig';
 import { ArrowLeftIcon, ArrowRightIcon, CloseIcon } from '../components/common/Icons';
@@ -14,6 +14,11 @@ export default function ImageUploader({ images = [], onChange, folder = 'product
   const inputRef = useRef();
   const [dragging, setDragging] = useState(false);
   const [uploads, setUploads] = useState({}); // { tempId: progress }
+
+  const imagesRef = useRef(images);
+  useEffect(() => {
+    imagesRef.current = images;
+  }, [images]);
 
   function handleFiles(files) {
     Array.from(files).forEach((file) => {
@@ -43,7 +48,9 @@ export default function ImageUploader({ images = [], onChange, folder = 'product
         },
         async () => {
           const url = await getDownloadURL(task.snapshot.ref);
-          onChange([...images, url]);
+          const nextImages = [...imagesRef.current, url];
+          imagesRef.current = nextImages;
+          onChange(nextImages);
           setUploads((prev) => {
             const copy = { ...prev };
             delete copy[tempId];

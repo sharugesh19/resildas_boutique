@@ -10,7 +10,9 @@ service cloud.firestore {
 
     // Orders — user can create their own, read/update their own; admin can do all
     match /orders/{id} {
-      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+      allow create: if request.auth != null
+        && request.auth.uid == request.resource.data.userId
+        && request.resource.data.orderStatus == 'placed';
       allow read, update: if request.auth != null &&
         (request.auth.uid == resource.data.userId || request.auth.token.admin == true);
       allow delete: if request.auth != null && request.auth.token.admin == true;

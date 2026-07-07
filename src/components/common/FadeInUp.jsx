@@ -15,7 +15,8 @@ function FadeInUp({ children, delay = 0, duration = 0.5, className = '' }) {
       className={className}
       variants={variants}
       initial="hidden"
-      animate="visible"
+      whileInView="visible"
+      viewport={{ once: true, margin: "-60px" }}
       transition={{ duration, delay, ease: 'easeOut' }}
     >
       {children}

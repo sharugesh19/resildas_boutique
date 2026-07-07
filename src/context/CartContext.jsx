@@ -59,18 +59,15 @@ function cartReducer(state, action) {
 // ── Provider ─────────────────────────────────────────────────────────────────
 
 export function CartProvider({ children }) {
-  const [cart, dispatch] = useReducer(cartReducer, [])
-  const [isOpen, setIsOpen] = React.useState(false)
-
-  // Hydrate from localStorage once on mount
-  useEffect(() => {
+  const [cart, dispatch] = useReducer(cartReducer, [], () => {
     try {
       const raw = localStorage.getItem(CART_STORAGE_KEY)
-      if (raw) dispatch({ type: 'LOAD', payload: JSON.parse(raw) })
+      return raw ? JSON.parse(raw) : []
     } catch {
-      localStorage.removeItem(CART_STORAGE_KEY)
+      return []
     }
-  }, [])
+  })
+  const [isOpen, setIsOpen] = React.useState(false)
 
   // Persist on every cart change
   useEffect(() => {

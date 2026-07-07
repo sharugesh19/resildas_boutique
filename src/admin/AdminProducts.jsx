@@ -57,11 +57,19 @@ export default function AdminProducts() {
     if (!deleteTarget) return;
     setDeleting(true);
     try {
-      const images = deleteTarget.images || [];
-      for (const url of images) {
+      const images = [...(deleteTarget.images || [])];
+      if (Array.isArray(deleteTarget.colors)) {
+        deleteTarget.colors.forEach((c) => {
+          if (Array.isArray(c.images)) {
+            images.push(...c.images);
+          }
+        });
+      }
+      const uniqueImages = Array.from(new Set(images));
+      for (const url of uniqueImages) {
         try {
           await deleteObject(ref(storage, url));
-        } catch{ /* ignore missing images */ }
+        } catch { /* ignore missing images */ }
       }
       await deleteDoc(doc(db, 'products', deleteTarget.id));
       setProducts((prev) => prev.filter((p) => p.id !== deleteTarget.id));

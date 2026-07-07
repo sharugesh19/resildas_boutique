@@ -12,7 +12,7 @@ const Account           = lazy(() => import('../pages/Account'))
 const Login             = lazy(() => import('../pages/Login'))
 const Checkout          = lazy(() => import('../pages/Checkout'))
 const NotFound          = lazy(() => import('../pages/NotFound'))
-const ProtectedWishlist = lazy(() => import('../components/common/ProtectedWishlist'))
+const ProtectedRoute = lazy(() => import('../components/common/ProtectedRoute'))
 const AdminRoutes       = lazy(() => import('../admin/AdminRoutes'))
 
 function PageLoader() {
@@ -55,16 +55,16 @@ function AppRoutes() {
           {/* Protected — login required */}
           <Route path="/wishlist" element={
             <PageTransition>
-              <ProtectedWishlist>
+              <ProtectedRoute>
                 <Wishlist />
-              </ProtectedWishlist>
+              </ProtectedRoute>
             </PageTransition>
           } />
            <Route path="/account" element={
             <PageTransition>
-              <ProtectedWishlist>
+              <ProtectedRoute>
                 <Account />
-              </ProtectedWishlist>
+              </ProtectedRoute>
             </PageTransition>
           } />
 

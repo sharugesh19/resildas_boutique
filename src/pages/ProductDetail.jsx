@@ -232,7 +232,10 @@ function ProductDetail() {
   }, [selectedColor])
 
   useEffect(() => {
+    setSelectedColor(product?.colors?.length > 0 ? product.colors[0] : null)
     setSelectedSize('')
+    setActiveImg(0)
+    setQty(1)
   }, [product?.id])
 
   if (loading) {

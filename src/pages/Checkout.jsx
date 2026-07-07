@@ -1,6 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
+import { db } from '../firebase/firebaseConfig'
 import { useCart }  from '../context/CartContext'
 import { useAuth } from '../hooks/useAuth'
 import { formatPrice } from '../utils/formatPrice'
@@ -37,16 +39,22 @@ function Checkout() {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError]           = useState('')
 
+  useEffect(() => {
+    if (!user) {
+      navigate('/login?redirect=/checkout')
+    }
+  }, [user, navigate])
+
   const handleChange = (e) => {
-  const { name, value } = e.target
-  if (name === 'pincode') {
-    // strip anything that isn't a digit, cap at 6 characters
-    const digitsOnly = value.replace(/\D/g, '').slice(0, 6)
-    setAddr((prev) => ({ ...prev, pincode: digitsOnly }))
-    return
+    const { name, value } = e.target
+    if (name === 'pincode') {
+      // strip anything that isn't a digit, cap at 6 characters
+      const digitsOnly = value.replace(/\D/g, '').slice(0, 6)
+      setAddr((prev) => ({ ...prev, pincode: digitsOnly }))
+      return
+    }
+    setAddr((prev) => ({ ...prev, [name]: value }))
   }
-  setAddr((prev) => ({ ...prev, [name]: value }))
-}
 
   const orderTotal = cartTotal  // shipping always free
 
@@ -56,30 +64,61 @@ function Checkout() {
   }
 
   const handleSubmit = async (e) => {
-  e.preventDefault()
-  setError('')
+    e.preventDefault()
+    setError('')
 
-  if (!PHONE_REGEX.test(addr.phone.trim())) {
-    setError('Please enter a valid 10-digit Indian mobile number.')
-    return
-  }
-  if (!PINCODE_REGEX.test(addr.pincode.trim())) {
-    setError('Please enter a valid 6-digit pincode.')
-    return
-  }
+    if (!user) {
+      setError('You must be logged in to place an order.')
+      return
+    }
+    if (!PHONE_REGEX.test(addr.phone.trim())) {
+      setError('Please enter a valid 10-digit Indian mobile number.')
+      return
+    }
+    if (!PINCODE_REGEX.test(addr.pincode.trim())) {
+      setError('Please enter a valid 6-digit pincode.')
+      return
+    }
 
-  setSubmitting(true)
-  try {
-    // TODO: Integrate Razorpay
-    await new Promise((r) => setTimeout(r, 1000))
-    clearCart()
-    navigate('/?order=success')
-  } catch {
-    setError('Order could not be placed. Please try again.')
-  } finally {
-    setSubmitting(false)
+    setSubmitting(true)
+    try {
+      const orderPayload = {
+        userId: user.uid,
+        customerName: addr.fullName.trim(),
+        phone: addr.phone.trim(),
+        email: addr.email.trim(),
+        address: {
+          address1: addr.address1.trim(),
+          address2: addr.address2.trim(),
+          city: addr.city.trim(),
+          state: addr.state,
+          pincode: addr.pincode.trim(),
+        },
+        items: cart.map((item) => ({
+          productId: item.product.id,
+          name: item.product.name,
+          price: Number(item.product.price),
+          quantity: Number(item.quantity),
+          size: item.size,
+          color: item.color,
+          image: item.product.images?.[0] || null,
+        })),
+        total: Number(orderTotal),
+        paymentMethod: 'prepaid',
+        orderStatus: 'placed',
+        createdAt: serverTimestamp(),
+      }
+
+      await addDoc(collection(db, 'orders'), orderPayload)
+      clearCart()
+      navigate('/?order=success')
+    } catch (err) {
+      console.error('Order creation error:', err)
+      setError('Order could not be placed. Please try again.')
+    } finally {
+      setSubmitting(false)
+    }
   }
-}
 
   if (cart.length === 0) {
     return (

@@ -68,9 +68,32 @@ function CartDrawer() {
   )
 }
 
+function getCartItemMaxQty(item) {
+  const { product, size, color } = item
+  if (color && Array.isArray(product.colors)) {
+    const colorData = product.colors.find(c => c.name === color)
+    if (colorData && Array.isArray(colorData.sizes)) {
+      const sizeData = colorData.sizes.find(s => s.size === size)
+      if (sizeData && typeof sizeData.stock === 'number') {
+        return sizeData.stock
+      }
+    }
+  } else if (Array.isArray(product.sizes)) {
+    const sizeData = product.sizes.find(s => s.size === size)
+    if (sizeData && typeof sizeData.stock === 'number') {
+      return sizeData.stock
+    }
+  }
+
+  if (typeof product.stock === 'number') {
+    return product.stock
+  }
+  return 10
+}
+
 function CartItem({ item, onRemove, onQtyChange }) {
   const { product, size, quantity, color } = item
-  const maxQty = typeof product.stock === 'number' && product.stock > 0 ? product.stock : 10
+  const maxQty = getCartItemMaxQty(item)
 
   return (
     <div className="cart-drawer__item">
@@ -102,7 +125,7 @@ function CartItem({ item, onRemove, onQtyChange }) {
           </button>
         </div>
 
-        {quantity >= maxQty && typeof product.stock === 'number' && (
+        {quantity >= maxQty && (typeof product.stock === 'number' || color || product.sizes?.length > 0) && (
           <p style={{ fontSize: '0.7rem', color: '#cc0000', marginTop: '-4px', marginBottom: '8px' }}>
             Max available reached
           </p>
