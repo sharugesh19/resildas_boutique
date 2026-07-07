@@ -6,7 +6,7 @@ import { useWishlist } from '../../context/WishlistContext'
 import SearchBar       from './SearchBar'
 
 function Navbar() {
-  const { isLoggedIn, logout } = useAuth()
+  const { isLoggedIn } = useAuth()
   const { cartCount, openCart } = useCart()
   const { wishlistCount }       = useWishlist()
   const navigate                = useNavigate()
@@ -69,10 +69,6 @@ function Navbar() {
     return () => window.removeEventListener('scroll', getActiveSection)
   }, [location.pathname])
 
-  const handleLogout = async () => {
-    await logout()
-    navigate('/')
-  }
 
   const scrollTo = useCallback((sectionId) => {
     setMenuOpen(false)

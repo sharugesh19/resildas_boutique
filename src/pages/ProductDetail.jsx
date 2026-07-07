@@ -236,7 +236,7 @@ function ProductDetail() {
     setSelectedSize('')
     setActiveImg(0)
     setQty(1)
-  }, [product?.id])
+  }, [product?.id, product?.colors])
 
   if (loading) {
     return (

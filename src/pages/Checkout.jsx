@@ -23,7 +23,7 @@ const EMPTY_ADDR = {
   address1: '', address2: '', city: '', state: '', pincode: '',
 }
 
-const PHONE_REGEX = /^(\+91[\-\s]?)?[0]?(91)?[6789]\d{9}$/
+const PHONE_REGEX = /^(\+91[-\s]?)?[0]?(91)?[6789]\d{9}$/
 const PINCODE_REGEX = /^[1-9][0-9]{5}$/ // 6 digits, doesn't start with 0
 
 function Checkout() {
