@@ -7,6 +7,26 @@ import { useAuth } from '../../hooks/useAuth'
 import { formatPrice, calcDiscount } from '../../utils/formatPrice'
 import { requireLogin } from '../../utils/requireLogin'
 import { CATEGORY_LABELS } from '../../data/productsData'
+import { normalizeSizes } from '../../utils/normalizeSizes'
+
+// Picks a sensible default color+size for the one-click "Add to Cart" button.
+// For color products: prefers the first color that has an in-stock size;
+// falls back to the very first color+size if nothing shows stock > 0.
+// For plain products: just resolves the first size, string or object alike.
+function pickDefaultVariant(product) {
+  if (Array.isArray(product.colors) && product.colors.length > 0) {
+    for (const color of product.colors) {
+      const options = normalizeSizes(color.sizes || [])
+      const inStock = options.find((o) => o.stock > 0)
+      if (inStock) return { color: color.name, size: inStock.size }
+    }
+    const fallbackColor = product.colors[0]
+    const fallbackOptions = normalizeSizes(fallbackColor.sizes || [])
+    return { color: fallbackColor.name, size: fallbackOptions[0]?.size ?? 'Free Size' }
+  }
+  const options = normalizeSizes(product.sizes || [])
+  return { color: null, size: options[0]?.size ?? 'Free Size' }
+}
 
 function ProductCard({ product }) {
   const { addToCart }                    = useCart()
@@ -18,7 +38,7 @@ function ProductCard({ product }) {
 
   const discount      = calcDiscount(product.price, product.originalPrice)
   const wishlisted    = isWishlisted(product.id)
-  const defaultSize   = product.sizes?.[0] ?? 'Free Size'
+
   const imgSrc        = product.images?.[0]
   const categoryLabel = CATEGORY_LABELS[product.category] ?? product.category
 
@@ -30,7 +50,8 @@ function ProductCard({ product }) {
 
   const handleAddToCart = (e) => {
     e.preventDefault()
-    addToCart(product, defaultSize, 1)
+    const { color, size } = pickDefaultVariant(product)
+    addToCart(product, size, 1, color)
   }
 
   const showPlaceholder = !imgSrc || imgError

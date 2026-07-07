@@ -4,9 +4,8 @@
 // Run this locally with Node — never deploy or expose this file.
 //
 // USAGE:
-//   node scripts/setAdminClaim.js add admin@yourdomain.com
-//   node scripts/setAdminClaim.js remove admin@yourdomain.com
-//
+//   node scripts/setAdminClaim.js add admin@example.com
+//   node scripts/setAdminClaim.js remove admin@example.com
 // Requirements:
 //   1. npm install firebase-admin   (run this once inside scripts/ or project root)
 //   2. scripts/serviceAccountKey.json must exist (downloaded from Firebase Console)

@@ -10,7 +10,7 @@
  *  3. Creates product documents in Firestore with all details + image URLs
  *  4. Skips any product that already exists (safe to re-run)
  */
-
+const { FieldValue } = require('firebase-admin/firestore')
 const { initializeApp, cert } = require('firebase-admin/app')
 const { getFirestore } = require('firebase-admin/firestore')
 const { getStorage } = require('firebase-admin/storage')
@@ -29,11 +29,17 @@ const bucket = getStorage().bucket()
 // ── Base path to your product-images folder ─────────────────────────────────
 // Set via env var: PRODUCT_IMAGES_DIR=/path/to/product-images
 // Or pass as CLI arg: node uploadProducts.js /path/to/product-images
-const BASE_PATH = process.env.PRODUCT_IMAGES_DIR || process.argv[2] || (() => {
-  console.error('❌  Please set PRODUCT_IMAGES_DIR env variable or pass the path as a CLI argument.')
-  console.error('    Example: node uploadProducts.js /Users/you/Desktop/product-images')
+const BASE_PATH = process.env.PRODUCT_IMAGES_DIR || process.argv[2]
+
+if (!BASE_PATH) {
+  console.error('❌ Missing product images path.')
+  console.error('Provide it using PRODUCT_IMAGES_DIR or as a CLI argument.')
+  console.error('Examples:')
+  console.error('  Windows (PowerShell): $env:PRODUCT_IMAGES_DIR="C:\\path\\to\\product-images"; node uploadProducts.js')
+  console.error('  Windows (cmd): set PRODUCT_IMAGES_DIR=C:\\path\\to\\product-images && node uploadProducts.js')
+  console.error('  CLI: node uploadProducts.js C:\\path\\to\\product-images')
   process.exit(1)
-})()
+}
 
 // ── Folder names (exact, as on disk) ────────────────────────────────────────
 const FOLDERS = {
@@ -662,7 +668,7 @@ async function uploadAllProducts() {
       // Build the Firestore document
       const doc = {
         ...productData,
-        createdAt: getFirestore.FieldValue?.serverTimestamp() ?? new Date(),
+        createdAt: FieldValue.serverTimestamp(),
       }
 
       if (colors) {

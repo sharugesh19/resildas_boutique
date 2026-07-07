@@ -16,7 +16,17 @@ export function useCart() {
 const makeKey = (productId, size, color) =>
   `${productId}__${size}${color ? `__${color}` : ''}`
 
-
+/** Resolves the correct unit price — color-specific if the product has one
+ * set for that color, otherwise falls back to the product's base price. */
+function resolveUnitPrice(product, color) {
+  if (color && Array.isArray(product.colors)) {
+    const colorData = product.colors.find((c) => c.name === color)
+    if (colorData && Number(colorData.price) > 0) {
+      return Number(colorData.price)
+    }
+  }
+  return Number(product.price) || 0
+}
 
 // ── Reducer ──────────────────────────────────────────────────────────────────
 
@@ -29,13 +39,14 @@ function cartReducer(state, action) {
     case 'ADD': {
       const { product, size, quantity = 1, color = null } = action.payload
       const key = makeKey(product.id, size, color)
+      const price = resolveUnitPrice(product, color)
       const existing = state.find((i) => i.key === key)
       if (existing) {
         return state.map((i) =>
           i.key === key ? { ...i, quantity: i.quantity + quantity } : i
         )
       }
-     return [...state, { key, product, size, quantity, color }]
+      return [...state, { key, product, size, quantity, color, price }]
     }
     case 'REMOVE': {
       return state.filter((i) => i.key !== action.payload.key)
@@ -77,9 +88,9 @@ export function CartProvider({ children }) {
   // ── Public API ────────────────────────────────────────────────────────────
 
   const addToCart = (product, size, quantity = 1, color = null) => {
-  dispatch({ type: 'ADD', payload: { product, size, quantity, color } })
-  setIsOpen(true)
-}
+    dispatch({ type: 'ADD', payload: { product, size, quantity, color } })
+    setIsOpen(true)
+  }
 
   const removeFromCart = (key) => dispatch({ type: 'REMOVE', payload: { key } })
 
@@ -94,7 +105,9 @@ export function CartProvider({ children }) {
   // ── Derived state ─────────────────────────────────────────────────────────
 
   const cartCount = cart.reduce((sum, i) => sum + i.quantity, 0)
-  const cartTotal = cart.reduce((sum, i) => sum + i.product.price * i.quantity, 0)
+  // Falls back to product.price for any cart items saved in localStorage
+  // before this fix (those won't have a "price" field yet).
+  const cartTotal = cart.reduce((sum, i) => sum + (i.price ?? i.product.price) * i.quantity, 0)
 
   const value = {
     cart,

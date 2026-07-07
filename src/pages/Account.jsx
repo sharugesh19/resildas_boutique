@@ -39,6 +39,7 @@ function Account() {
         const snap = await getDocs(q)
         setOrders(snap.docs.map((d) => ({ id: d.id, ...d.data() })))
       } catch (err) {
+        console.error('ORDER FETCH ERROR:', err)
         setError(err.message)
       } finally {
         setLoading(false)

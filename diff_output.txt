@@ -1,0 +1,72 @@
+diff --git a/src/components/common/Navbar.jsx b/src/components/common/Navbar.jsx
+index b3e4ca6..dccedbe 100644
+--- a/src/components/common/Navbar.jsx
++++ b/src/components/common/Navbar.jsx
+@@ -6,7 +6,7 @@ import { useWishlist } from '../../context/WishlistContext'
+ import SearchBar       from './SearchBar'
+ 
+ function Navbar() {
+-  const { isLoggedIn, logout } = useAuth()
++  const { isLoggedIn } = useAuth()
+   const { cartCount, openCart } = useCart()
+   const { wishlistCount }       = useWishlist()
+   const navigate                = useNavigate()
+@@ -69,10 +69,6 @@ function Navbar() {
+     return () => window.removeEventListener('scroll', getActiveSection)
+   }, [location.pathname])
+ 
+-  const handleLogout = async () => {
+-    await logout()
+-    navigate('/')
+-  }
+ 
+   const scrollTo = useCallback((sectionId) => {
+     setMenuOpen(false)
+diff --git a/src/pages/Checkout.jsx b/src/pages/Checkout.jsx
+index 426a8c3..f16b412 100644
+--- a/src/pages/Checkout.jsx
++++ b/src/pages/Checkout.jsx
+@@ -23,7 +23,7 @@ const EMPTY_ADDR = {
+   address1: '', address2: '', city: '', state: '', pincode: '',
+ }
+ 
+-const PHONE_REGEX = /^(\+91[\-\s]?)?[0]?(91)?[6789]\d{9}$/
++const PHONE_REGEX = /^(\+91[-\s]?)?[0]?(91)?[6789]\d{9}$/
+ const PINCODE_REGEX = /^[1-9][0-9]{5}$/ // 6 digits, doesn't start with 0
+ 
+ function Checkout() {
+diff --git a/src/pages/ProductDetail.jsx b/src/pages/ProductDetail.jsx
+index b7c548e..c7f26e4 100644
+--- a/src/pages/ProductDetail.jsx
++++ b/src/pages/ProductDetail.jsx
+@@ -236,7 +236,7 @@ function ProductDetail() {
+     setSelectedSize('')
+     setActiveImg(0)
+     setQty(1)
+-  }, [product?.id])
++  }, [product?.id, product?.colors])
+ 
+   if (loading) {
+     return (
+@@ -291,7 +291,7 @@ function ProductDetail() {
+   const catLabel   = CATEGORY_LABELS[product.category] ?? product.category
+   const catDetail  = CATEGORY_DETAILS[product.category] ?? null
+   const showSize   = catDetail?.showSize ?? true
+-  const rawSizes    = hasColors ? (selectedColor?.sizes ?? []) : (product.sizes ?? [])
++  const rawSizes    = (hasColors && selectedColor?.sizes?.length > 0) ? selectedColor.sizes : (product.sizes ?? [])
+   const sizeOptions = normalizeSizes(rawSizes)
+   const selectedSizeData = sizeOptions.find((s) => s.size === selectedSize)
+   const savings    = activeOriginalPrice > activePrice ? activeOriginalPrice - activePrice : null
+diff --git a/src/utils/normalizeSizes.js b/src/utils/normalizeSizes.js
+index c9dbdc5..23e1f9c 100644
+--- a/src/utils/normalizeSizes.js
++++ b/src/utils/normalizeSizes.js
+@@ -12,7 +12,7 @@ export function normalizeSizes(sizes) {
+     .map((s) => {
+       if (typeof s === 'string') {
+         const trimmed = s.trim();
+-        return trimmed ? { size: trimmed, stock: 0 } : null;
++        return trimmed ? { size: trimmed, stock: 10 } : null;
+       }
+       if (s && typeof s === 'object' && typeof s.size === 'string' && s.size.trim()) {
+         return { size: s.size.trim(), stock: Number(s.stock) || 0 };

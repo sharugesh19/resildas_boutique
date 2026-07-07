@@ -93,6 +93,7 @@ function getCartItemMaxQty(item) {
 
 function CartItem({ item, onRemove, onQtyChange }) {
   const { product, size, quantity, color } = item
+  const unitPrice = item.price ?? product.price // fallback for carts saved before this fix
   const maxQty = getCartItemMaxQty(item)
 
   return (
@@ -132,7 +133,7 @@ function CartItem({ item, onRemove, onQtyChange }) {
         )}
 
         <div className="cart-drawer__item-footer">
-          <span className="cart-drawer__item-price">{formatPrice(product.price * quantity)}</span>
+          <span className="cart-drawer__item-price">{formatPrice(unitPrice * quantity)}</span>
           <button className="cart-drawer__remove" onClick={onRemove}>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>

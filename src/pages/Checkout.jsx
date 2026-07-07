@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
-import { db } from '../firebase/firebaseConfig'
+import { getApp } from 'firebase/app'
+import { getFunctions, httpsCallable } from 'firebase/functions'
 import { useCart }  from '../context/CartContext'
 import { useAuth } from '../hooks/useAuth'
 import { formatPrice } from '../utils/formatPrice'
-import { MapPinIcon, CreditCardIcon, BagIcon, ImagePlaceholderIcon, LockIcon, ExchangeIcon, TruckIcon } from '../components/common/Icons'
+import { MapPinIcon, CreditCardIcon, BagIcon, ImagePlaceholderIcon, LockIcon, ExchangeIcon, TruckIcon, CheckIcon } from '../components/common/Icons'
 
 const INDIAN_STATES = [
   'Andhra Pradesh','Arunachal Pradesh','Assam','Bihar','Chhattisgarh',
@@ -25,6 +25,10 @@ const EMPTY_ADDR = {
 
 const PHONE_REGEX = /^(\+91[-\s]?)?[0]?(91)?[6789]\d{9}$/
 const PINCODE_REGEX = /^[1-9][0-9]{5}$/ // 6 digits, doesn't start with 0
+
+// placeOrder must be called in the same region it was deployed to (asia-south1)
+const functions = getFunctions(getApp(), 'asia-south1')
+const placeOrderFn = httpsCallable(functions, 'placeOrder')
 
 function Checkout() {
   const { cart, cartTotal, clearCart, openCart } = useCart()
@@ -56,7 +60,7 @@ function Checkout() {
     setAddr((prev) => ({ ...prev, [name]: value }))
   }
 
-  const orderTotal = cartTotal  // shipping always free
+  const orderTotal = cartTotal  // shipping always free (client-side display only — server recalculates the real total)
 
   const handleGoToCart = () => {
     navigate('/')
@@ -82,12 +86,11 @@ function Checkout() {
 
     setSubmitting(true)
     try {
-      const orderPayload = {
-        userId: user.uid,
-        customerName: addr.fullName.trim(),
-        phone: addr.phone.trim(),
-        email: addr.email.trim(),
-        address: {
+      const payload = {
+        customer: {
+          name: addr.fullName.trim(),
+          phone: addr.phone.trim(),
+          email: addr.email.trim(),
           address1: addr.address1.trim(),
           address2: addr.address2.trim(),
           city: addr.city.trim(),
@@ -96,25 +99,23 @@ function Checkout() {
         },
         items: cart.map((item) => ({
           productId: item.product.id,
-          name: item.product.name,
-          price: Number(item.product.price),
-          quantity: Number(item.quantity),
+          colorName: item.color || null,
           size: item.size,
-          color: item.color,
-          image: item.product.images?.[0] || null,
+          qty: Number(item.quantity),
         })),
-        total: Number(orderTotal),
-        paymentMethod: 'prepaid',
-        orderStatus: 'placed',
-        createdAt: serverTimestamp(),
       }
 
-      await addDoc(collection(db, 'orders'), orderPayload)
+      // Server verifies real prices, checks + decrements stock, and writes
+      // the order — nothing here is trusted, it's all re-checked in placeOrder.
+      await placeOrderFn(payload)
+
       clearCart()
       navigate('/?order=success')
     } catch (err) {
       console.error('Order creation error:', err)
-      setError('Order could not be placed. Please try again.')
+      // Cloud Function errors (out of stock, price issue, etc.) carry a
+      // readable message — show it directly instead of a generic failure.
+      setError(err?.message || 'Order could not be placed. Please try again.')
     } finally {
       setSubmitting(false)
     }
@@ -275,7 +276,7 @@ function Checkout() {
                   <strong>Pay Online</strong>
                   <p>UPI, Cards, Net Banking via Razorpay</p>
                 </div>
-                <span className="payment-option__check">✔</span>
+                <span className="payment-option__check" style={{ display: 'inline-flex', alignItems: 'center' }}><CheckIcon size={16} /></span>
               </div>
 
             </div>
@@ -314,7 +315,7 @@ function Checkout() {
                         {item.size !== 'Free Size' && ` (${item.size})`}
                       </p>
                       <p className="checkout-summary__meta">Qty: {item.quantity}</p>
-                      <p className="checkout-summary__price">{formatPrice(item.product.price * item.quantity)}</p>
+                      <p className="checkout-summary__price">{formatPrice((item.price ?? item.product.price) * item.quantity)}</p>
                     </div>
                   </li>
                 ))}
