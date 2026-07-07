@@ -27,7 +27,13 @@ const db     = getFirestore()
 const bucket = getStorage().bucket()
 
 // ── Base path to your product-images folder ─────────────────────────────────
-const BASE_PATH = 'C:\\Users\\kmahe\\OneDrive\\Desktop\\product-images'
+// Set via env var: PRODUCT_IMAGES_DIR=/path/to/product-images
+// Or pass as CLI arg: node uploadProducts.js /path/to/product-images
+const BASE_PATH = process.env.PRODUCT_IMAGES_DIR || process.argv[2] || (() => {
+  console.error('❌  Please set PRODUCT_IMAGES_DIR env variable or pass the path as a CLI argument.')
+  console.error('    Example: node uploadProducts.js /Users/you/Desktop/product-images')
+  process.exit(1)
+})()
 
 // ── Folder names (exact, as on disk) ────────────────────────────────────────
 const FOLDERS = {

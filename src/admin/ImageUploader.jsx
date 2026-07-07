@@ -21,8 +21,14 @@ export default function ImageUploader({ images = [], onChange, folder = 'product
   }, [images]);
 
   function handleFiles(files) {
+    const MAX_SIZE_MB = 5;
+    const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
     Array.from(files).forEach((file) => {
       if (!file.type.startsWith('image/')) return;
+      if (file.size > MAX_SIZE_BYTES) {
+        alert(`"${file.name}" is too large (${(file.size / 1024 / 1024).toFixed(1)} MB). Max allowed size is ${MAX_SIZE_MB} MB.`);
+        return;
+      }
       const tempId = `${Date.now()}_${Math.random()}`;
       setUploads((prev) => ({ ...prev, [tempId]: 0 }));
 
@@ -98,7 +104,7 @@ export default function ImageUploader({ images = [], onChange, folder = 'product
           <line x1="12" y1="3" x2="12" y2="15" />
         </svg>
         <p><span>Click to upload</span> or drag &amp; drop images</p>
-        <p style={{ fontSize: 11, marginTop: 4 }}>First image = main product image</p>
+        <p style={{ fontSize: 11, marginTop: 4 }}>First image = main product image · Max 5 MB per file</p>
       </div>
 
       <input
