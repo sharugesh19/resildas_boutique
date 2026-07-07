@@ -291,7 +291,7 @@ function ProductDetail() {
   const catLabel   = CATEGORY_LABELS[product.category] ?? product.category
   const catDetail  = CATEGORY_DETAILS[product.category] ?? null
   const showSize   = catDetail?.showSize ?? true
-  const rawSizes    = hasColors ? (selectedColor?.sizes ?? []) : (product.sizes ?? [])
+  const rawSizes    = (hasColors && selectedColor?.sizes?.length > 0) ? selectedColor.sizes : (product.sizes ?? [])
   const sizeOptions = normalizeSizes(rawSizes)
   const selectedSizeData = sizeOptions.find((s) => s.size === selectedSize)
   const savings    = activeOriginalPrice > activePrice ? activeOriginalPrice - activePrice : null

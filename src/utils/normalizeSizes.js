@@ -12,7 +12,7 @@ export function normalizeSizes(sizes) {
     .map((s) => {
       if (typeof s === 'string') {
         const trimmed = s.trim();
-        return trimmed ? { size: trimmed, stock: 0 } : null;
+        return trimmed ? { size: trimmed, stock: 10 } : null;
       }
       if (s && typeof s === 'object' && typeof s.size === 'string' && s.size.trim()) {
         return { size: s.size.trim(), stock: Number(s.stock) || 0 };
