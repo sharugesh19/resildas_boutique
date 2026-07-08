@@ -9,23 +9,21 @@ import { requireLogin } from '../../utils/requireLogin'
 import { CATEGORY_LABELS } from '../../data/productsData'
 import { normalizeSizes } from '../../utils/normalizeSizes'
 
-// Picks a sensible default color+size for the one-click "Add to Cart" button.
-// For color products: prefers the first color that has an in-stock size;
-// falls back to the very first color+size if nothing shows stock > 0.
-// For plain products: just resolves the first size, string or object alike.
-function pickDefaultVariant(product) {
+// Resolves which color to use (first one with any in-stock size, else the
+// first color regardless) and returns that color's size options.
+// For plain (no-color) products, just resolves the top-level sizes.
+function getAddToCartOptions(product) {
   if (Array.isArray(product.colors) && product.colors.length > 0) {
-    for (const color of product.colors) {
-      const options = normalizeSizes(color.sizes || [])
-      const inStock = options.find((o) => o.stock > 0)
-      if (inStock) return { color: color.name, size: inStock.size }
+    for (const c of product.colors) {
+      const opts = normalizeSizes(c.sizes || [])
+      if (opts.some((o) => o.stock > 0)) {
+        return { color: c.name, sizeOptions: opts }
+      }
     }
-    const fallbackColor = product.colors[0]
-    const fallbackOptions = normalizeSizes(fallbackColor.sizes || [])
-    return { color: fallbackColor.name, size: fallbackOptions[0]?.size ?? 'Free Size' }
+    const fallback = product.colors[0]
+    return { color: fallback.name, sizeOptions: normalizeSizes(fallback.sizes || []) }
   }
-  const options = normalizeSizes(product.sizes || [])
-  return { color: null, size: options[0]?.size ?? 'Free Size' }
+  return { color: null, sizeOptions: normalizeSizes(product.sizes || []) }
 }
 
 function ProductCard({ product }) {
@@ -35,6 +33,9 @@ function ProductCard({ product }) {
   const navigate                         = useNavigate()
   const [imgError, setImgError]          = useState(false)
   const [pressed, setPressed]            = useState(false)
+  const [showSizePicker, setShowSizePicker]         = useState(false)
+  const [pendingColor, setPendingColor]             = useState(null)
+  const [pendingSizeOptions, setPendingSizeOptions] = useState([])
 
   const discount      = calcDiscount(product.price, product.originalPrice)
   const wishlisted    = isWishlisted(product.id)
@@ -50,8 +51,33 @@ function ProductCard({ product }) {
 
   const handleAddToCart = (e) => {
     e.preventDefault()
-    const { color, size } = pickDefaultVariant(product)
-    addToCart(product, size, 1, color)
+    const { color, sizeOptions } = getAddToCartOptions(product)
+
+    // Only one size available (or none tracked) — just add it directly,
+    // no need to make the customer pick from a list of one.
+    if (sizeOptions.length <= 1) {
+      const size = sizeOptions[0]?.size ?? 'Free Size'
+      addToCart(product, size, 1, color)
+      return
+    }
+
+    // Multiple sizes — ask which one via the inline popup.
+    setPendingColor(color)
+    setPendingSizeOptions(sizeOptions)
+    setShowSizePicker(true)
+  }
+
+  const handlePickSize = (e, size) => {
+    e.preventDefault()
+    e.stopPropagation()
+    addToCart(product, size, 1, pendingColor)
+    setShowSizePicker(false)
+  }
+
+  const closeSizePicker = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setShowSizePicker(false)
   }
 
   const showPlaceholder = !imgSrc || imgError
@@ -138,20 +164,73 @@ function ProductCard({ product }) {
       </Link>
 
       {/* The ONE real Add to Cart button — outside the Link, at the bottom */}
-      <motion.button
-        className={`product-card__add${pressed ? ' product-card__add--pressed' : ''}`}
-        onClick={handleAddToCart}
-        disabled={!product.inStock}
-        whileTap={{ scale: 0.97, transition: { duration: 0.1 } }}
-        onPointerDown={(e) => {
-          e.currentTarget.setPointerCapture(e.pointerId)
-          setPressed(true)
-        }}
-        onPointerUp={() => setPressed(false)}
-        onPointerCancel={() => setPressed(false)}
-      >
-        {product.inStock ? 'Add to Cart' : 'Out of Stock'}
-      </motion.button>
+      <div style={{ position: 'relative' }}>
+        <motion.button
+          className={`product-card__add${pressed ? ' product-card__add--pressed' : ''}`}
+          onClick={handleAddToCart}
+          disabled={!product.inStock}
+          whileTap={{ scale: 0.97, transition: { duration: 0.1 } }}
+          onPointerDown={(e) => {
+            e.currentTarget.setPointerCapture(e.pointerId)
+            setPressed(true)
+          }}
+          onPointerUp={() => setPressed(false)}
+          onPointerCancel={() => setPressed(false)}
+        >
+          {product.inStock ? 'Add to Cart' : 'Out of Stock'}
+        </motion.button>
+
+        {showSizePicker && (
+          <>
+            {/* Invisible overlay — click anywhere outside to dismiss without adding */}
+            <div
+              onClick={closeSizePicker}
+              style={{ position: 'fixed', inset: 0, zIndex: 40 }}
+            />
+            <div
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                position: 'absolute',
+                bottom: 'calc(100% + 8px)',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                background: '#fff',
+                border: '1px solid #e5e5e5',
+                borderRadius: 8,
+                padding: '10px 12px',
+                boxShadow: '0 6px 20px rgba(0,0,0,0.15)',
+                zIndex: 50,
+                minWidth: 180,
+              }}
+            >
+              <p style={{ fontSize: 12, fontWeight: 600, margin: '0 0 8px', color: '#555' }}>
+                Select Size
+              </p>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                {pendingSizeOptions.map((opt) => (
+                  <button
+                    key={opt.size}
+                    type="button"
+                    disabled={opt.stock <= 0}
+                    onClick={(e) => handlePickSize(e, opt.size)}
+                    style={{
+                      padding: '6px 10px',
+                      fontSize: 12,
+                      border: '1px solid #ccc',
+                      borderRadius: 6,
+                      background: opt.stock <= 0 ? '#f2f2f2' : '#fff',
+                      color: opt.stock <= 0 ? '#aaa' : '#111',
+                      cursor: opt.stock <= 0 ? 'not-allowed' : 'pointer',
+                    }}
+                  >
+                    {opt.size}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+      </div>
     </motion.article>
   )
 }

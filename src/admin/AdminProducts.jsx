@@ -5,6 +5,9 @@ import { ref, deleteObject } from 'firebase/storage';
 import { db, storage } from '../firebase/firebaseConfig';
 import { Link } from 'react-router-dom';
 import { RefreshIcon } from '../components/common/Icons';
+import { invalidateProductsCache } from '../hooks/useProducts';
+
+
 
 const CATEGORIES = [
   { value: 'unstitched-salwar', label: 'Unstitched Salwar Set' },
@@ -72,6 +75,7 @@ export default function AdminProducts() {
         } catch { /* ignore missing images */ }
       }
       await deleteDoc(doc(db, 'products', deleteTarget.id));
+      await invalidateProductsCache();   // push removal to all open pages
       setProducts((prev) => prev.filter((p) => p.id !== deleteTarget.id));
       showMsg('success', `"${deleteTarget.name}" deleted.`);
     } catch (e) {

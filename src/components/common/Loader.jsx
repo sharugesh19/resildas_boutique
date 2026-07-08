@@ -1,15 +1,8 @@
+import { createPortal } from "react-dom";
 import "./Loader.css";
 
-/**
- * Reusable logo-based loading indicator.
- *
- * Usage:
- *   <Loader />                         // full-screen overlay (default)
- *   <Loader fullScreen={false} />       // inline, fits parent container
- *   <Loader size={60} />                // custom logo size in px
- */
 const Loader = ({ fullScreen = true, size = 200 }) => {
-  return (
+  const content = (
     <div className={fullScreen ? "loader-overlay" : "loader-inline"}>
       <div className="loader-content">
         <img
@@ -24,6 +17,11 @@ const Loader = ({ fullScreen = true, size = 200 }) => {
       </div>
     </div>
   );
+
+  if (fullScreen) {
+    return createPortal(content, document.body);
+  }
+  return content;
 };
 
 export default Loader;

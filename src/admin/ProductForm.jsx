@@ -15,6 +15,9 @@ import ColorVariants from './ColorVariants';
 import ImageUploader from './ImageUploader';
 import SizeStockEditor from './SizeStockEditor';
 import { normalizeSizes } from '../utils/normalizeSizes';
+import { invalidateProductsCache } from '../hooks/useProducts';
+
+
 
 // value = slug stored in Firestore (matches CATEGORY_LABELS in src/data/productsData.js)
 // label = shown to the admin
@@ -171,10 +174,12 @@ if (payload.inStock === undefined) delete payload.inStock;
 
       if (isEdit) {
         await updateDoc(doc(db, 'products', id), payload);
+        await invalidateProductsCache();   // push fresh data to all open pages
         setMsg({ type: 'success', text: 'Product updated successfully.' });
       } else {
         payload.createdAt = serverTimestamp();
         await addDoc(collection(db, 'products'), payload);
+        await invalidateProductsCache();   // push fresh data to all open pages
         setMsg({ type: 'success', text: 'Product added successfully.' });
         setTimeout(() => navigate('/admin/products'), 1200);
       }

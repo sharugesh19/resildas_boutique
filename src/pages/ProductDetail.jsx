@@ -14,6 +14,7 @@ import {
   BagIcon, BoltIcon, HeartIcon, TruckIcon, ExchangeIcon,
   LockIcon, MapPinIcon, ChevronLeftIcon, ChevronRightIcon, CloseIcon
 } from '../components/common/Icons'
+import { getMaxQty } from '../utils/stockHelpers'   // add to top imports
 
 const CATEGORY_DETAILS = {
   'unstitched-salwar': {
@@ -238,6 +239,24 @@ function ProductDetail() {
     setQty(1)
   }, [product?.id, product?.colors])
 
+  const catDetail = product
+    ? (CATEGORY_DETAILS[product.category] ?? null)
+    : null
+
+  const showSize = catDetail?.showSize ?? true
+
+  const sizeForStock = showSize
+    ? selectedSize
+    : 'Free Size'
+
+  const maxQty = product
+    ? getMaxQty(product, sizeForStock, selectedColor?.name ?? null)
+    : 1
+
+  useEffect(() => {
+  setQty((q) => Math.min(q, Math.max(maxQty, 1)))
+}, [maxQty])
+
   if (loading) {
     return (
       <main className="container" style={{ padding: '8rem 1rem', textAlign: 'center' }}>
@@ -289,15 +308,15 @@ function ProductDetail() {
   const discount   = calcDiscount(activePrice, activeOriginalPrice)
   const wishlisted = isWishlisted(product.id)
   const catLabel   = CATEGORY_LABELS[product.category] ?? product.category
-  const catDetail  = CATEGORY_DETAILS[product.category] ?? null
-  const showSize   = catDetail?.showSize ?? true
   const rawSizes    = (hasColors && selectedColor?.sizes?.length > 0) ? selectedColor.sizes : (product.sizes ?? [])
   const sizeOptions = normalizeSizes(rawSizes)
   const selectedSizeData = sizeOptions.find((s) => s.size === selectedSize)
   const savings    = activeOriginalPrice > activePrice ? activeOriginalPrice - activePrice : null
-  const maxQty = selectedSizeData?.stock != null
-    ? selectedSizeData.stock
-    : (typeof product.stock === 'number' && product.stock > 0 ? product.stock : 10)
+  // For categories without size selection (sarees etc.), use the first size entry's stock.
+  // selectedSizeData is always undefined in those cases since selectedSize is never set.
+
+ 
+
 
   const handleAddToCart = () => {
     const size = showSize ? selectedSize : 'Free Size'
@@ -623,33 +642,80 @@ function ProductDetail() {
 
           {activeTab === 'details' && (
             <div className="pd-tab-content">
-              {catDetail && (
-                <>
-                  <h3 className="pd-tab-heading">Top Highlights</h3>
-                  <div className="pd-highlights-grid">
-                    {catDetail.highlights.map(([key, val]) => (
-                      <div key={key} className="pd-highlight-item">
-                        <span className="pd-highlight-check"><CheckIcon size={14} /></span>
-                        <div>
-                          <strong>{key}</strong>
-                          <span>{val}</span>
-                        </div>
+              {catDetail && (() => {
+                  // Build a live spec list: start with the category template and
+                  // override / extend with actual values stored in the Firestore product.
+                  // Fields known to be editable via the admin form:
+                  const SPEC_FIELD_LABELS = {
+                    fabric:           'Fabric',
+                    borderType:       'Border Type',
+                    blouseIncluded:   'Blouse',
+                    setIncludes:      'Set Includes',
+                    careInstructions: 'Care Instructions',
+                    occasion:         'Occasion',
+                    sareetLength:     'Saree Length',
+                    weavetype:        'Weave Type',
+                    silkType:         'Silk Type',
+                    neckType:         'Neck Type',
+                    sleeveType:       'Sleeve Type',
+                    fitType:          'Fit Type',
+                  }
+
+                  // Build a merged spec list: use catDetail.specs as the template,
+                  // replacing each row's value with the live product field if it exists.
+                  const liveSpecs = catDetail.specs.map(([key, staticVal]) => {
+                    // Try to find a matching Firestore field by lowercased key comparison
+                    const productKey = Object.keys(SPEC_FIELD_LABELS).find(
+                      (k) => SPEC_FIELD_LABELS[k].toLowerCase() === key.toLowerCase()
+                    )
+                    const liveVal = productKey ? product[productKey] : undefined
+                    const display = liveVal !== undefined && liveVal !== null && liveVal !== ''
+                      ? (Array.isArray(liveVal) ? liveVal.join(', ') : String(liveVal === true ? 'Yes' : liveVal === false ? 'No' : liveVal))
+                      : staticVal
+                    return [key, display]
+                  })
+
+                  // Also build highlights with live values
+                  const liveHighlights = catDetail.highlights.map(([key, staticVal]) => {
+                    const productKey = Object.keys(SPEC_FIELD_LABELS).find(
+                      (k) => SPEC_FIELD_LABELS[k].toLowerCase() === key.toLowerCase()
+                    )
+                    const liveVal = productKey ? product[productKey] : undefined
+                    const display = liveVal !== undefined && liveVal !== null && liveVal !== ''
+                      ? (Array.isArray(liveVal) ? liveVal.join(', ') : String(liveVal === true ? 'Yes' : liveVal === false ? 'No' : liveVal))
+                      : staticVal
+                    return [key, display]
+                  })
+
+                  return (
+                    <>
+                      <h3 className="pd-tab-heading">Top Highlights</h3>
+                      <div className="pd-highlights-grid">
+                        {liveHighlights.map(([key, val]) => (
+                          <div key={key} className="pd-highlight-item">
+                            <span className="pd-highlight-check"><CheckIcon size={14} /></span>
+                            <div>
+                              <strong>{key}</strong>
+                              <span>{val}</span>
+                            </div>
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
-                  <h3 className="pd-tab-heading">{catDetail.specTitle}</h3>
-                  <table className="pd-spec-table">
-                    <tbody>
-                      {catDetail.specs.map(([key, val]) => (
-                        <tr key={key}>
-                          <td className="pd-spec-key">{key}</td>
-                          <td className="pd-spec-val">{val}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </>
-              )}
+                      <h3 className="pd-tab-heading">{catDetail.specTitle}</h3>
+                      <table className="pd-spec-table">
+                        <tbody>
+                          {liveSpecs.map(([key, val]) => (
+                            <tr key={key}>
+                              <td className="pd-spec-key">{key}</td>
+                              <td className="pd-spec-val">{val}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </>
+                  )
+                })()}
+
               {!catDetail && (
                 <p style={{ color: 'var(--color-grey-700)', lineHeight: 1.8 }}>{product.description}</p>
               )}

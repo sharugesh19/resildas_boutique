@@ -1,10 +1,12 @@
 import { Link } from 'react-router-dom'
 import { useCart }     from '../../context/CartContext'
+import { useProducts } from '../../hooks/useProducts'
 import { formatPrice } from '../../utils/formatPrice'
 import { ImagePlaceholderIcon } from './Icons'
 
 function CartDrawer() {
   const { cart, cartTotal, cartCount, isOpen, closeCart, removeFromCart, setQuantity } = useCart()
+  const { products: liveProducts } = useProducts()
 
   return (
     <>
@@ -45,6 +47,7 @@ function CartDrawer() {
               <CartItem
                 key={item.key}
                 item={item}
+                liveProducts={liveProducts}
                 onRemove={() => removeFromCart(item.key)}
                 onQtyChange={(qty) => setQuantity(item.key, qty)}
               />
@@ -68,33 +71,20 @@ function CartDrawer() {
   )
 }
 
-function getCartItemMaxQty(item) {
-  const { product, size, color } = item
-  if (color && Array.isArray(product.colors)) {
-    const colorData = product.colors.find(c => c.name === color)
-    if (colorData && Array.isArray(colorData.sizes)) {
-      const sizeData = colorData.sizes.find(s => s.size === size)
-      if (sizeData && typeof sizeData.stock === 'number') {
-        return sizeData.stock
-      }
-    }
-  } else if (Array.isArray(product.sizes)) {
-    const sizeData = product.sizes.find(s => s.size === size)
-    if (sizeData && typeof sizeData.stock === 'number') {
-      return sizeData.stock
-    }
-  }
+// Reads stock from the LIVE product data (fetched fresh, refreshed
+// automatically every couple minutes) instead of the snapshot saved on the
+// cart item when it was first added — so admin stock edits are respected
+// without needing to remove and re-add the item.
+import { getMaxQty } from '../../utils/stockHelpers'
 
-  if (typeof product.stock === 'number') {
-    return product.stock
-  }
-  return 10
+function getCartItemMaxQty(item, liveProducts) {
+  const liveProduct = liveProducts.find((p) => p.id === item.product.id) || item.product
+  return getMaxQty(liveProduct, item.size, item.color)
 }
-
-function CartItem({ item, onRemove, onQtyChange }) {
+function CartItem({ item, liveProducts, onRemove, onQtyChange }) {
   const { product, size, quantity, color } = item
-  const unitPrice = item.price ?? product.price // fallback for carts saved before this fix
-  const maxQty = getCartItemMaxQty(item)
+  const unitPrice = item.price ?? product.price // fallback for carts saved before the price fix
+  const maxQty = getCartItemMaxQty(item, liveProducts)
 
   return (
     <div className="cart-drawer__item">
