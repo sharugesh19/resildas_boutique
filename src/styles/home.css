@@ -453,6 +453,8 @@ main.page-content {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: var(--space-5);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* Without this, grid items default to min-width: auto, which lets their
@@ -1200,7 +1202,13 @@ main.page-content {
      wrapping, which is the exact cut-off card seen on a real phone. */
   .arrivals-grid-premium {
     grid-template-columns: repeat(2, 1fr);
-    gap: var(--space-4);
+    gap: var(--space-3);
+    overflow: hidden;
+  }
+  .new-arrivals-section .container {
+    padding-left: 12px;
+    padding-right: 12px;
+    overflow-x: hidden;
   }
 }
 @media (max-width: 768px) {
