@@ -608,12 +608,17 @@ main.page-content {
      scroll — it gets silently clipped, leaving the thin empty sliver
      of an adjacent card visible at the edge instead of one clean card. */
   .testimonials-grid {
-    grid-template-columns: 1fr;
-  }
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  gap: var(--space-4);
+  scrollbar-width: none;
+}
 
-  .testimonials-dots {
-    display: flex;
-  }
+.testimonial-card {
+  flex: 0 0 100%;
+  scroll-snap-align: center;
+}
 }
 
 .testimonial-card {

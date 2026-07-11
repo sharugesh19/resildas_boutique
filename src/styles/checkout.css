@@ -1,7 +1,9 @@
 /* ============================================================
    CHECKOUT PAGE — Resilda's Boutique
    ============================================================ */
-
+*, *::before, *::after {
+  box-sizing: border-box;
+}
 .checkout-page {
   background: var(--color-off-white);
   min-height: 100vh;
@@ -209,6 +211,7 @@
 
 /* ── Submit button ── */
 .checkout-submit {
+  box-sizing: border-box;
   width: 100%;
   margin-top: 1.25rem;
   padding: 1rem;
@@ -613,6 +616,7 @@
 }
 
 .btn-checkout {
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: center;
