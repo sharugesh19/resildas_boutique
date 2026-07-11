@@ -62,8 +62,12 @@ const categoryLinks = [
 ]
 
 const customerCareLinks = [
-  { label: 'My Account',        path: '/account' },
-  { label: 'My Wishlist',       path: '/wishlist' },
+  { label: 'My Account',          path: '/account' },
+  { label: 'My Wishlist',         path: '/wishlist' },
+  { label: 'Shipping Policy',     path: '/shipping-policy' },
+  { label: 'Return & Refund',     path: '/return-policy' },
+  { label: 'Privacy Policy',      path: '/privacy-policy' },
+  { label: 'Terms & Conditions',  path: '/terms-and-conditions' },
 ]
 
 function Footer() {

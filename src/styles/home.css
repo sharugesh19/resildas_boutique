@@ -455,7 +455,15 @@ main.page-content {
   gap: var(--space-5);
 }
 
+/* Without this, grid items default to min-width: auto, which lets their
+   intrinsic content (the product image inside ProductCard) push them
+   wider than their 1fr track — the row then silently overflows past the
+   viewport on real phones instead of shrinking to fit. Desktop DevTools'
+   mobile emulation doesn't reproduce this reliably since it's not a true
+   mobile rendering engine, which is why it looked fine there but not on
+   an actual phone. */
 .arrival-card-wrap {
+  min-width: 0;
   animation: fadeUp 0.5s ease both;
   animation-delay: var(--delay, 0ms);
 }
@@ -592,6 +600,20 @@ main.page-content {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: var(--space-4);
+}
+
+@media (max-width: 900px) {
+  /* Without this, 5 fixed columns can't fit a phone screen. Since
+     .testimonials-section has overflow: hidden, the overflow doesn't
+     scroll — it gets silently clipped, leaving the thin empty sliver
+     of an adjacent card visible at the edge instead of one clean card. */
+  .testimonials-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .testimonials-dots {
+    display: flex;
+  }
 }
 
 .testimonial-card {
@@ -1163,6 +1185,17 @@ main.page-content {
     margin-bottom: 0;
     text-align: center;
     width: 100%;
+  }
+
+  /* Without this override, the 4-column desktop grid tries to squeeze
+     onto a phone screen. Grid tracks can shrink, but grid items default
+     to min-width: auto, which lets a card's intrinsic content (its
+     product image) refuse to shrink below its natural size — so the row
+     silently overflows past the right edge of the viewport instead of
+     wrapping, which is the exact cut-off card seen on a real phone. */
+  .arrivals-grid-premium {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-4);
   }
 }
 @media (max-width: 768px) {

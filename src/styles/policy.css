@@ -1,0 +1,259 @@
+/* ═══════════════════════════════════════════
+   policy.css — Resilda's Boutique
+   Shared styles for all 4 policy pages
+═══════════════════════════════════════════ */
+
+.policy-page {
+  background: #0a0a0a;
+  color: #fafafa;
+  min-height: 100vh;
+  padding-top: 97px;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* ── Hero banner ────────────────────────── */
+.policy-hero {
+  background: linear-gradient(135deg, #111111 0%, #1a1000 50%, #111111 100%);
+  border-bottom: 1px solid rgba(212,160,23,0.2);
+  padding: 56px 24px 48px;
+  text-align: center;
+}
+
+.policy-hero__tag {
+  font-size: 12px;
+  letter-spacing: 3px;
+  color: #d4a017;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  font-family: 'Poppins', sans-serif;
+}
+
+.policy-hero__title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 700;
+  color: #fafafa;
+  margin: 0 0 12px;
+  line-height: 1.1;
+}
+
+.policy-hero__title span {
+  color: #d4a017;
+}
+
+.policy-hero__meta {
+  font-size: 13px;
+  color: #888;
+  margin: 0;
+}
+
+/* ── Gold divider ───────────────────────── */
+.policy-gold-line {
+  width: 56px;
+  height: 2px;
+  background: #d4a017;
+  margin: 16px auto 0;
+  border-radius: 2px;
+}
+
+/* ── Content wrapper ────────────────────── */
+.policy-body {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 56px 24px 80px;
+}
+
+/* ── Notice box (important callout) ─────── */
+.policy-notice {
+  background: rgba(212,160,23,0.07);
+  border: 1px solid rgba(212,160,23,0.25);
+  border-left: 4px solid #d4a017;
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-bottom: 40px;
+  font-size: 14px;
+  color: rgba(255,255,255,0.82);
+  line-height: 1.7;
+}
+
+.policy-notice strong {
+  color: #d4a017;
+}
+
+/* ── Section ────────────────────────────── */
+.policy-section {
+  margin-bottom: 48px;
+}
+
+.policy-section__number {
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: #d4a017;
+  text-transform: uppercase;
+  font-family: 'Poppins', sans-serif;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.policy-section__title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: #fafafa;
+  margin: 0 0 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(212,160,23,0.15);
+}
+
+.policy-section p {
+  font-size: 14.5px;
+  line-height: 1.85;
+  color: rgba(255,255,255,0.75);
+  margin-bottom: 14px;
+}
+
+.policy-section p:last-child {
+  margin-bottom: 0;
+}
+
+/* ── Lists ──────────────────────────────── */
+.policy-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.policy-list li {
+  font-size: 14.5px;
+  line-height: 1.75;
+  color: rgba(255,255,255,0.75);
+  padding-left: 20px;
+  position: relative;
+}
+
+.policy-list li::before {
+  content: '✦';
+  position: absolute;
+  left: 0;
+  color: #d4a017;
+  font-size: 9px;
+  top: 5px;
+}
+
+/* ── Steps (numbered process) ───────────── */
+.policy-steps {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  counter-reset: step-counter;
+}
+
+.policy-steps li {
+  font-size: 14.5px;
+  line-height: 1.75;
+  color: rgba(255,255,255,0.75);
+  padding-left: 40px;
+  position: relative;
+  counter-increment: step-counter;
+}
+
+.policy-steps li::before {
+  content: counter(step-counter);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 26px;
+  height: 26px;
+  background: rgba(212,160,23,0.15);
+  border: 1px solid rgba(212,160,23,0.4);
+  border-radius: 50%;
+  color: #d4a017;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* ── Highlight box (within section) ─────── */
+.policy-highlight {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(212,160,23,0.12);
+  border-radius: 8px;
+  padding: 18px 20px;
+  margin: 16px 0;
+}
+
+.policy-highlight p {
+  margin: 0;
+}
+
+/* ── Contact card ───────────────────────── */
+.policy-contact-card {
+  background: linear-gradient(135deg, rgba(212,160,23,0.08) 0%, rgba(212,160,23,0.03) 100%);
+  border: 1px solid rgba(212,160,23,0.25);
+  border-radius: 12px;
+  padding: 28px 32px;
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.policy-contact-card__item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 14px;
+  color: rgba(255,255,255,0.82);
+}
+
+.policy-contact-card__icon {
+  width: 36px;
+  height: 36px;
+  background: rgba(212,160,23,0.12);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #d4a017;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+.policy-contact-card__item a {
+  color: #d4a017;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.policy-contact-card__item a:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+}
+
+/* ── Footer note ────────────────────────── */
+.policy-footer-note {
+  margin-top: 56px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(212,160,23,0.15);
+  text-align: center;
+  font-size: 13px;
+  color: #555;
+}
+
+/* ── Responsive ─────────────────────────── */
+@media (max-width: 768px) {
+  .policy-page { padding-top: 110px; }
+  .policy-hero { padding: 40px 16px 36px; }
+  .policy-body { padding: 40px 16px 60px; }
+  .policy-section__title { font-size: 1.15rem; }
+  .policy-contact-card { padding: 20px; }
+}

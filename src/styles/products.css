@@ -509,7 +509,7 @@
 
   /* FIX: reduce header space on mobile */
   .products-page__header {
-    padding: 16px 0;
+    padding: 40px 0 16px; 
   }
   .products-page__title {
     font-size: 24px;
@@ -666,6 +666,7 @@
   .products-page__body {
     grid-template-columns: 1fr !important;
   }
+
 }
 
 @media (min-width: 769px) {

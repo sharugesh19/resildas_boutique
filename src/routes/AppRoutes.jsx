@@ -12,11 +12,17 @@ const Account           = lazy(() => import('../pages/Account'))
 const Login             = lazy(() => import('../pages/Login'))
 const Checkout          = lazy(() => import('../pages/Checkout'))
 const NotFound          = lazy(() => import('../pages/NotFound'))
-const ProtectedRoute = lazy(() => import('../components/common/ProtectedRoute'))
+const ProtectedRoute    = lazy(() => import('../components/common/ProtectedRoute'))
 const AdminRoutes       = lazy(() => import('../admin/AdminRoutes'))
 
+// Policy pages
+const ShippingPolicy    = lazy(() => import('../pages/ShippingPolicy'))
+const ReturnPolicy      = lazy(() => import('../pages/ReturnPolicy'))
+const PrivacyPolicy     = lazy(() => import('../pages/PrivacyPolicy'))
+const TermsConditions   = lazy(() => import('../pages/TermsConditions'))
+
 function PageLoader() {
-  return <Loader fullScreen={false} />
+  return <Loader fullScreen={true} />
 }
 
 function AppRoutes() {
@@ -24,11 +30,6 @@ function AppRoutes() {
 
   return (
     <Suspense fallback={<PageLoader />}>
-      {/*
-        AnimatePresence watches for route changes and plays exit animation
-        before the new page mounts. mode="wait" ensures one page exits
-        fully before the next one enters.
-      */}
       <AnimatePresence mode="wait" initial={false}>
         <Routes location={location} key={location.pathname}>
 
@@ -52,23 +53,33 @@ function AppRoutes() {
             <PageTransition><Checkout /></PageTransition>
           } />
 
+          {/* Policy pages */}
+          <Route path="/shipping-policy" element={
+            <PageTransition><ShippingPolicy /></PageTransition>
+          } />
+          <Route path="/return-policy" element={
+            <PageTransition><ReturnPolicy /></PageTransition>
+          } />
+          <Route path="/privacy-policy" element={
+            <PageTransition><PrivacyPolicy /></PageTransition>
+          } />
+          <Route path="/terms-and-conditions" element={
+            <PageTransition><TermsConditions /></PageTransition>
+          } />
+
           {/* Protected — login required */}
           <Route path="/wishlist" element={
             <PageTransition>
-              <ProtectedRoute>
-                <Wishlist />
-              </ProtectedRoute>
+              <ProtectedRoute><Wishlist /></ProtectedRoute>
             </PageTransition>
           } />
-           <Route path="/account" element={
+          <Route path="/account" element={
             <PageTransition>
-              <ProtectedRoute>
-                <Account />
-              </ProtectedRoute>
+              <ProtectedRoute><Account /></ProtectedRoute>
             </PageTransition>
           } />
 
-          {/* Admin Panel — no transition, it has its own layout */}
+          {/* Admin Panel */}
           <Route path="/admin/*" element={<AdminRoutes />} />
 
           {/* 404 */}

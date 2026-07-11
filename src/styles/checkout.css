@@ -637,8 +637,21 @@
   .cart-drawer__header,
   .cart-drawer__items,
   .cart-drawer__footer { padding-left: var(--space-5); padding-right: var(--space-5); }
-}
 
+  .cart-drawer__footer {
+  padding: var(--space-6) var(--space-8);
+  padding-bottom: calc(var(--space-6) + env(safe-area-inset-bottom));
+  border-top: 1px solid rgba(194,144,58,0.25);
+  flex-shrink: 0;
+  background: var(--color-white);
+}
+}
+@media (max-width: 480px) {
+  .cart-drawer__footer {
+    padding: var(--space-4) var(--space-5);
+    padding-bottom: calc(var(--space-4) + env(safe-area-inset-bottom));
+  }
+}
 
 /* ── Responsive ── */
 @media (max-width: 900px) {
@@ -673,73 +686,7 @@
     width: 48px;
   }
 }
-/* ── Cart Drawer — Mobile tightening ─────────────────────── */
-@media (max-width: 480px) {
-  .cart-drawer__header {
-    padding: var(--space-4) var(--space-5);
-  }
 
-  .cart-drawer__title {
-    font-size: 1.4rem;
-  }
-
-  .cart-drawer__items {
-    padding: var(--space-2) var(--space-5);
-  }
-
-  .cart-drawer__item {
-    padding: 1rem 0;
-    gap: var(--space-3);
-  }
-
-  .cart-drawer__item-img {
-    width: 64px;
-    height: 84px;
-  }
-
-  .cart-drawer__item-name {
-    font-size: 0.92rem;
-  }
-
-  .cart-drawer__item-meta {
-    font-size: 0.65rem;
-  }
-
-  .cart-drawer__qty-btn {
-    width: 26px;
-    height: 26px;
-  }
-
-  .cart-drawer__qty-val {
-    width: 28px;
-    font-size: 0.85rem;
-  }
-
-  .cart-drawer__item-price {
-    font-size: 0.88rem;
-  }
-
-  .cart-drawer__remove {
-    font-size: 0.7rem;
-  }
-
-  .cart-drawer__footer {
-    padding: var(--space-4) var(--space-5);
-  }
-
-  .cart-drawer__total {
-    font-size: 1rem;
-  }
-
-  .cart-drawer__total span:last-child {
-    font-size: 1.1rem;
-  }
-
-  .btn-checkout {
-    padding: var(--space-3);
-    font-size: 0.78rem;
-  }
-}
 .cart-drawer,
 .cart-drawer__header,
 .cart-drawer__items,
