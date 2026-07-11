@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
-import { useCart }     from '../../context/CartContext'
-import { useWishlist } from '../../context/WishlistContext'
+import { useCart } from '../../hooks/useCart'
+import { useWishlist } from '../../hooks/useWishlist'
 import SearchBar       from './SearchBar'
 
 function Navbar() {

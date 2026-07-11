@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
@@ -10,8 +10,7 @@ import {
 } from 'firebase/auth'
 import { auth, googleProvider } from '../firebase/firebaseConfig'
 import Loader from '../components/common/Loader'
-
-export const AuthContext = createContext(null)
+import { AuthContext } from './AuthContextObject'
 
 export function AuthProvider({ children }) {
   const [user, setUser]       = useState(null)

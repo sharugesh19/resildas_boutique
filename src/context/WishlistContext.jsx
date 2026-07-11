@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   doc,
   onSnapshot,
@@ -8,20 +8,12 @@ import {
 } from 'firebase/firestore'
 import { db } from '../firebase/firebaseConfig'
 import { useAuth } from '../hooks/useAuth'
-
-const WishlistContext = createContext(null)
-
-export function useWishlist() {
-  const ctx = useContext(WishlistContext)
-  if (!ctx) throw new Error('useWishlist must be used inside <WishlistProvider>')
-  return ctx
-}
+import { WishlistContext } from './WishlistContextObject'
 
 export function WishlistProvider({ children }) {
   const { user, isLoggedIn } = useAuth()
   const [wishlist, setWishlist] = useState([]) // array of product IDs
 
-  // Real-time sync from Firestore when logged in
   useEffect(() => {
     if (!isLoggedIn || !user) {
       setWishlist([])
@@ -36,14 +28,8 @@ export function WishlistProvider({ children }) {
     return unsub
   }, [user, isLoggedIn])
 
-  // ── Helpers ─────────────────────────────────────────────────────────────
-
   const wishlistRef = () => doc(db, 'wishlists', user.uid)
 
-  /**
-   * Returns true if action completed, false if user is not logged in.
-   * Caller is responsible for redirecting to login when false is returned.
-   */
   const addToWishlist = async (productId) => {
     if (!isLoggedIn) return false
     await setDoc(wishlistRef(), { productIds: arrayUnion(productId) }, { merge: true })

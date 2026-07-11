@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useState} from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { getApp } from 'firebase/app'
 import { getFunctions, httpsCallable } from 'firebase/functions'
-import { useCart }  from '../context/CartContext'
+import { useCart } from '../../hooks/useCart'
 import { useAuth } from '../hooks/useAuth'
 import { formatPrice } from '../utils/formatPrice'
 import { MapPinIcon, CreditCardIcon, BagIcon, ImagePlaceholderIcon, LockIcon, ExchangeIcon, TruckIcon, CheckIcon } from '../components/common/Icons'
@@ -43,11 +43,6 @@ function Checkout() {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError]           = useState('')
 
-  useEffect(() => {
-    if (!user) {
-      navigate('/login?redirect=/checkout')
-    }
-  }, [user, navigate])
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -71,10 +66,6 @@ function Checkout() {
     e.preventDefault()
     setError('')
 
-    if (!user) {
-      setError('You must be logged in to place an order.')
-      return
-    }
     if (!PHONE_REGEX.test(addr.phone.trim())) {
       setError('Please enter a valid 10-digit Indian mobile number.')
       return

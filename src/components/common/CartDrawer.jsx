@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { useCart }     from '../../context/CartContext'
+import { useCart } from '../../hooks/useCart'
 import { useProducts } from '../../hooks/useProducts'
 import { formatPrice } from '../../utils/formatPrice'
 import { ImagePlaceholderIcon } from './Icons'

@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
-import { useWishlist } from '../context/WishlistContext'
+import { useWishlist } from '../hooks/useWishlist'
 import { useProducts } from '../hooks/useProducts'
 import ProductCard from '../components/product/ProductCard'
 import { HeartIcon } from '../components/common/Icons'

@@ -22,10 +22,9 @@ function normalizeSizeEntry(raw) {
 }
 
 exports.placeOrder = onCall({ region: 'asia-south1' }, async (request) => {
-  const uid = request.auth?.uid;
-  if (!uid) {
-    throw new HttpsError('unauthenticated', 'You must be signed in to place an order.');
-  }
+  // CHANGED: guest checkout allowed — uid is null for unauthenticated users.
+  // (Login is still required for /wishlist via ProtectedRoute elsewhere in the app.)
+  const uid = request.auth?.uid ?? null;
 
   const { items, customer } = request.data || {};
 
@@ -135,7 +134,7 @@ exports.placeOrder = onCall({ region: 'asia-south1' }, async (request) => {
     // ── Write the order itself ──
     const orderRef = db.collection('orders').doc();
     tx.set(orderRef, {
-      userId: uid,
+      userId: uid, // null for guest orders
       customer,
       items: verifiedItems,
       total,
