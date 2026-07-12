@@ -3,13 +3,13 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Product Listing', () => {
   test('products page loads with product grid', async ({ page }) => {
-    await page.goto('/products', { waitUntil: 'domcontentloaded' });
+    await page.goto('/products');
     await expect(page.locator('.product-grid')).toBeVisible();
     await expect(page.locator('.product-card').first()).toBeVisible({ timeout: 10000 });
   });
 
   test('category tab filters products', async ({ page }) => {
-    await page.goto('/products', { waitUntil: 'domcontentloaded' });
+    await page.goto('/products');
     await page.waitForSelector('.product-card');
     const initialCount = await page.locator('.product-card').count();
 
@@ -28,7 +28,7 @@ test.describe('Product Listing', () => {
   });
 
   test('breadcrumb is not clipped by fixed navbar on mobile', async ({ page }) => {
-    await page.goto('/products/cotton-saree', { waitUntil: 'domcontentloaded' });
+    await page.goto('/products/cotton-saree');
     const breadcrumb = page.locator('.products-page__breadcrumb');
     await expect(breadcrumb).toBeVisible();
 
@@ -41,7 +41,7 @@ test.describe('Product Listing', () => {
 
 test.describe('Product Detail Page', () => {
   test('clicking a product card opens its detail page', async ({ page }) => {
-    await page.goto('/products', { waitUntil: 'domcontentloaded' });
+    await page.goto('/products');
     await page.waitForSelector('.product-card');
     const firstCardLink = page.locator('.product-card__link').first();
     await firstCardLink.click();
@@ -49,12 +49,14 @@ test.describe('Product Detail Page', () => {
   });
 
   test('product detail page shows price and add-to-cart controls', async ({ page }) => {
-    await page.goto('/products', { waitUntil: 'domcontentloaded' });
+    await page.goto('/products');
     await page.waitForSelector('.product-card');
     await page.locator('.product-card__link').first().click();
     await expect(page).toHaveURL(/\/product\//);
 
     await expect(page.locator('.pd-price')).toBeVisible();
-    await expect(page.locator('.pd-btn-cart, .pd-cta')).toBeVisible();
+    // .pd-btn-cart alone — .pd-cta is a wrapper div around it, so the
+    // combined selector matched two elements instead of one.
+    await expect(page.locator('.pd-btn-cart')).toBeVisible();
   });
 });

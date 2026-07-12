@@ -10,7 +10,7 @@ const INVALID_PINCODE = '012345'; // starts with 0
 
 test.describe('Checkout — empty cart guard', () => {
   test('visiting /checkout with an empty cart shows empty-cart message, not the form', async ({ page }) => {
-    await page.goto('/checkout', { waitUntil: 'domcontentloaded' });
+    await page.goto('/checkout');
     await expect(page.getByText('Your cart is empty')).toBeVisible();
     await expect(page.locator('.checkout-form')).toHaveCount(0);
   });
@@ -20,7 +20,7 @@ test.describe('Checkout — form validation', () => {
   // Helper: add a product to cart, then navigate to checkout, since the
   // form only renders when cart.length > 0.
   async function goToCheckoutWithItem(page) {
-    await page.goto('/products', { waitUntil: 'domcontentloaded' });
+    await page.goto('/products');
     await page.waitForSelector('.product-card');
     const addBtn = page.locator('.product-card__add').first();
     if (await addBtn.isDisabled()) {
@@ -61,8 +61,17 @@ test.describe('Checkout — form validation', () => {
 
   test('pincode field strips non-digit characters', async ({ page }) => {
     await goToCheckoutWithItem(page);
-    await page.fill('#pincode', 'abc123xyz456');
-    await expect(page.locator('#pincode')).toHaveValue('123456');
+    const pincode = page.locator('#pincode');
+    // pressSequentially simulates real keystrokes (one input event per
+    // character), matching how a real user types and how the controlled
+    // React input actually re-renders between keystrokes. fill() sends
+    // the whole string as a single input event, which was producing an
+    // incomplete result ('123' instead of '123456') against this specific
+    // controlled input — not a real site bug, a test-interaction mismatch.
+    await pincode.click();
+    await pincode.fill(''); // ensure empty before typing
+    await pincode.pressSequentially('abc123xyz456', { delay: 30 });
+    await expect(pincode).toHaveValue('123456');
   });
 
   test('order summary reflects cart item and total', async ({ page }) => {

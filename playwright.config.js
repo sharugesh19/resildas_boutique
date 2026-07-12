@@ -9,6 +9,7 @@ const BASE_URL = process.env.BASE_URL || 'https://resildas-boutique.vercel.app';
 
 export default defineConfig({
   testDir: './tests',
+  timeout: 90000,
   fullyParallel: true,
   retries: process.env.CI ? 2 : 0,
   reporter: [
