@@ -52,7 +52,6 @@ export function AuthProvider({ children }) {
     resetPassword,
   }
 
-  // Don't render children until Firebase has resolved auth state
   if (loading) return <Loader />
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

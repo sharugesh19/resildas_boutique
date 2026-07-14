@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { useAuth } from '../hooks/useAuth'
@@ -26,10 +26,18 @@ function Login() {
   const [info, setInfo]       = useState('')
   const [loading, setLoading] = useState(false)
 
-  const { login, register, loginWithGoogle, resetPassword } = useAuth()
+  const { login, register, loginWithGoogle, resetPassword, isLoggedIn } = useAuth()
   const navigate       = useNavigate()
   const [searchParams] = useSearchParams()
   const redirect       = searchParams.get('redirect') || '/'
+
+  // Redirect once auth state resolves to logged-in.
+  // Covers normal login/register AND coming back from the Google redirect flow.
+  useEffect(() => {
+    if (isLoggedIn) {
+      navigate(redirect, { replace: true })
+    }
+  }, [isLoggedIn, redirect, navigate])
 
   const clearMessages = () => { setError(''); setInfo('') }
 
@@ -39,7 +47,7 @@ function Login() {
     setLoading(true)
     try {
       await login(email, password)
-      navigate(redirect, { replace: true })
+      // useEffect above will handle navigation once isLoggedIn updates
     } catch (err) {
       setError(err.message || 'Login failed. Please check your credentials.')
     } finally {
@@ -53,7 +61,7 @@ function Login() {
     setLoading(true)
     try {
       await register(email, password, name)
-      navigate(redirect, { replace: true })
+      // useEffect above will handle navigation once isLoggedIn updates
     } catch (err) {
       setError(err.message || 'Registration failed. Please try again.')
     } finally {
@@ -62,17 +70,17 @@ function Login() {
   }
 
   const handleGoogle = async () => {
-    clearMessages()
-    setLoading(true)
-    try {
-      await loginWithGoogle()
-      navigate(redirect, { replace: true })
-    } catch (err) {
-      setError(err.message || 'Google sign-in failed.')
-    } finally {
-      setLoading(false)
-    }
+  clearMessages()
+  setLoading(true)
+  try {
+    await loginWithGoogle()
+    navigate(redirect, { replace: true })
+  } catch (err) {
+    setError(err.message || 'Google sign-in failed.')
+  } finally {
+    setLoading(false)
   }
+}
 
   const handleReset = async (e) => {
     e.preventDefault()
