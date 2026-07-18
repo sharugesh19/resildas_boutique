@@ -49,7 +49,15 @@ function Home() {
           }
         `}</script>
       </Helmet>
-
+      <section style={{ maxWidth: 800, margin: '2rem auto', padding: '0 1.5rem', textAlign: 'center' }}>
+    <p style={{ fontSize: '1rem', lineHeight: 1.7, color: '#555' }}>
+      Resilda's Boutique is a women's ethnic wear store based in Udumalaipettai, offering a wide range of
+      sarees and sets including organza sarees, tussar silk sarees, soft silk sarees, cotton sarees, and
+      fancy party wear sarees. We also stock unstitched kurtha materials, kurthi sets, and co-ord sets —
+      all exclusively curated for women who love traditional and contemporary Indian fashion. Every order
+      comes with free delivery, making it easy to shop premium ethnic wear from the comfort of your home.
+    </p>
+  </section>
       {/* Hero has its own entrance — no FadeInUp wrapper needed */}
       <Hero />
 

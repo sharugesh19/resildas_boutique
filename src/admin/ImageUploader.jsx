@@ -3,6 +3,7 @@ import { useRef, useState, useEffect } from 'react';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { storage } from '../firebase/firebaseConfig';
 import { ArrowLeftIcon, ArrowRightIcon, CloseIcon } from '../components/common/Icons';
+import imageCompression from 'browser-image-compression'; // NEW
 
 /**
  * Props:
@@ -20,23 +21,41 @@ export default function ImageUploader({ images = [], onChange, folder = 'product
     imagesRef.current = images;
   }, [images]);
 
-  function handleFiles(files) {
+  async function handleFiles(files) {
     const MAX_SIZE_MB = 5;
     const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
-    Array.from(files).forEach((file) => {
-      if (!file.type.startsWith('image/')) return;
+
+    for (const file of Array.from(files)) {
+      if (!file.type.startsWith('image/')) continue;
       if (file.size > MAX_SIZE_BYTES) {
         alert(`"${file.name}" is too large (${(file.size / 1024 / 1024).toFixed(1)} MB). Max allowed size is ${MAX_SIZE_MB} MB.`);
-        return;
+        continue;
       }
+
       const tempId = `${Date.now()}_${Math.random()}`;
       setUploads((prev) => ({ ...prev, [tempId]: 0 }));
 
+      // ── NEW: auto-shrink the photo before it uploads ──
+      let fileToUpload = file;
+      try {
+        fileToUpload = await imageCompression(file, {
+          maxSizeMB: 0.4,           // target ~400KB
+          maxWidthOrHeight: 1600,   // resize if larger than this
+          useWebWorker: true,
+          fileType: 'image/webp',  // convert to the lighter WebP format
+        });
+      } catch (err) {
+        console.error('Compression failed, uploading original instead', err);
+        // if compression fails for any reason, we still upload the original photo
+        // so nothing ever gets blocked
+      }
+
+      const cleanName = file.name.replace(/\.[^/.]+$/, ''); // strip old extension
       const storageRef = ref(
         storage,
-        `${folder}/${Date.now()}_${file.name.replace(/\s+/g, '_')}`
+        `${folder}/${Date.now()}_${cleanName.replace(/\s+/g, '_')}.webp`
       );
-      const task = uploadBytesResumable(storageRef, file);
+      const task = uploadBytesResumable(storageRef, fileToUpload);
 
       task.on(
         'state_changed',
@@ -64,7 +83,7 @@ export default function ImageUploader({ images = [], onChange, folder = 'product
           });
         }
       );
-    });
+    }
   }
 
   function handleDrop(e) {
