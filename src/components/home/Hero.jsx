@@ -89,7 +89,9 @@ export default function Hero() {
 
   return (
     <section className="rh-hero" id="home">
-
+       <h1 className="rh-visually-hidden">
+          Resilda's Boutique — Premium Ethnic Wear, Sarees &amp; Kurthi Sets Online
+       </h1>
       {/* slider */}
       <div className="rh-slider">
         {heroSlides.map((s, i) => (
