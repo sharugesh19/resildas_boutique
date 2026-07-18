@@ -14,7 +14,7 @@ const Checkout          = lazy(() => import('../pages/Checkout'))
 const NotFound          = lazy(() => import('../pages/NotFound'))
 const ProtectedRoute    = lazy(() => import('../components/common/ProtectedRoute'))
 const AdminRoutes       = lazy(() => import('../admin/AdminRoutes'))
-
+const About              = lazy(() => import('../pages/About'))
 // Policy pages
 const ShippingPolicy    = lazy(() => import('../pages/ShippingPolicy'))
 const ReturnPolicy      = lazy(() => import('../pages/ReturnPolicy'))
@@ -51,6 +51,9 @@ function AppRoutes() {
           } />
           <Route path="/checkout" element={
             <PageTransition><Checkout /></PageTransition>
+          } />
+          <Route path="/about" element={
+            <PageTransition><About /></PageTransition>
           } />
 
           {/* Policy pages */}

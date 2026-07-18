@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import Hero                from '../components/home/Hero'
 import CategorySection     from '../components/home/CategorySection'
@@ -51,18 +52,7 @@ function Home() {
       </Helmet>
       <Hero />
 
-<section className="home-intro">
-  <div className="home-intro__inner">
-    <span className="eyebrow">Welcome to Resilda's Boutique</span>
-    <p className="home-intro__text">
-      Resilda's Boutique is a women's ethnic wear store based in Udumalaipettai, offering a wide range of
-      sarees and sets including organza sarees, tussar silk sarees, soft silk sarees, cotton sarees, and
-      fancy party wear sarees. We also stock unstitched kurtha materials, kurthi sets, and co-ord sets —
-      all exclusively curated for women who love traditional and contemporary Indian fashion. Every order
-      comes with free delivery, making it easy to shop premium ethnic wear from the comfort of your home.
-    </p>
-  </div>
-</section>
+
 
       {/* Each section fades in as it scrolls into view.
           Delays are staggered so they don't all fire at once. */}

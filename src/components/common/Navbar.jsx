@@ -91,6 +91,7 @@ function Navbar() {
 
   const navLinks = [
     { label: 'Home',         type: 'route',  path: '/',               end: true },
+    { label: 'About',        type: 'route',  path: '/about',          end: true },
     { label: 'New Arrivals', type: 'scroll', sectionId: 'new-arrivals' },
     { label: 'Categories',   type: 'scroll', sectionId: 'categories' },
     { label: 'Best Sellers', type: 'scroll', sectionId: 'best-sellers' },

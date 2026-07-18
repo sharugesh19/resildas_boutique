@@ -1289,3 +1289,21 @@ main.page-content {
   line-height: 1.8;
   letter-spacing: 0.01em;
 }
+.home-intro__link {
+  color: #b8860b; /* gold tone — swap for your brand's accent color if different */
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.home-intro__link:hover {
+  text-decoration: underline;
+}
+.footer__seo-text {
+  font-size: 12px;
+  color: #999;
+  max-width: 700px;
+  margin: 0 auto 12px;
+  text-align: center;
+  line-height: 1.5;
+}

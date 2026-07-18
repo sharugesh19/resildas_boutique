@@ -44,6 +44,7 @@ const socialLinks = [
 
 const quickLinks = [
   { label: 'Home',         path: '/' },
+  { label: 'About',        path: '/about' },
   { label: 'Categories',   path: '/products' },
   { label: 'Best Sellers', path: '/products?filter=featured' },
   { label: 'All Products', path: '/products' },
@@ -140,6 +141,10 @@ function Footer() {
 
       {/* ── Bottom bar ── */}
       <div className="footer__bottom">
+        <p className="footer__seo-text">
+          Resilda's Boutique — women's ethnic wear store in Udumalaipettai offering sarees, kurthi sets,
+          co-ord sets and more, with free delivery on every order.
+        </p>
         <span>Resilda's Boutique</span>
       </div>
     </footer>
