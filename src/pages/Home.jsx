@@ -49,7 +49,9 @@ function Home() {
           }
         `}</script>
       </Helmet>
-      <section className="home-intro">
+      <Hero />
+
+<section className="home-intro">
   <div className="home-intro__inner">
     <span className="eyebrow">Welcome to Resilda's Boutique</span>
     <p className="home-intro__text">
@@ -61,8 +63,6 @@ function Home() {
     </p>
   </div>
 </section>
-      {/* Hero has its own entrance — no FadeInUp wrapper needed */}
-      <Hero />
 
       {/* Each section fades in as it scrolls into view.
           Delays are staggered so they don't all fire at once. */}
