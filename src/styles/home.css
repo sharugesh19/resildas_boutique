@@ -1266,3 +1266,26 @@ main.page-content {
   margin: var(--space-4) 0 var(--space-6);
   font-size: var(--text-base);
 }
+/* ═══════════════════════════════════════════════
+   HOME INTRO (SEO content block)
+   ═══════════════════════════════════════════════ */
+.home-intro {
+  background: var(--color-off-white);
+  padding: var(--space-12) 0;
+  text-align: center;
+}
+
+.home-intro__inner {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 var(--container-pad);
+}
+
+.home-intro__text {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: 300;
+  color: var(--color-text-muted);
+  line-height: 1.8;
+  letter-spacing: 0.01em;
+}
