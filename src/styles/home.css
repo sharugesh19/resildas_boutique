@@ -1307,3 +1307,22 @@ main.page-content {
   text-align: center;
   line-height: 1.5;
 }
+.category-section__note {
+  max-width: 560px;
+  margin: var(--space-12) auto 0;
+  padding: 0 var(--container-pad);
+  text-align: center;
+}
+
+.category-section__note .eyebrow {
+  margin-bottom: var(--space-3);
+}
+
+.category-section__intro-text {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 300;
+  color: var(--color-text-muted);
+  line-height: 1.75;
+  letter-spacing: 0.01em;
+}

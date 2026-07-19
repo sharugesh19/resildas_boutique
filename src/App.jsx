@@ -1,4 +1,6 @@
 import { BrowserRouter, useLocation } from 'react-router-dom'
+import { useEffect } from 'react'
+import { trackPageView } from './utils/analytics'
 import { AuthProvider } from './context/AuthContext'
 import { CartProvider } from './context/CartContext'
 import { WishlistProvider } from './context/WishlistContext'
@@ -16,6 +18,11 @@ import ErrorBoundary from './components/common/ErrorBoundary'
 function AppShell() {
   const location = useLocation()
   const isAdminRoute = location.pathname.startsWith('/admin')
+
+  useEffect(() => {
+    if (isAdminRoute) return // don't track admin/dashboard traffic, only real customer visits
+    trackPageView(location.pathname + location.search)
+  }, [location, isAdminRoute])
 
   return (
     <>

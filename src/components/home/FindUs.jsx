@@ -53,15 +53,15 @@ function FindUs() {
               <div>
                 <p className="find-us__info-label">Phone &amp; Email</p>
                 <p className="find-us__info-val">
-                  +91 98765 43210<br />
-                  hello@resildasboutique.com
+                  +91 83005 27985<br />
+                  jenolineresilda@gmail.com
                 </p>
               </div>
             </div>
           </div>
 
           <a
-            href="https://maps.google.com/?q=Coimbatore+Textile+Market"
+            href="https://www.google.com/maps/search/?api=1&query=Resilda%27s+Boutique%2C+1st+Floor%2C+11%2C+2nd+Street%2C+near+UK+Hospital%2C+Aishwarya+Nagar%2C+Udumalaipettai%2C+Tamil+Nadu+642154"
             target="_blank"
             rel="noopener noreferrer"
             className="directions-btn"
@@ -79,7 +79,7 @@ function FindUs() {
             {/* Replace with your actual Google Maps embed */}
             <iframe
               title="Resilda's Boutique Location"
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3916.265657!2d76.9558432!3d11.0168!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ba859af0eb22bfb%3A0x0!2sCoimbatore%2C+Tamil+Nadu!5e0!3m2!1sen!2sin!4v1609459200000"
+              src="https://www.google.com/maps?q=Resilda%27s+Boutique%2C+1st+Floor%2C+11%2C+2nd+Street%2C+near+UK+Hospital%2C+Aishwarya+Nagar%2C+Udumalaipettai%2C+Tamil+Nadu+642154&output=embed"
               width="100%"
               height="100%"
               style={{ border: 0 }}

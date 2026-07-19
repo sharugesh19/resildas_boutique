@@ -49,7 +49,7 @@ const categoryCards = [
     label:  'Fancy Saree',
     sub:    'Breezy all-day drapes',
     image:  '/images/categories/sarees.jpg',
-    path:   '/products/lightweight-saree',
+    path:   '/products/fancy-saree',
   },
   {
     key:    'coord-sets',
@@ -82,6 +82,14 @@ function CategorySection() {
             </div>
           </Link>
         ))}
+      </div>
+       <div className="category-section__note">
+        <span className="eyebrow">Our Philosophy</span>
+        <p className="category-section__intro-text">
+          Eight handpicked collections — from breathable cotton and organza sarees to kurthi
+          sets and co-ord sets — curated for women who love traditional and contemporary
+          Indian fashion.
+        </p>
       </div>
     </section>
   )

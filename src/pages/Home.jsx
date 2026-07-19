@@ -13,14 +13,14 @@ function Home() {
   return (
     <main className="page-content">
       <Helmet>
-        <title>Resilda's Boutique — Premium Ethnic Wear in Udumalaipettai</title>
-        <meta name="description" content="Shop premium sarees, kurthi sets, co-ord sets and ethnic wear online at Resilda's Boutique, Udumalaipettai. Free delivery on every order." />
-        <meta name="keywords" content="sarees online, kurthi sets, ethnic wear, boutique Udumalaipettai, organza saree, tussar saree, co-ord sets women" />
+        <title>Resilda's Boutique — Cotton Sarees, Kurthi Sets & Ethnic Wear | Udumalaipettai</title>
+        <meta name="description" content="Shop cotton sarees, organza sarees, kurthi sets, and co-ord sets online at Resilda's Boutique, Udumalaipettai. Premium ethnic wear with free delivery on every order." />
+        <meta name="keywords" content="cotton sarees online, kurthi sets, ethnic wear, boutique Udumalaipettai, organza saree, tussar saree, co-ord sets women" />
         <link rel="canonical" href="https://resildas.com/" />
 
         {/* Open Graph */}
-        <meta property="og:title" content="Resilda's Boutique — Premium Ethnic Wear" />
-        <meta property="og:description" content="Shop premium sarees, kurthi sets, co-ord sets and ethnic wear online. Free delivery on every order." />
+        <meta property="og:title" content="Resilda's Boutique — Cotton Sarees, Kurthi Sets & Ethnic Wear" />
+        <meta property="og:description" content="Shop cotton sarees, organza sarees, kurthi sets, and co-ord sets online. Free delivery on every order." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://resildas.com/" />
 
