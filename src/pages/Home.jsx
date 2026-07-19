@@ -13,7 +13,7 @@ function Home() {
   return (
     <main className="page-content">
       <Helmet>
-        <title>Resilda's Boutique — Cotton Sarees, Kurthi Sets & Ethnic Wear | Udumalaipettai</title>
+        <title>Resilda's Boutique — Cotton Sarees & Ethnic Wear</title>
         <meta name="description" content="Shop cotton sarees, organza sarees, kurthi sets, and co-ord sets online at Resilda's Boutique, Udumalaipettai. Premium ethnic wear with free delivery on every order." />
         <meta name="keywords" content="cotton sarees online, kurthi sets, ethnic wear, boutique Udumalaipettai, organza saree, tussar saree, co-ord sets women" />
         <link rel="canonical" href="https://resildas.com/" />

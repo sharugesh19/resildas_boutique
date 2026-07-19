@@ -3,8 +3,9 @@ import { Routes, Route, useLocation } from 'react-router-dom'
 import { AnimatePresence } from 'framer-motion'
 import PageTransition from '../components/common/PageTransition'
 import Loader from '../components/common/Loader'
+import Home from '../pages/Home'
 
-const Home              = lazy(() => import('../pages/Home'))
+
 const Products          = lazy(() => import('../pages/Products'))
 const ProductDetail     = lazy(() => import('../pages/ProductDetail'))
 const Wishlist          = lazy(() => import('../pages/Wishlist'))
