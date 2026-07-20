@@ -106,8 +106,8 @@ export default function ShippingPolicy() {
             <div className="policy-contact-card__item">
               <div className="policy-contact-card__icon">💬</div>
               <span>
-                WhatsApp: <a href="https://wa.me/91XXXXXXXXXX" target="_blank" rel="noreferrer">
-                  +91 XXXXXXXXXX
+                WhatsApp: <a href="https://wa.me/918300527985" target="_blank" rel="noreferrer">
+                  +91 83005 27985
                 </a>
               </span>
             </div>

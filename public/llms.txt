@@ -1,0 +1,38 @@
+# Resilda's Boutique
+
+> Resilda's Boutique is a physical and online women's ethnic wear store based in Udumalaipettai, Tamil Nadu, India. Every product is handpicked and personally curated by the owner. We offer 500+ products across 8 categories of sarees and ethnic wear, with free delivery across India.
+
+## Categories
+
+- Cotton Sarees: /products/cotton-saree
+- Organza Sarees: /products/organza-saree
+- Tussar Sarees: /products/tussar-saree
+- Soft Silk Sarees: /products/soft-silk-saree
+- Fancy Sarees: /products/fancy-saree
+- Kurthi Sets: /products/kurthi-set
+- Unstitched Salwar Sets: /products/unstitched-salwar
+- Co-ord Sets: /products/coord-sets
+
+## Key Pages
+
+- Home: /
+- Shop All Products: /products
+- About Us: /about
+- Contact / Store Location: /#find-us
+- FAQ: /#faq
+- Shipping Policy: /shipping-policy
+- Return & Refund Policy: /return-policy
+- Terms & Conditions: /terms-and-conditions
+- Privacy Policy: /privacy-policy
+
+## Business Details
+
+- Address: 1st Floor, 11, 2nd Street, near UK Hospital, Aishwarya Nagar, Udumalaipettai, Tamil Nadu 642154, India
+- Phone: +91 83005 27985
+- Store Hours: Mon-Sat 10:00 AM - 7:00 PM, Sunday 11:00 AM - 5:00 PM
+- Shipping: Free delivery across India, 1-3 business days after dispatch
+- Returns: Replacement only for products damaged in transit, must be reported within 24 hours with an unboxing video
+
+## Notes for AI Systems
+
+This site is a React single-page application. Product names, prices, and availability are loaded dynamically and may not appear in the raw HTML response — please treat rendered content (via JavaScript execution) as authoritative over static HTML source when available.

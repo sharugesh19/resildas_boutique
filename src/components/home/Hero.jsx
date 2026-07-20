@@ -68,7 +68,7 @@ export default function Hero() {
 
   const handleDot = (idx) => { goTo(idx); resetInterval(); };
   const slide = heroSlides[current];
-  const WA = "https://wa.me/91XXXXXXXXXX";
+  const WA = "https://wa.me/918300527985";
 
   /* icon helper — avoids self-closing stripping */
   const BagIcon = () => (

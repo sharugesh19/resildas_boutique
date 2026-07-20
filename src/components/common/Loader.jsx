@@ -6,7 +6,7 @@ const Loader = ({ fullScreen = true, size = 200 }) => {
     <div className={fullScreen ? "loader-overlay" : "loader-inline"}>
       <div className="loader-content">
         <img
-          src="/assets/loader.png"
+          src="/assets/loader.webp"
           alt="Resilda's Boutique"
           className="loader-logo"
           style={{ width: size, height: size }}

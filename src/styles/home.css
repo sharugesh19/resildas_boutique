@@ -1326,3 +1326,107 @@ main.page-content {
   line-height: 1.75;
   letter-spacing: 0.01em;
 }
+/* ═══════════════════════════════════════════════
+   FAQ SECTION
+   ═══════════════════════════════════════════════ */
+.faq-section {
+  padding: var(--space-20) 0;
+  background: var(--color-off-white);
+}
+
+.faq-section__head {
+  max-width: var(--container-max);
+  margin: 0 auto var(--space-10);
+  padding: 0 var(--container-pad);
+  text-align: center;
+}
+
+.faq-list {
+  max-width: 760px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.faq-item {
+  background: var(--color-white);
+  border: 1px solid var(--color-grey-300);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.faq-item__question {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: var(--space-5) var(--space-6);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--color-black);
+  text-align: left;
+}
+
+.faq-item__icon {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-gold);
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.faq-item__answer {
+  padding: 0 var(--space-6) var(--space-5);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  line-height: 1.7;
+}
+
+@media (max-width: 600px) {
+  .faq-item__question {
+    padding: var(--space-4) var(--space-5);
+    font-size: var(--text-sm);
+  }
+  .faq-item__answer {
+    padding: 0 var(--space-5) var(--space-4);
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   WHY SHOP WITH US
+   ═══════════════════════════════════════════════ */
+.why-us-section {
+  padding: var(--space-16) 0;
+  background: var(--color-white);
+}
+
+.why-us-section__inner {
+  max-width: 720px;
+  text-align: center;
+}
+
+.why-us-section__inner .eyebrow { margin-bottom: var(--space-2); }
+.why-us-section__inner .section-title { margin-bottom: var(--space-6); }
+
+.why-us-section__text {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: 300;
+  color: var(--color-text-muted);
+  line-height: 1.8;
+  margin-bottom: var(--space-5);
+}
+
+.why-us-section__text:last-child {
+  margin-bottom: 0;
+}

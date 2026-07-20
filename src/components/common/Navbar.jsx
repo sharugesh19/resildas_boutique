@@ -130,7 +130,7 @@ function Navbar() {
             }}
           >
             <div className="navbar__logo-emblem">
-              <img src="/assets/logo.png" alt="Resilda's Boutique" className="navbar__logo-img" />
+              <img src="/assets/logo.webp" alt="Resilda's Boutique" className="navbar__logo-img" />
               <span className="navbar__logo-initial"></span>
             </div>
             <div className="navbar__logo-text">

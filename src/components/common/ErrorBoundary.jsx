@@ -46,7 +46,7 @@ class ErrorBoundary extends React.Component {
           }}
         >
           <img
-            src="/assets/logo.png"
+            src="/assets/logo.webp"
             alt="Resilda's Boutique"
             style={{ width: 70, height: 70, marginBottom: 24, opacity: 0.85 }}
           />

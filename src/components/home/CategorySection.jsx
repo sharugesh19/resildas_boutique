@@ -6,21 +6,21 @@ const categoryCards = [
     key:    'unstitched-salwar',
     label:  'Unstitched Salwar Set',
     sub:    'Customize your style',
-    image:  '/assets/category/unstitched-salwar-material.PNG',
+    image:  '/assets/category/unstitched-salwar-material.webp',
     path:   '/products/unstitched-salwar',
   },
   {
     key:    'kurthi-set',
     label:  'Kurthi Set',
     sub:    'Elegant everyday wear',
-    image:  '/assets/category/kurthi-set.PNG',
+    image:  '/assets/category/kurthi-set.webp',
     path:   '/products/kurthi-set',
   },
   {
     key:    'organza-saree',
     label:  'Organza Saree',
     sub:    'Sheer luxury drapes',
-    image:  '/assets/category/organza-saree.PNG',
+    image:  '/assets/category/organza-saree.webp',
     path:   '/products/organza-saree',
   },
   {
@@ -41,7 +41,7 @@ const categoryCards = [
     key:    'cotton-saree',
     label:  'Cotton Saree',
     sub:    'Comfort meets tradition',
-    image:  '/assets/category/cotton-saree.PNG',
+    image:  '/assets/category/cotton-saree.webp',
     path:   '/products/cotton-saree',
   },
   {

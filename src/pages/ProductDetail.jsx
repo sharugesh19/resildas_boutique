@@ -726,8 +726,8 @@ function ProductDetail() {
             <div className="pd-tab-content">
               <div className="pd-shipping-list">
                 {[
-                  { icon: <TruckIcon size={22} />, title: 'Free Shipping', body: 'Free delivery on all orders across India. Standard delivery in 5–7 business days.' },
-                  { icon: <ExchangeIcon size={22} />, title: 'Exchange Policy', body: 'Size exchanges available within 7 days of delivery. Contact us on WhatsApp for quick exchange.' },
+                  { icon: <TruckIcon size={22} />, title: 'Free Shipping', body: 'Free delivery on all orders across India. Standard delivery in 1–3 business days after dispatch.' },
+                  { icon: <ExchangeIcon size={22} />, title: 'Damage Protection', body: 'Replacement available only for products damaged in transit. Must be reported within 24 hours with an unboxing video.' },
                   { icon: <MapPinIcon size={22} />, title: 'Track Your Order', body: "You'll receive a tracking link via SMS and email once your order is shipped." },
                 ].map((item) => (
                   <div key={item.title} className="pd-shipping-item">
