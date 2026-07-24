@@ -64,7 +64,7 @@ test.describe('Cart Drawer', () => {
       test.skip(true, 'First product card is out of stock, skipping checkout nav check');
     }
     await addBtn.click();
-    await page.locator('.btn-checkout').click();
+    await page.locator('.btn-checkout').click();  
     await expect(page).toHaveURL(/\/checkout/);
   });
 });

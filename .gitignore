@@ -3,6 +3,7 @@ dist/
 .env
 .vscode/
 scripts/serviceAccountKey.json
+functions/.env
 
 # Playwright
 /test-results/

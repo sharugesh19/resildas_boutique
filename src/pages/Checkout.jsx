@@ -26,9 +26,10 @@ const EMPTY_ADDR = {
 const PHONE_REGEX = /^(\+91[-\s]?)?[0]?(91)?[6789]\d{9}$/
 const PINCODE_REGEX = /^[1-9][0-9]{5}$/ // 6 digits, doesn't start with 0
 
-// placeOrder must be called in the same region it was deployed to (asia-south1)
+// placeOrder / verifyPayment must be called in the same region they were deployed to (asia-south1)
 const functions = getFunctions(getApp(), 'asia-south1')
 const placeOrderFn = httpsCallable(functions, 'placeOrder')
+const verifyPaymentFn = httpsCallable(functions, 'verifyPayment')
 
 function Checkout() {
   const { cart, cartTotal, clearCart, openCart } = useCart()
@@ -47,7 +48,6 @@ function Checkout() {
   const handleChange = (e) => {
     const { name, value } = e.target
     if (name === 'pincode') {
-      // strip anything that isn't a digit, cap at 6 characters
       const digitsOnly = value.replace(/\D/g, '').slice(0, 6)
       setAddr((prev) => ({ ...prev, pincode: digitsOnly }))
       return
@@ -75,6 +75,11 @@ function Checkout() {
       return
     }
 
+    if (typeof window.Razorpay === 'undefined') {
+      setError('Payment could not load. Please refresh the page and try again.')
+      return
+    }
+
     setSubmitting(true)
     try {
       const payload = {
@@ -96,18 +101,60 @@ function Checkout() {
         })),
       }
 
-      // Server verifies real prices, checks + decrements stock, and writes
-      // the order — nothing here is trusted, it's all re-checked in placeOrder.
-      await placeOrderFn(payload)
+      // Server verifies real prices, checks + decrements stock, creates the
+      // Firestore order (pending_payment) AND a matching Razorpay order.
+      const { data } = await placeOrderFn(payload)
+      const { orderId, total, razorpayOrderId, razorpayKeyId } = data
 
-      clearCart()
-      navigate('/?order=success')
+      const rzp = new window.Razorpay({
+        key: razorpayKeyId,
+        amount: Math.round(total * 100),
+        currency: 'INR',
+        name: "Resilda's Boutique",
+        description: 'Order Payment',
+        order_id: razorpayOrderId,
+        prefill: {
+          name: addr.fullName.trim(),
+          email: addr.email.trim(),
+          contact: addr.phone.trim(),
+        },
+        handler: async (response) => {
+          // Runs only after Razorpay confirms payment succeeded.
+          try {
+            await verifyPaymentFn({
+              orderId,
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+            })
+            clearCart()
+            navigate('/?order=success')
+          } catch (err) {
+            console.error('Payment verification error:', err)
+            setError('Payment could not be verified. If money was deducted, it will be refunded automatically — please contact us with your order ID: ' + orderId)
+          } finally {
+            setSubmitting(false)
+          }
+        },
+        modal: {
+          // User closed the popup without paying — order stays pending_payment in Firestore.
+          ondismiss: () => {
+            setSubmitting(false)
+            setError('Payment was not completed. You can try again.')
+          },
+        },
+        theme: { color: '#000000' },
+      })
+
+      rzp.on('payment.failed', () => {
+        setSubmitting(false)
+        setError('Payment failed. Please try again.')
+      })
+
+      rzp.open()
     } catch (err) {
       console.error('Order creation error:', err)
-      // Cloud Function errors (out of stock, price issue, etc.) carry a
-      // readable message — show it directly instead of a generic failure.
       setError(err?.message || 'Order could not be placed. Please try again.')
-    } finally {
       setSubmitting(false)
     }
   }
@@ -135,7 +182,6 @@ function Checkout() {
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
 
-      {/* Step indicator */}
       <div className="checkout-steps">
         <div
           className="checkout-step checkout-step--done checkout-step--clickable"
@@ -162,7 +208,6 @@ function Checkout() {
       <div className="checkout-container">
         <div className="checkout-layout">
 
-          {/* Left — Form */}
           <form className="checkout-form" onSubmit={handleSubmit} noValidate>
             <div className="checkout-card">
 
@@ -170,7 +215,6 @@ function Checkout() {
                 <span className="checkout-card__icon" style={{ display: 'inline-flex', alignItems: 'center' }}><MapPinIcon size={18} /></span> Delivery Details
               </h2>
 
-              {/* Full Name + Phone */}
               <div className="checkout-form__row">
                 <div className="form-group">
                   <label htmlFor="fullName">Full Name *</label>
@@ -191,7 +235,6 @@ function Checkout() {
                 </div>
               </div>
 
-              {/* Email */}
               <div className="form-group">
                 <label htmlFor="email">Email Address</label>
                 <input
@@ -201,7 +244,6 @@ function Checkout() {
                 />
               </div>
 
-              {/* Address Line 1 */}
               <div className="form-group">
                 <label htmlFor="address1">Address Line 1 *</label>
                 <input
@@ -211,7 +253,6 @@ function Checkout() {
                 />
               </div>
 
-              {/* Address Line 2 */}
               <div className="form-group">
                 <label htmlFor="address2">Address Line 2</label>
                 <input
@@ -221,7 +262,6 @@ function Checkout() {
                 />
               </div>
 
-              {/* City + State */}
               <div className="checkout-form__row">
                 <div className="form-group">
                   <label htmlFor="city">City *</label>
@@ -242,7 +282,6 @@ function Checkout() {
                 </div>
               </div>
 
-              {/* Pincode */}
               <div className="form-group form-group--half">
                 <label htmlFor="pincode">Pincode *</label>
                 <input
@@ -254,7 +293,6 @@ function Checkout() {
                 />
               </div>
 
-              {/* Payment — online only */}
               <h2 className="checkout-card__title" style={{ marginTop: '2rem' }}>
                 <span className="checkout-card__icon" style={{ display: 'inline-flex', alignItems: 'center' }}><CreditCardIcon size={16} /></span> Payment Method
               </h2>
@@ -284,7 +322,6 @@ function Checkout() {
             </button>
           </form>
 
-          {/* Right — Order Summary */}
           <aside className="checkout-summary">
             <div className="checkout-card">
               <h2 className="checkout-card__title">
@@ -327,7 +364,6 @@ function Checkout() {
                 </div>
               </div>
 
-              {/* Trust badges */}
               <div className="checkout-trust">
                 <div className="checkout-trust__item">
                   <span style={{ display: 'inline-flex', justifyContent: 'center', alignItems: 'center' }}><LockIcon size={18} /></span>
