@@ -10,9 +10,9 @@ import { formatPrice, calcDiscount } from '../utils/formatPrice'
 import { requireLogin } from '../utils/requireLogin'
 import ProductCard from '../components/product/ProductCard'
 import {
-  ImagePlaceholderIcon, CheckIcon, XCircleIcon, RulerIcon,
+  ImagePlaceholderIcon, CheckIcon, XCircleIcon,
   BagIcon, BoltIcon, HeartIcon, TruckIcon, ExchangeIcon,
-  LockIcon, MapPinIcon, ChevronLeftIcon, ChevronRightIcon, CloseIcon
+  LockIcon, MapPinIcon, ChevronLeftIcon, ChevronRightIcon
 } from '../components/common/Icons'
 import { getMaxQty } from '../utils/stockHelpers'   // add to top imports
 
@@ -187,17 +187,7 @@ const CATEGORY_DETAILS = {
   },
 }
 
-const SIZE_GUIDE = {
-  headers: ['Size', 'Chest (in)', 'Waist (in)', 'Hip (in)', 'Length (in)'],
-  rows: [
-    ['XS',  '34', '28', '36', '44'],
-    ['S',   '36', '30', '38', '45'],
-    ['M',   '38', '32', '40', '46'],
-    ['L',   '40', '34', '42', '47'],
-    ['XL',  '42', '36', '44', '48'],
-    ['2XL', '44', '38', '46', '49'],
-  ],
-}
+
 function normalizeSizes(sizesRaw) {
   if (!Array.isArray(sizesRaw)) return []
   return sizesRaw.map((s) =>
@@ -220,7 +210,6 @@ function ProductDetail() {
   const [selectedSize, setSelectedSize]   = useState('')
   const [qty, setQty]                     = useState(1)
   const [activeTab, setActiveTab]         = useState('details')
-  const [showSizeGuide, setShowSizeGuide] = useState(false)
 
   const { addToCart }                    = useCart()
   const { isWishlisted, toggleWishlist } = useWishlist()
@@ -538,9 +527,6 @@ function ProductDetail() {
               <div className="pd-option-group">
                 <div className="pd-option-label">
                   <span>Select Size</span>
-                  <button className="pd-size-guide-btn" onClick={() => setShowSizeGuide(true)} style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                    <RulerIcon size={14} /> Size Guide
-                  </button>
                 </div>
                 <div className="pd-size-btns">
                   {sizeOptions.map(({ size, stock }) => {
@@ -757,33 +743,6 @@ function ProductDetail() {
 
       </div>
 
-      {/* ── Size Guide Modal ───────────────────────────── */}
-      {showSizeGuide && (
-        <>
-          <div className="pd-modal-overlay" onClick={() => setShowSizeGuide(false)} />
-          <div className="pd-size-guide-modal">
-            <button className="pd-modal-close" onClick={() => setShowSizeGuide(false)}>
-              <CloseIcon size={16} />
-            </button>
-            <h3>Size Guide</h3>
-            <table className="pd-spec-table">
-              <thead>
-                <tr>{SIZE_GUIDE.headers.map((h) => <th key={h}>{h}</th>)}</tr>
-              </thead>
-              <tbody>
-                {SIZE_GUIDE.rows.map((row) => (
-                  <tr key={row[0]}>
-                    {row.map((cell, i) => <td key={i}>{cell}</td>)}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <p style={{ fontSize: '0.8rem', color: '#888', marginTop: '0.75rem', fontStyle: 'italic' }}>
-              * All measurements are in inches. Model (5'8") wears size S.
-            </p>
-          </div>
-        </>
-      )}
     </main>
   )
 }

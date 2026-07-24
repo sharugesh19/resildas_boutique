@@ -43,6 +43,7 @@ function Checkout() {
   })
   const [submitting, setSubmitting] = useState(false)
   const [error, setError]           = useState('')
+  const [agreed, setAgreed]         = useState(false)
 
 
   const handleChange = (e) => {
@@ -65,7 +66,10 @@ function Checkout() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
-
+    if (!agreed) {
+      setError('Please agree to the Terms, Shipping & Return Policy before proceeding.')
+      return
+    }
     if (!PHONE_REGEX.test(addr.phone.trim())) {
       setError('Please enter a valid 10-digit Indian mobile number.')
       return
@@ -108,16 +112,24 @@ function Checkout() {
 
       const rzp = new window.Razorpay({
         key: razorpayKeyId,
-        amount: Math.round(total * 100),
-        currency: 'INR',
-        name: "Resilda's Boutique",
-        description: 'Order Payment',
-        order_id: razorpayOrderId,
-        prefill: {
-          name: addr.fullName.trim(),
-          email: addr.email.trim(),
-          contact: addr.phone.trim(),
-        },
+  amount: Math.round(total * 100),
+  currency: 'INR',
+  name: "Resilda's Boutique",
+  description: 'Order Payment',
+  order_id: razorpayOrderId,
+  prefill: {
+    name: addr.fullName.trim(),
+    email: addr.email.trim(),
+    contact: addr.phone.trim(),
+  },
+method: {
+  upi: true,
+  card: true,
+  netbanking: true,
+  wallet: false,
+  paylater: false,
+  emi: false,
+},
         handler: async (response) => {
           // Runs only after Razorpay confirms payment succeeded.
           try {
@@ -308,6 +320,22 @@ function Checkout() {
                 <span className="payment-option__check" style={{ display: 'inline-flex', alignItems: 'center' }}><CheckIcon size={16} /></span>
               </div>
 
+              <div className="checkout-policy-agree" style={{ marginTop: '1rem', display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+                <input
+                  type="checkbox"
+                  id="policyAgree"
+                  checked={agreed}
+                  onChange={(e) => setAgreed(e.target.checked)}
+                  style={{ marginTop: '3px' }}
+                />
+                <label htmlFor="policyAgree" style={{ fontSize: '0.85rem', lineHeight: '1.4' }}>
+                  I have read and agree to the{' '}
+                  <Link to="/terms" target="_blank">Terms of Service</Link>,{' '}
+                  <Link to="/shipping-policy" target="_blank">Shipping Policy</Link>, and{' '}
+                  <Link to="/return-policy" target="_blank">Return & Exchange Policy</Link>.
+                </label>
+              </div>
+
             </div>
 
             {error && <p className="auth-error">{error}</p>}
@@ -315,7 +343,7 @@ function Checkout() {
             <button
               type="submit"
               className="checkout-submit"
-              disabled={submitting}
+              disabled={submitting || !agreed}
               style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
             >
               <CreditCardIcon size={16} /> {submitting ? 'Processing…' : 'Pay Now'}

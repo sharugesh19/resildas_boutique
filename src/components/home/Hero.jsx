@@ -143,17 +143,34 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* stats bar */}
-      <div className="rh-stats-bar">
-        <div className="rh-stat"><span>500+</span><p>Products</p></div>
-        <div className="rh-stat-divider"></div>
-        <div className="rh-stat"><span>1.6K+</span><p>Happy Customers</p></div>
-        <div className="rh-stat-divider"></div>
-        <div className="rh-stat"><span>8</span><p>Categories</p></div>
-        <div className="rh-stat-divider"></div>
-        <div className="rh-stat"><span><span style={{ display: 'inline-flex', alignItems: 'center', gap: 2 }}>4.8<StarIcon size={14} /></span></span><p>Avg Rating</p></div>
-      </div>
+      {/* Stats Bar */}
+<div className="rh-stats-bar">
+  <div className="rh-stat">
+    <span>500+</span>
+    <p>Products</p>
+  </div>
 
+  <div className="rh-stat-divider"></div>
+
+  <div className="rh-stat">
+    <span>Premium</span>
+    <p>Quality Collections</p>
+  </div>
+
+  <div className="rh-stat-divider"></div>
+
+  <div className="rh-stat">
+    <span>8</span>
+    <p>Categories</p>
+  </div>
+
+  <div className="rh-stat-divider"></div>
+
+  <div className="rh-stat">
+    <span>Free</span>
+    <p>Delivery Across India</p>
+  </div>
+</div>
     </section>
   );
 }
