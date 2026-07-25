@@ -11,7 +11,7 @@ const INVALID_PINCODE = '012345'; // starts with 0
 test.describe('Checkout — empty cart guard', () => {
   test('visiting /checkout with an empty cart shows empty-cart message, not the form', async ({ page }) => {
     await page.goto('/checkout');
-    await expect(page.getByText('Your cart is empty')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Your cart is empty' })).toBeVisible();
     await expect(page.locator('.checkout-form')).toHaveCount(0);
   });
 });
