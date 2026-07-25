@@ -41,6 +41,7 @@ test.describe('Checkout — form validation', () => {
     await page.selectOption('#state', 'Tamil Nadu');
     await page.fill('#pincode', VALID_PINCODE);
 
+    await page.check('#policyAgree');   // <-- ADD THIS LINE
     await page.click('.checkout-submit');
     await expect(page.locator('.auth-error')).toContainText('valid 10-digit Indian mobile number');
   });
@@ -54,7 +55,8 @@ test.describe('Checkout — form validation', () => {
     await page.fill('#city', 'Udumalaipettai');
     await page.selectOption('#state', 'Tamil Nadu');
     await page.fill('#pincode', INVALID_PINCODE);
-
+    
+    await page.check('#policyAgree');   // <-- ADD THIS LINE
     await page.click('.checkout-submit');
     await expect(page.locator('.auth-error')).toContainText('valid 6-digit pincode');
   });
