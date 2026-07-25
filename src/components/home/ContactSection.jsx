@@ -19,7 +19,7 @@ function ContactSection() {
               </div>
               <div>
                 <p className="contact-item__label">Call Us</p>
-                <p className="contact-item__val">+91 98765 43210</p>
+                <p className="contact-item__val">+91 83005 27985</p>
               </div>
             </div>
 
@@ -32,7 +32,7 @@ function ContactSection() {
               </div>
               <div>
                 <p className="contact-item__label">Email Us</p>
-                <p className="contact-item__val">hello@resildasboutique.com</p>
+                <p className="contact-item__val">jenolineresildas@gmail.com</p>
               </div>
             </div>
 

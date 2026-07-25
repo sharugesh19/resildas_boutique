@@ -42,21 +42,29 @@ function FAQ() {
       </div>
 
       <div className="faq-list container">
-        {faqs.map((item, i) => (
-          <div key={i} className="faq-item">
-            <button
-              className="faq-item__question"
-              onClick={() => toggle(i)}
-              aria-expanded={openIndex === i}
-            >
-              {item.q}
-              <span className="faq-item__icon">{openIndex === i ? '−' : '+'}</span>
-            </button>
-            {openIndex === i && (
-              <p className="faq-item__answer">{item.a}</p>
-            )}
-          </div>
-        ))}
+        {faqs.map((item, i) => {
+          const isOpen = openIndex === i
+          return (
+            <div key={i} className={`faq-item${isOpen ? ' faq-item--open' : ''}`}>
+              <button
+                className="faq-item__question"
+                onClick={() => toggle(i)}
+                aria-expanded={isOpen}
+              >
+                <span>{item.q}</span>
+                <span className="faq-item__icon" aria-hidden="true">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                  </svg>
+                </span>
+              </button>
+              <div className="faq-item__answer-wrap">
+                <p className="faq-item__answer">{item.a}</p>
+              </div>
+            </div>
+          )
+        })}
       </div>
     </section>
   )

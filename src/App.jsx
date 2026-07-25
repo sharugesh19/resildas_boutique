@@ -12,12 +12,31 @@ import Toast from './components/common/Toast'
 import ScrollToTop from './components/common/ScrollToTop'
 import ErrorBoundary from './components/common/ErrorBoundary'
 
+// Matches AppRoutes.jsx — used only to detect the 404 page so we can hide the footer there.
+const KNOWN_ROUTE_PATTERNS = [
+  /^\/$/,
+  /^\/products$/,
+  /^\/products\/[^/]+$/,
+  /^\/product\/[^/]+$/,
+  /^\/login$/,
+  /^\/checkout$/,
+  /^\/about$/,
+  /^\/shipping-policy$/,
+  /^\/return-policy$/,
+  /^\/privacy-policy$/,
+  /^\/terms-and-conditions$/,
+  /^\/wishlist$/,
+  /^\/account$/,
+]
+
 // useLocation() only works inside <BrowserRouter>, so the check has to live
 // in a component rendered *inside* it — App() itself renders BrowserRouter,
 // so it can't call useLocation directly.
 function AppShell() {
   const location = useLocation()
   const isAdminRoute = location.pathname.startsWith('/admin')
+  const isKnownRoute = KNOWN_ROUTE_PATTERNS.some((pattern) => pattern.test(location.pathname))
+  const isNotFoundRoute = !isAdminRoute && !isKnownRoute
 
   useEffect(() => {
     if (isAdminRoute) return // don't track admin/dashboard traffic, only real customer visits
@@ -29,7 +48,7 @@ function AppShell() {
       <ScrollToTop />
       {!isAdminRoute && <Navbar />}
       <AppRoutes />
-      {!isAdminRoute && <Footer />}
+      {!isAdminRoute && !isNotFoundRoute && <Footer />}
       <CartDrawer />
       <Toast />
     </>

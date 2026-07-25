@@ -7,7 +7,6 @@ import BestSellingCarousel from '../components/home/BestSellingCarousel'
 import Testimonials        from '../components/home/Testimonials'
 import ContactSection      from '../components/home/ContactSection'
 import FindUs              from '../components/home/FindUs'
-import WhyShopWithUs       from '../components/home/WhyShopWithUs'
 import FAQ                 from '../components/home/FAQ'
 import FadeInUp            from '../components/common/FadeInUp'
 
@@ -115,8 +114,6 @@ function Home() {
       </Helmet>
       <Hero />
 
-
-
       {/* Each section fades in as it scrolls into view.
           Delays are staggered so they don't all fire at once. */}
       <FadeInUp delay={0}>
@@ -125,10 +122,6 @@ function Home() {
 
       <FadeInUp delay={0}>
         <CategorySection />
-      </FadeInUp>
-
-      <FadeInUp delay={0}>
-        <WhyShopWithUs />
       </FadeInUp>
 
       <FadeInUp delay={0}>

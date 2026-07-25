@@ -330,7 +330,7 @@ method: {
                 />
                 <label htmlFor="policyAgree" style={{ fontSize: '0.85rem', lineHeight: '1.4' }}>
                   I have read and agree to the{' '}
-                  <Link to="/terms" target="_blank">Terms of Service</Link>,{' '}
+                  <Link to="/terms-and-conditions" target="_blank">Terms of Service</Link>,{' '}
                   <Link to="/shipping-policy" target="_blank">Shipping Policy</Link>, and{' '}
                   <Link to="/return-policy" target="_blank">Return & Exchange Policy</Link>.
                 </label>
