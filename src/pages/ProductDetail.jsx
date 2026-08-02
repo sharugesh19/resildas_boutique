@@ -335,7 +335,7 @@ function ProductDetail() {
     await toggleWishlist(product.id)
   }
 
-  const productUrl   = `https://resildas.com/product/${product.id}`
+  const productUrl   = `https://resildas.in/product/${product.id}`
   const productImage = images[0] ?? ''
 
   const productStructuredData = {

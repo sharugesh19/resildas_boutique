@@ -133,8 +133,8 @@ function Products() {
       : `Shop premium sarees, kurthi sets, co-ord sets and ethnic wear at Resilda's Boutique, Udumalaipettai. Free delivery on every order.`
 
   const canonicalUrl = filters.category
-    ? `https://resildas.com/products/${filters.category}`
-    : `https://resildas.com/products`
+    ? `https://resildas.in/products/${filters.category}`
+    : `https://resildas.in/products`
 
   if (loading) {
     return (
@@ -188,7 +188,7 @@ function Products() {
           "@context": "https://schema.org",
           "@type": "BreadcrumbList",
           "itemListElement": [
-            { "@type": "ListItem", "position": 1, "name": "Home",    "item": "https://resildas.com" },
+            { "@type": "ListItem", "position": 1, "name": "Home",    "item": "https://resildas.in" },
             { "@type": "ListItem", "position": 2, "name": pageTitle, "item": canonicalUrl }
           ]
         })}</script>

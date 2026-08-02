@@ -17,13 +17,13 @@ function Home() {
         <title>Resilda's Boutique — Best Cotton Sarees & Kurthi Sets Online</title>
         <meta name="description" content="Shop cotton sarees, organza sarees, kurthi sets & co-ord sets online at Resilda's Boutique, Udumalaipettai. Premium ethnic wear, free delivery." />
         <meta name="keywords" content="cotton sarees online, kurthi sets, ethnic wear, boutique Udumalaipettai, organza saree, tussar saree, co-ord sets women" />
-        <link rel="canonical" href="https://resildas.com/" />
+        <link rel="canonical" href="https://resildas.in/" />
 
         {/* Open Graph */}
         <meta property="og:title" content="Resilda's Boutique — Cotton Sarees, Kurthi Sets & Ethnic Wear" />
         <meta property="og:description" content="Shop cotton sarees, organza sarees, kurthi sets, and co-ord sets online. Free delivery on every order." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://resildas.com/" />
+        <meta property="og:url" content="https://resildas.in/" />
 
         {/* Local Business JSON-LD */}
         <script type="application/ld+json">{`
@@ -32,9 +32,9 @@ function Home() {
             "@type": "ClothingStore",
             "name": "Resilda's Boutique",
             "description": "Premium ethnic wear for the modern Indian woman. Sarees, kurthi sets, co-ord sets and more.",
-            "url": "https://resildas.com",
-            "logo": "https://resildas.com/assets/logo.webp",
-            "image": "https://resildas.com/assets/og-cover.jpg",
+            "url": "https://resildas.in",
+            "logo": "https://resildas.in/assets/logo.webp",
+            "image": "https://resildas.in/assets/og-cover.jpg",
             "address": {
               "@type": "PostalAddress",
               "streetAddress": "1st Floor, 11, 2nd Street, near UK hospital, Aishwarya Nagar",

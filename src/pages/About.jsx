@@ -7,7 +7,7 @@ function About() {
       <Helmet>
         <title>About Us — Resilda's Boutique</title>
         <meta name="description" content="Learn about Resilda's Boutique, a women's ethnic wear store in Udumalaipettai offering sarees, kurthi sets, and co-ord sets crafted for the modern Indian woman." />
-        <link rel="canonical" href="https://resildas.com/about" />
+        <link rel="canonical" href="https://resildas.in/about" />
       </Helmet>
 
       <FadeInUp delay={0}>
