@@ -11,4 +11,4 @@ Disallow: /profile
 # Allow everything else
 Allow: /
 
-Sitemap: https://resildas.com/sitemap.xml
+Sitemap: https://resildas.in/sitemap.xml
