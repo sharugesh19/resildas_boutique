@@ -8,6 +8,21 @@ import { useAuth } from '../hooks/useAuth'
 import { formatPrice } from '../utils/formatPrice'
 import { MapPinIcon, CreditCardIcon, BagIcon, ImagePlaceholderIcon, LockIcon, ExchangeIcon, TruckIcon, CheckIcon } from '../components/common/Icons'
 
+function loadRazorpayScript() {
+  return new Promise((resolve) => {
+    if (document.getElementById('razorpay-checkout-script')) {
+      resolve(true)
+      return
+    }
+    const script = document.createElement('script')
+    script.id = 'razorpay-checkout-script'
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js'
+    script.onload = () => resolve(true)
+    script.onerror = () => resolve(false)
+    document.body.appendChild(script)
+  })
+}
+
 const INDIAN_STATES = [
   'Andhra Pradesh','Arunachal Pradesh','Assam','Bihar','Chhattisgarh',
   'Goa','Gujarat','Haryana','Himachal Pradesh','Jharkhand','Karnataka',
@@ -80,8 +95,11 @@ function Checkout() {
     }
 
     if (typeof window.Razorpay === 'undefined') {
-      setError('Payment could not load. Please refresh the page and try again.')
-      return
+      const loaded = await loadRazorpayScript()
+      if (!loaded) {
+        setError('Payment could not load. Please check your internet connection and try again.')
+        return
+      }
     }
 
     setSubmitting(true)
@@ -142,7 +160,7 @@ method: {
             clearCart()
             navigate('/?order=success')
           } catch (err) {
-            console.error('Payment verification error:', err)
+            if (import.meta.env.DEV) console.error('Payment verification error:', err)
             setError('Payment could not be verified. If money was deducted, it will be refunded automatically — please contact us with your order ID: ' + orderId)
           } finally {
             setSubmitting(false)
@@ -165,7 +183,7 @@ method: {
 
       rzp.open()
     } catch (err) {
-      console.error('Order creation error:', err)
+      if (import.meta.env.DEV) console.error('Order creation error:', err)
       setError(err?.message || 'Order could not be placed. Please try again.')
       setSubmitting(false)
     }

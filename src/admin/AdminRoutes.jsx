@@ -22,7 +22,6 @@ function AdminGuard({ children }) {
         return;
       }
 
-      // Temporary: env-based check until Blaze + custom claims are set up
       const tokenResult = await user.getIdTokenResult(true);
       const isAdmin = tokenResult.claims.admin === true;
 
