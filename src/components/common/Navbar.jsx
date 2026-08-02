@@ -34,7 +34,6 @@ function Navbar() {
       'new-arrivals',
       'categories',
       'best-sellers',
-      'reviews',
       'contact',
       'find-us',
     ]
@@ -95,11 +94,10 @@ function Navbar() {
     { label: 'New Arrivals', type: 'scroll', sectionId: 'new-arrivals' },
     { label: 'Categories',   type: 'scroll', sectionId: 'categories' },
     { label: 'Best Sellers', type: 'scroll', sectionId: 'best-sellers' },
-    { label: 'Reviews',      type: 'scroll', sectionId: 'reviews' },
     { label: 'Contact',      type: 'scroll', sectionId: 'contact' },
   ]
 
-  const navSectionIds = ['new-arrivals', 'categories', 'best-sellers', 'reviews', 'contact', 'find-us']
+  const navSectionIds = ['new-arrivals', 'categories', 'best-sellers', 'contact', 'find-us']
   const activeLinkSection = navSectionIds.includes(activeSection) ? activeSection : ''
 
   return (

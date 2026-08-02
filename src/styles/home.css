@@ -110,7 +110,7 @@ main.page-content {
   min-height: 560px;
   overflow: hidden;
   background: var(--color-off-white);
-}
+} 
 
 .hero__slide {
   position: absolute;
@@ -1449,5 +1449,56 @@ main.page-content {
   }
   .faq-item__answer {
     padding: 0 var(--space-5);
+  }
+}
+/* ═══════════════════════════════════════════════
+   ABOUT PAGE HERO
+   ═══════════════════════════════════════════════ */
+.about-hero {
+  background: var(--color-off-white);
+  padding-top: 96px; /* clears fixed navbar (68px) + announcement ticker (28px) */
+  min-height: calc(100vh - 96px);
+  display: flex;
+  align-items: center;
+}
+
+.about-hero__inner {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: var(--space-16) var(--container-pad);
+  text-align: center;
+}
+
+.about-hero__heading {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 500;
+  color: var(--color-black);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin-bottom: var(--space-8);
+}
+
+.about-hero__text {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: 300;
+  color: var(--color-text-muted);
+  line-height: 1.85;
+  margin-bottom: var(--space-5);
+  text-align: left;
+}
+
+.about-hero__text:last-child {
+  margin-bottom: 0;
+}
+
+@media (max-width: 900px) {
+  .about-hero {
+    padding-top: 88px;
+    min-height: auto;
+  }
+  .about-hero__inner {
+    padding: var(--space-10) var(--container-pad) var(--space-14);
   }
 }

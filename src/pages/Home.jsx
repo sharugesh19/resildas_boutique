@@ -4,7 +4,7 @@ import Hero                from '../components/home/Hero'
 import CategorySection     from '../components/home/CategorySection'
 import NewArrivals         from '../components/home/NewArrivals'
 import BestSellingCarousel from '../components/home/BestSellingCarousel'
-import Testimonials        from '../components/home/Testimonials'
+// import Testimonials        from '../components/home/Testimonials' // hidden until we have real customer reviews
 import ContactSection      from '../components/home/ContactSection'
 import FindUs              from '../components/home/FindUs'
 import FAQ                 from '../components/home/FAQ'
@@ -128,9 +128,11 @@ function Home() {
         <BestSellingCarousel />
       </FadeInUp>
 
+      {/* Testimonials hidden until we have real customer reviews to display
       <FadeInUp delay={0}>
         <Testimonials />
       </FadeInUp>
+      */}
 
       <FadeInUp delay={0}>
         <ContactSection />
