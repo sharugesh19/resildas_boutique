@@ -14,6 +14,8 @@ const STATUS_LABEL = {
   shipped: 'Shipped',
   delivered: 'Delivered',
   cancelled: 'Cancelled',
+  pending_payment: 'Payment Pending',
+  failed: 'Payment Failed',
 }
 
 function Account() {
@@ -37,7 +39,10 @@ function Account() {
           orderBy('createdAt', 'desc')
         )
         const snap = await getDocs(q)
-        setOrders(snap.docs.map((d) => ({ id: d.id, ...d.data() })))
+        const allOrders = snap.docs.map((d) => ({ id: d.id, ...d.data() }))
+        // Only show orders the customer actually paid for — hide
+        // abandoned/failed checkout attempts from their order history.
+        setOrders(allOrders.filter((o) => o.paymentStatus === 'paid'))
       } catch (err) {
         console.error('ORDER FETCH ERROR:', err)
         setError(err.message)

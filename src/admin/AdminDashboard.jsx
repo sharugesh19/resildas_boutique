@@ -74,7 +74,7 @@ export default function AdminDashboard() {
         const orders = ordSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
 
         const revenue = orders
-          .filter((o) => o.orderStatus !== 'cancelled')
+          .filter((o) => o.paymentStatus === 'paid')
           .reduce((sum, o) => sum + (o.total || 0), 0);
 
         const pending = orders.filter(
@@ -176,7 +176,7 @@ setLowStock(flagged);
                 )}
                 {recentOrders.map((o) => (
                   <tr key={o.id}>
-                    <td><strong>{o.customerName || o.name || '—'}</strong></td>
+                    <td><strong>{o.customer?.name || '—'}</strong></td>
                     <td>{fmt(o.total || 0)}</td>
                     <td>
                       <span className={`pill ${STATUS_CLASS[o.orderStatus] || 'pill-placed'}`}>
