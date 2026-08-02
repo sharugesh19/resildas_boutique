@@ -27,6 +27,7 @@ export default function AdminOrders() {
   const [msg, setMsg] = useState(null);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  
 
   const filteredOrders = useMemo(() => {
     return orders.filter((o) => {
@@ -38,8 +39,8 @@ export default function AdminOrders() {
       if (!search.trim()) return true;
 
       const term = search.trim().toLowerCase();
-      const customerName = (o.customerName || o.name || '').toLowerCase();
-      const phone = (o.phone || '').toLowerCase();
+      const customerName = (o.customer?.name || '').toLowerCase();
+      const phone = (o.customer?.phone || '').toLowerCase();
       const orderId = o.id.toLowerCase();
 
       return (
@@ -184,16 +185,16 @@ export default function AdminOrders() {
                       #{o.id.slice(0, 8).toUpperCase()}
                     </code>
                   </td>
-                  <td><strong>{o.customerName || o.name || '—'}</strong></td>
-                  <td>{o.phone || '—'}</td>
+                  <td><strong>{o.customer?.name || '—'}</strong></td>
+                  <td>{o.customer?.phone || '—'}</td>
                   <td><strong>{fmt(o.total)}</strong></td>
                   <td>
                     <span
                       className={`pill ${
-                        o.paymentMethod === 'prepaid' ? 'pill-paid' : 'pill-cod'
+                        o.paymentStatus === 'paid' ? 'pill-paid' : 'pill-cod'
                       }`}
                     >
-                      {o.paymentMethod === 'prepaid' ? 'Paid' : 'COD'}
+                      {o.paymentStatus === 'paid' ? 'Paid' : (o.paymentStatus || 'Pending')}
                     </span>
                   </td>
                   <td>

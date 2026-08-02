@@ -3,11 +3,15 @@ const { initializeApp } = require('firebase-admin/app');
 const { getFirestore, FieldValue } = require('firebase-admin/firestore');
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
+const { defineSecret } = require('firebase-functions/params');
+
+const razorpayKeyId = defineSecret('RAZORPAY_KEY_ID');
+const razorpayKeySecret = defineSecret('RAZORPAY_KEY_SECRET');
 
 initializeApp();
 const db = getFirestore();
 
-// (keep the require, remove the `new Razorpay(...)` block from here)
+
 
 // Reads a single size entry regardless of legacy format.
 function normalizeSizeEntry(raw) {
@@ -22,7 +26,7 @@ function normalizeSizeEntry(raw) {
   return null;
 }
 
-exports.placeOrder = onCall({ region: 'asia-south1' }, async (request) => {
+exports.placeOrder = onCall({ region: 'asia-south1', secrets: [razorpayKeyId, razorpayKeySecret] }, async (request) => {
   const uid = request.auth?.uid ?? null;
 
   const { items, customer } = request.data || {};
@@ -116,14 +120,6 @@ exports.placeOrder = onCall({ region: 'asia-south1' }, async (request) => {
       });
     }
 
-    for (const productId of uniqueProductIds) {
-      const { ref, data: product } = productDocs.get(productId);
-      if (Array.isArray(product.colors) && product.colors.length > 0) {
-        tx.update(ref, { colors: product.colors });
-      } else if (Array.isArray(product.sizes)) {
-        tx.update(ref, { sizes: product.sizes });
-      }
-    }
 
     const orderRef = db.collection('orders').doc();
     tx.set(orderRef, {
@@ -144,9 +140,9 @@ exports.placeOrder = onCall({ region: 'asia-south1' }, async (request) => {
   let razorpayOrder;
   try {
     const razorpay = new Razorpay({
-    key_id: process.env.RAZORPAY_KEY_ID,
-    key_secret: process.env.RAZORPAY_KEY_SECRET,
-    });
+  key_id: razorpayKeyId.value(),
+  key_secret: razorpayKeySecret.value(),
+});
     razorpayOrder = await razorpay.orders.create({
       amount: Math.round(result.total * 100), // Razorpay wants paise, not rupees
       currency: 'INR',
@@ -168,12 +164,16 @@ exports.placeOrder = onCall({ region: 'asia-south1' }, async (request) => {
     orderId: result.orderId,
     total: result.total,
     razorpayOrderId: razorpayOrder.id,
-    razorpayKeyId: process.env.RAZORPAY_KEY_ID,
+    razorpayKeyId: razorpayKeyId.value(),
   };
 });
 
-// ── NEW: call this after Razorpay's checkout popup succeeds on the frontend ──
-exports.verifyPayment = onCall({ region: 'asia-south1' }, async (request) => {
+// ── Runs after Razorpay confirms payment succeeded on the frontend ──
+exports.verifyPayment = onCall({ region: 'asia-south1', secrets: [razorpayKeySecret] }, async (request) => {
+  if (!request.auth?.uid) {
+    throw new HttpsError('unauthenticated', 'Must be logged in to verify payment.');
+  }
+
   const { orderId, razorpay_order_id, razorpay_payment_id, razorpay_signature } = request.data || {};
 
   if (!orderId || !razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
@@ -181,7 +181,7 @@ exports.verifyPayment = onCall({ region: 'asia-south1' }, async (request) => {
   }
 
   const expectedSignature = crypto
-    .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+    .createHmac('sha256', razorpayKeySecret.value())
     .update(`${razorpay_order_id}|${razorpay_payment_id}`)
     .digest('hex');
 
@@ -193,10 +193,76 @@ exports.verifyPayment = onCall({ region: 'asia-south1' }, async (request) => {
     throw new HttpsError('permission-denied', 'Payment verification failed.');
   }
 
-  await db.collection('orders').doc(orderId).update({
-    paymentStatus: 'paid',
-    orderStatus: 'placed',
-    razorpayPaymentId: razorpay_payment_id,
+  // Signature confirmed — now decrement stock and mark the order paid,
+  // all inside one transaction so it only ever happens once per order.
+  await db.runTransaction(async (tx) => {
+    const orderRef = db.collection('orders').doc(orderId);
+    const orderSnap = await tx.get(orderRef);
+    if (!orderSnap.exists) {
+      throw new HttpsError('not-found', 'Order not found.');
+    }
+    const order = orderSnap.data();
+
+    // Idempotency guard — if this order was already marked paid before,
+    // don't decrement stock a second time.
+    if (order.paymentStatus === 'paid') {
+      return;
+    }
+
+    const uniqueProductIds = [...new Set(order.items.map((i) => i.productId))];
+    const productDocs = new Map();
+
+    for (const productId of uniqueProductIds) {
+      const ref = db.collection('products').doc(productId);
+      const snap = await tx.get(ref);
+      if (snap.exists) {
+        productDocs.set(productId, { ref, data: JSON.parse(JSON.stringify(snap.data())) });
+      }
+    }
+
+    for (const item of order.items) {
+      const entry = productDocs.get(item.productId);
+      if (!entry) continue;
+      const { data: product } = entry;
+
+      let sizesArr = null;
+      if (item.color && Array.isArray(product.colors)) {
+        const colorObj = product.colors.find((c) => c.name === item.color);
+        if (colorObj && Array.isArray(colorObj.sizes)) sizesArr = colorObj.sizes;
+      } else if (Array.isArray(product.sizes)) {
+        sizesArr = product.sizes;
+      }
+      if (!sizesArr) continue;
+
+      const sizeIndex = sizesArr.findIndex((s) => {
+        const n = normalizeSizeEntry(s);
+        return n && n.size === item.size;
+      });
+      if (sizeIndex === -1) continue;
+
+      const normalized = normalizeSizeEntry(sizesArr[sizeIndex]);
+      if (normalized.stock !== null) {
+        const newStock = Math.max(0, normalized.stock - item.quantity);
+        sizesArr[sizeIndex] = { ...sizesArr[sizeIndex], size: normalized.size, stock: newStock };
+      }
+    }
+
+    for (const productId of uniqueProductIds) {
+      const entry = productDocs.get(productId);
+      if (!entry) continue;
+      const { ref, data: product } = entry;
+      if (Array.isArray(product.colors) && product.colors.length > 0) {
+        tx.update(ref, { colors: product.colors });
+      } else if (Array.isArray(product.sizes)) {
+        tx.update(ref, { sizes: product.sizes });
+      }
+    }
+
+    tx.update(orderRef, {
+      paymentStatus: 'paid',
+      orderStatus: 'placed',
+      razorpayPaymentId: razorpay_payment_id,
+    });
   });
 
   return { success: true };
