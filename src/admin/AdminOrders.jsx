@@ -1,5 +1,5 @@
 // src/admin/AdminOrders.jsx
-import { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import {
   collection,
   getDocs,
@@ -27,6 +27,7 @@ export default function AdminOrders() {
   const [msg, setMsg] = useState(null);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [expandedId, setExpandedId] = useState(null);
   
 
   const filteredOrders = useMemo(() => {
@@ -179,7 +180,8 @@ export default function AdminOrders() {
                 </tr>
               )}
               {filteredOrders.map((o) => (
-                <tr key={o.id}>
+                <React.Fragment key={o.id}>
+                <tr onClick={() => setExpandedId(expandedId === o.id ? null : o.id)} style={{ cursor: 'pointer' }}>
                   <td>
                     <code style={{ fontSize: 11, color: 'var(--admin-text-muted)' }}>
                       #{o.id.slice(0, 8).toUpperCase()}
@@ -221,6 +223,54 @@ export default function AdminOrders() {
                     )}
                   </td>
                 </tr>
+                {expandedId === o.id && (
+                  <tr>
+                    <td colSpan={8} style={{ background: 'rgba(255,255,255,0.03)', padding: '16px 20px' }}>
+                      <div style={{ marginBottom: 12 }}>
+                        <strong>Delivery Address:</strong><br />
+                        {o.customer?.address1}{o.customer?.address2 ? `, ${o.customer.address2}` : ''}<br />
+                        {o.customer?.city}, {o.customer?.state} - {o.customer?.pincode}<br />
+                        Email: {o.customer?.email || '—'}
+                      </div>
+                      <div>
+                        <strong>Items:</strong>
+                        <table style={{ width: '100%', marginTop: 8 }}>
+                          <thead>
+                            <tr>
+                              <th style={{ textAlign: 'left' }}>Image</th>
+                              <th style={{ textAlign: 'left' }}>Product</th>
+                              <th style={{ textAlign: 'left' }}>Size</th>
+                              <th style={{ textAlign: 'left' }}>Color</th>
+                              <th style={{ textAlign: 'left' }}>Qty</th>
+                              <th style={{ textAlign: 'left' }}>Price</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {(o.items || []).map((item, i) => (
+                              <tr key={i}>
+                                <td>
+                                  {item.image ? (
+                                    <img
+                                      src={item.image}
+                                      alt={item.name}
+                                      style={{ width: 48, height: 48, objectFit: 'cover', borderRadius: 4 }}
+                                    />
+                                  ) : '—'}
+                                </td>
+                                <td>{item.name}</td>
+                                <td>{item.size}</td>
+                                <td>{item.color || '—'}</td>
+                                <td>{item.quantity}</td>
+                                <td>{fmt(item.lineTotal)}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+                </React.Fragment>
               ))}
             </tbody>
           </table>
