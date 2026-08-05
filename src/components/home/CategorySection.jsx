@@ -7,7 +7,7 @@ const categoryCards = [
     label: 'Unstitched Salwar Set',
     sub: 'Customize your style',
     desktopImage: '/assets/category/desktop/unstitched-salwar.webp',
-    mobileImage: '/assets/category/mobile/unstitched-salwar.png',
+    mobileImage: '/assets/category/mobile/unstitched-salwar.webp',
     path: '/products/unstitched-salwar',
   },
   {
@@ -15,7 +15,7 @@ const categoryCards = [
     label: 'Kurthi Set',
     sub: 'Elegant everyday wear',
     desktopImage: '/assets/category/desktop/kurthi-set.webp',
-    mobileImage: '/assets/category/mobile/kurthi-set.png',
+    mobileImage: '/assets/category/mobile/kurthi-set.webp',
     path: '/products/kurthi-set',
   },
   {
@@ -23,7 +23,7 @@ const categoryCards = [
     label: 'Organza Saree',
     sub: 'Sheer luxury drapes',
     desktopImage: '/assets/category/desktop/organza-saree.webp',
-    mobileImage: '/assets/category/mobile/organza-saree.png',
+    mobileImage: '/assets/category/mobile/organza-saree.webp',
     path: '/products/organza-saree',
   },
   {
@@ -31,7 +31,7 @@ const categoryCards = [
     label: 'Tussar Saree',
     sub: 'Natural texture, pure grace',
     desktopImage: '/assets/category/desktop/tussar-saree.webp',
-    mobileImage: '/assets/category/mobile/tussar-saree.png',
+    mobileImage: '/assets/category/mobile/tussar-saree.webp',
     path: '/products/tussar-saree',
   },
   {
@@ -39,7 +39,7 @@ const categoryCards = [
     label: 'Soft Silk Saree',
     sub: 'Timeless silk elegance',
     desktopImage: '/assets/category/desktop/soft-silk-saree.webp',
-    mobileImage: '/assets/category/mobile/soft-silk-saree.png',
+    mobileImage: '/assets/category/mobile/soft-silk-saree.webp',
     path: '/products/soft-silk-saree',
   },
   {
@@ -47,7 +47,7 @@ const categoryCards = [
     label: 'Cotton Saree',
     sub: 'Comfort meets tradition',
     desktopImage: '/assets/category/desktop/cotton-saree.webp',
-    mobileImage: '/assets/category/mobile/cotton-saree.png',
+    mobileImage: '/assets/category/mobile/cotton-saree.webp',
     path: '/products/cotton-saree',
   },
   {
@@ -55,7 +55,7 @@ const categoryCards = [
     label: 'Fancy Saree',
     sub: 'Breezy all-day drapes',
     desktopImage: '/assets/category/desktop/fancy-saree.webp',
-    mobileImage: '/assets/category/mobile/fancy-saree.png',
+    mobileImage: '/assets/category/mobile/fancy-saree.webp',
     path: '/products/fancy-saree',
   },
   {
@@ -63,7 +63,7 @@ const categoryCards = [
     label: 'Co-ord Sets',
     sub: 'Perfectly matched sets',
     desktopImage: '/assets/category/desktop/co-ord-set.webp',
-    mobileImage: '/assets/category/mobile/co-ord-set.png',
+    mobileImage: '/assets/category/mobile/co-ord-set.webp',
     path: '/products/coord-sets',
   },
 ]
