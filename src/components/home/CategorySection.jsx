@@ -3,60 +3,68 @@ import { Link } from 'react-router-dom'
 // 8 Premium Categories
 const categoryCards = [
   {
-    key:    'unstitched-salwar',
-    label:  'Unstitched Salwar Set',
-    sub:    'Customize your style',
-    image:  '/assets/category/unstitched-salwar.webp',
-    path:   '/products/unstitched-salwar',
+    key: 'unstitched-salwar',
+    label: 'Unstitched Salwar Set',
+    sub: 'Customize your style',
+    desktopImage: '/assets/category/desktop/unstitched-salwar.webp',
+    mobileImage: '/assets/category/mobile/unstitched-salwar.png',
+    path: '/products/unstitched-salwar',
   },
   {
-    key:    'kurthi-set',
-    label:  'Kurthi Set',
-    sub:    'Elegant everyday wear',
-    image:  '/assets/category/kurthi-set.webp',
-    path:   '/products/kurthi-set',
+    key: 'kurthi-set',
+    label: 'Kurthi Set',
+    sub: 'Elegant everyday wear',
+    desktopImage: '/assets/category/desktop/kurthi-set.webp',
+    mobileImage: '/assets/category/mobile/kurthi-set.png',
+    path: '/products/kurthi-set',
   },
   {
-    key:    'organza-saree',
-    label:  'Organza Saree',
-    sub:    'Sheer luxury drapes',
-    image:  '/assets/category/organza-saree.webp',
-    path:   '/products/organza-saree',
+    key: 'organza-saree',
+    label: 'Organza Saree',
+    sub: 'Sheer luxury drapes',
+    desktopImage: '/assets/category/desktop/organza-saree.webp',
+    mobileImage: '/assets/category/mobile/organza-saree.png',
+    path: '/products/organza-saree',
   },
   {
-    key:    'tussar-saree',
-    label:  'Tussar Saree',
-    sub:    'Natural texture, pure grace',
-    image:  '/assets/category/tussar-saree.webp',
-    path:   '/products/tussar-saree',
+    key: 'tussar-saree',
+    label: 'Tussar Saree',
+    sub: 'Natural texture, pure grace',
+    desktopImage: '/assets/category/desktop/tussar-saree.webp',
+    mobileImage: '/assets/category/mobile/tussar-saree.png',
+    path: '/products/tussar-saree',
   },
   {
-    key:    'soft-silk-saree',
-    label:  'Soft Silk Saree',
-    sub:    'Timeless silk elegance',
-    image:  '/assets/category/soft-silk-saree.webp',
-    path:   '/products/soft-silk-saree',
+    key: 'soft-silk-saree',
+    label: 'Soft Silk Saree',
+    sub: 'Timeless silk elegance',
+    desktopImage: '/assets/category/desktop/soft-silk-saree.webp',
+    mobileImage: '/assets/category/mobile/soft-silk-saree.png',
+    path: '/products/soft-silk-saree',
   },
   {
-    key:    'cotton-saree',
-    label:  'Cotton Saree',
-    sub:    'Comfort meets tradition',
-    image:  '/assets/category/cotton-saree.webp',
-    path:   '/products/cotton-saree',
+    key: 'cotton-saree',
+    label: 'Cotton Saree',
+    sub: 'Comfort meets tradition',
+    desktopImage: '/assets/category/desktop/cotton-saree.webp',
+    mobileImage: '/assets/category/mobile/cotton-saree.png',
+    path: '/products/cotton-saree',
   },
   {
-    key:    'fancy-saree',
-    label:  'Fancy Saree',
-    sub:    'Breezy all-day drapes',
-    image:  '/assets/category/fancy-saree.webp',
-    path:   '/products/fancy-saree',
+    key: 'fancy-saree',
+    label: 'Fancy Saree',
+    sub: 'Breezy all-day drapes',
+    desktopImage: '/assets/category/desktop/fancy-saree.webp',
+    mobileImage: '/assets/category/mobile/fancy-saree.png',
+    path: '/products/fancy-saree',
   },
   {
-    key:    'coord-sets',
-    label:  'Co-ord Sets',
-    sub:    'Perfectly matched sets',
-    image:  '/assets/category/co-ord-set.webp',
-    path:   '/products/coord-sets',
+    key: 'coord-sets',
+    label: 'Co-ord Sets',
+    sub: 'Perfectly matched sets',
+    desktopImage: '/assets/category/desktop/co-ord-set.webp',
+    mobileImage: '/assets/category/mobile/co-ord-set.png',
+    path: '/products/coord-sets',
   },
 ]
 
@@ -73,7 +81,19 @@ function CategorySection() {
         {categoryCards.map((cat, i) => (
           <Link key={cat.key} to={cat.path} className="cat-card" style={{ '--delay': `${i * 40}ms` }}>
             <div className="cat-card__img-wrap">
-              <img src={cat.image} alt={cat.label} loading="lazy" className="cat-card__img" />
+              <picture>
+  <source
+    media="(max-width: 768px)"
+    srcSet={cat.mobileImage}
+  />
+
+  <img
+    src={cat.desktopImage}
+    alt={cat.label}
+    loading="lazy"
+    className="cat-card__img"
+  />
+</picture>
               <div className="cat-card__gradient" />
             </div>
             <div className="cat-card__body">
