@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { CATEGORY_LABELS } from '../data/productsData'
+import { getCategorySpec } from '../data/categorySpecs'
 import { useProducts } from '../hooks/useProducts'
 import { useCart } from '../hooks/useCart'
 import { useWishlist } from '../hooks/useWishlist'
@@ -231,6 +232,8 @@ function ProductDetail() {
   const catDetail = product
     ? (CATEGORY_DETAILS[product.category] ?? null)
     : null
+
+  const catSpec = product ? getCategorySpec(product.category) : null
 
   const showSize = catDetail?.showSize ?? true
 
@@ -628,81 +631,54 @@ function ProductDetail() {
 
           {activeTab === 'details' && (
             <div className="pd-tab-content">
-              {catDetail && (() => {
-                  // Build a live spec list: start with the category template and
-                  // override / extend with actual values stored in the Firestore product.
-                  // Fields known to be editable via the admin form:
-                  const SPEC_FIELD_LABELS = {
-                    fabric:           'Fabric',
-                    borderType:       'Border Type',
-                    blouseIncluded:   'Blouse',
-                    setIncludes:      'Set Includes',
-                    careInstructions: 'Care Instructions',
-                    occasion:         'Occasion',
-                    sareetLength:     'Saree Length',
-                    weavetype:        'Weave Type',
-                    silkType:         'Silk Type',
-                    neckType:         'Neck Type',
-                    sleeveType:       'Sleeve Type',
-                    fitType:          'Fit Type',
-                  }
+              {catSpec && (
+  <>
+    <h3 className="pd-tab-heading">Top Highlights</h3>
+    <div className="pd-highlights-grid">
+      {catSpec.specFields.slice(0, 6).map(({ key, label, format }) => {
+        const raw = product[key]
+        if (raw === undefined || raw === null || raw === '') return null
+        const display = format ? format(raw) : raw
+        return (
+          <div key={key} className="pd-highlight-item">
+            <span className="pd-highlight-check"><CheckIcon size={14} /></span>
+            <div>
+              <strong>{label}</strong>
+              <span>{display}</span>
+            </div>
+          </div>
+        )
+      })}
+    </div>
 
-                  // Build a merged spec list: use catDetail.specs as the template,
-                  // replacing each row's value with the live product field if it exists.
-                  const liveSpecs = catDetail.specs.map(([key, staticVal]) => {
-                    // Try to find a matching Firestore field by lowercased key comparison
-                    const productKey = Object.keys(SPEC_FIELD_LABELS).find(
-                      (k) => SPEC_FIELD_LABELS[k].toLowerCase() === key.toLowerCase()
-                    )
-                    const liveVal = productKey ? product[productKey] : undefined
-                    const display = liveVal !== undefined && liveVal !== null && liveVal !== ''
-                      ? (Array.isArray(liveVal) ? liveVal.join(', ') : String(liveVal === true ? 'Yes' : liveVal === false ? 'No' : liveVal))
-                      : staticVal
-                    return [key, display]
-                  })
+    <h3 className="pd-tab-heading">{catSpec.label} — Details</h3>
+    <table className="pd-spec-table">
+      <tbody>
+        {catSpec.specFields.map(({ key, label, format }) => {
+          const raw = product[key]
+          if (raw === undefined || raw === null || raw === '') return null
+          const display = format ? format(raw) : raw
+          return (
+            <tr key={key}>
+              <td className="pd-spec-key">{label}</td>
+              <td className="pd-spec-val">{display}</td>
+            </tr>
+          )
+        })}
+      </tbody>
+    </table>
 
-                  // Also build highlights with live values
-                  const liveHighlights = catDetail.highlights.map(([key, staticVal]) => {
-                    const productKey = Object.keys(SPEC_FIELD_LABELS).find(
-                      (k) => SPEC_FIELD_LABELS[k].toLowerCase() === key.toLowerCase()
-                    )
-                    const liveVal = productKey ? product[productKey] : undefined
-                    const display = liveVal !== undefined && liveVal !== null && liveVal !== ''
-                      ? (Array.isArray(liveVal) ? liveVal.join(', ') : String(liveVal === true ? 'Yes' : liveVal === false ? 'No' : liveVal))
-                      : staticVal
-                    return [key, display]
-                  })
+    {catSpec.sizeNote && (
+      <p style={{ marginTop: '1rem', color: 'var(--color-grey-600)', fontSize: '0.9rem' }}>
+        {catSpec.sizeNote}
+      </p>
+    )}
+  </>
+)}
 
-                  return (
-                    <>
-                      <h3 className="pd-tab-heading">Top Highlights</h3>
-                      <div className="pd-highlights-grid">
-                        {liveHighlights.map(([key, val]) => (
-                          <div key={key} className="pd-highlight-item">
-                            <span className="pd-highlight-check"><CheckIcon size={14} /></span>
-                            <div>
-                              <strong>{key}</strong>
-                              <span>{val}</span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                      <h3 className="pd-tab-heading">{catDetail.specTitle}</h3>
-                      <table className="pd-spec-table">
-                        <tbody>
-                          {liveSpecs.map(([key, val]) => (
-                            <tr key={key}>
-                              <td className="pd-spec-key">{key}</td>
-                              <td className="pd-spec-val">{val}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </>
-                  )
-                })()}
 
-              {!catDetail && (
+
+              {!catSpec  && (
                 <p style={{ color: 'var(--color-grey-700)', lineHeight: 1.8 }}>{product.description}</p>
               )}
             </div>
