@@ -80,13 +80,13 @@ const CATEGORY_CONFIG = {
   },
   'tussar-saree': {
     fields: [
-      f('Fabric', 'fabric'),
-      f('Weave Type', 'weaveType'),
-      sf('Blouse Included', 'blouseIncluded', ['Yes', 'No']),
+      f('Saree Fabric', 'fabric'),
+      sf('Blouse Piece Included', 'blouseIncluded', ['Yes', 'No']),
       f('Saree Length', 'sareeLength'),
+      f('Blouse Length', 'blouseLength'),
       f('Border Type', 'borderType'),
-      sf('Occasion', 'occasion', ['Festival', 'Wedding', 'Party Wear', 'Regular Wear']),
-      f('Wash Care', 'washCare'),
+      sf('Occasion', 'occasion', ['Regular', 'Festival', 'Wedding', 'Party Wear']),
+      f('Care Instructions', 'washCare'),
     ],
   },
   'soft-silk-saree': {
@@ -101,22 +101,24 @@ const CATEGORY_CONFIG = {
   },
   'cotton-saree': {
     fields: [
-      f('Fabric', 'fabric'),
+      f('Saree Fabric', 'fabric'),
+      sf('Blouse Piece Included', 'blouseIncluded', ['Yes', 'No']),
       f('Saree Length', 'sareeLength'),
-      sf('Blouse Included', 'blouseIncluded', ['Yes', 'No']),
+      f('Blouse Length', 'blouseLength'),
       f('Border Type', 'borderType'),
-      sf('Occasion', 'occasion', ['Regular Wear', 'Office Wear', 'Party Wear', 'Puja']),
-      f('Wash Care', 'washCare'),
+      sf('Occasion', 'occasion', ['Party Wear', 'Regular Wear', 'Office Wear', 'Puja']),
+      f('Care Instructions', 'washCare'),
     ],
   },
   'fancy-saree': {
     fields: [
-      f('Fabric', 'fabric'),
-      f('Embellishment', 'embellishment'),
-      sf('Blouse Included', 'blouseIncluded', ['Yes', 'No']),
+      f('Saree Fabric', 'fabric'),
+      sf('Blouse Piece Included', 'blouseIncluded', ['Yes', 'No']),
       f('Saree Length', 'sareeLength'),
+      f('Blouse Length', 'blouseLength'),
+      f('Border Type', 'borderType'),
       sf('Occasion', 'occasion', ['Party Wear', 'Wedding', 'Reception', 'Festival']),
-      f('Wash Care', 'washCare'),
+      f('Care Instructions', 'washCare'),
     ],
   },
   'coord-sets': {

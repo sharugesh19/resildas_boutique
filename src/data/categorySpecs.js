@@ -8,6 +8,54 @@
  */
 
 export const categorySpecs = {
+  'tussar-saree': {
+    label: 'Tussar Sarees',
+
+    specFields: [
+      { key: 'fabric',         label: 'Saree Fabric' },
+      { key: 'blouseIncluded', label: 'Blouse Piece', format: (v) => (v === 'Yes' ? 'Included' : 'Not included') },
+      { key: 'sareeLength',    label: 'Saree Length' },
+      { key: 'blouseLength',   label: 'Blouse Length' },
+      { key: 'borderType',     label: 'Border Type' },
+      { key: 'occasion',       label: 'Occasion' },
+      { key: 'washCare',       label: 'Care Instructions' },
+    ],
+
+    sizeNote: 'Tussar sarees are one-size. Length approximately 5.5m including blouse piece.',
+    sizeChart: null,
+  },
+  'fancy-saree': {
+    label: 'Fancy Sarees',
+
+    specFields: [
+      { key: 'fabric',         label: 'Saree Fabric' },
+      { key: 'blouseIncluded', label: 'Blouse Piece', format: (v) => (v === 'Yes' ? 'Included' : 'Not included') },
+      { key: 'sareeLength',    label: 'Saree Length' },
+      { key: 'blouseLength',   label: 'Blouse Length' },
+      { key: 'borderType',     label: 'Border Type' },
+      { key: 'occasion',       label: 'Occasion' },
+      { key: 'washCare',       label: 'Care Instructions' },
+    ],
+
+    sizeNote: 'Fancy sarees are one-size. Length approximately 5.5m including blouse piece.',
+    sizeChart: null,
+  },
+  'cotton-saree': {
+    label: 'Cotton Sarees',
+
+    specFields: [
+      { key: 'fabric',         label: 'Saree Fabric' },
+      { key: 'blouseIncluded', label: 'Blouse Piece', format: (v) => (v === 'Yes' ? 'Included' : 'Not included') },
+      { key: 'sareeLength',    label: 'Saree Length' },
+      { key: 'blouseLength',   label: 'Blouse Length' },
+      { key: 'borderType',     label: 'Border Type' },
+      { key: 'occasion',       label: 'Occasion' },
+      { key: 'washCare',       label: 'Care Instructions' },
+    ],
+
+    sizeNote: 'Cotton sarees are one-size. Length approximately 5.5m including blouse piece.',
+    sizeChart: null,
+  },
   sarees: {
     label: 'Sarees',
 
