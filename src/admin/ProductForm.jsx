@@ -153,33 +153,34 @@ export default function ProductForm() {
 
     setSaving(true);
     try {
+      const cleanedColors = cleanColors(form.colors);
+
       const payload = {
-  name: form.name.trim(),
-  category: form.category,
-  price: Number(form.price),
-  originalPrice: Number(form.originalPrice) || 0,
-  inStock: form.colors.length > 0
-    ? undefined // colors carry their own inStock now; base inStock unused when colored
-    : (form.sizes.some((s) => Number(s.stock) > 0)),
-  isFeatured: form.badge === 'bestseller',
-  isNewArrival: form.badge === 'new',
-  description: form.description.trim(),
-  sizes: form.colors.length > 0 ? [] : form.sizes, // avoid stale sizes when colored
-  images: form.images,
-  colors: cleanColors(form.colors),
-  ...form.specs,
-  updatedAt: serverTimestamp(),
-};
-if (payload.inStock === undefined) delete payload.inStock;
+        name: form.name.trim(),
+        category: form.category,
+        price: Number(form.price),
+        originalPrice: Number(form.originalPrice) || 0,
+        inStock: form.colors.length > 0
+          ? cleanedColors.some((c) => c.inStock)
+          : (form.sizes.some((s) => Number(s.stock) > 0)),
+        isFeatured: form.badge === 'bestseller',
+        isNewArrival: form.badge === 'new',
+        description: form.description.trim(),
+        sizes: form.colors.length > 0 ? [] : form.sizes,
+        images: form.images.length > 0 ? form.images : (cleanedColors[0]?.images || []),
+        colors: cleanedColors,
+        ...form.specs,
+        updatedAt: serverTimestamp(),
+      };
 
       if (isEdit) {
         await updateDoc(doc(db, 'products', id), payload);
-        await invalidateProductsCache();   // push fresh data to all open pages
+        await invalidateProductsCache();
         setMsg({ type: 'success', text: 'Product updated successfully.' });
       } else {
         payload.createdAt = serverTimestamp();
         await addDoc(collection(db, 'products'), payload);
-        await invalidateProductsCache();   // push fresh data to all open pages
+        await invalidateProductsCache();
         setMsg({ type: 'success', text: 'Product added successfully.' });
         setTimeout(() => navigate('/admin/products'), 1200);
       }

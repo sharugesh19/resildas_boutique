@@ -6,6 +6,7 @@ import { useAuth } from '../../hooks/useAuth'
 import { formatPrice, calcDiscount } from '../../utils/formatPrice'
 import { requireLogin } from '../../utils/requireLogin'
 import { getCategorySpec } from '../../data/categorySpecs'
+import { getActiveVariant } from '../../data/productsData'
 import SizeSelector from './SizeSelector'
 
 function ProductInfo({ product }) {
@@ -18,7 +19,16 @@ function ProductInfo({ product }) {
   const { isLoggedIn }                  = useAuth()
   const navigate                        = useNavigate()
 
-  const discount   = calcDiscount(product.price, product.originalPrice)
+  let colorName = null;
+  if (Array.isArray(product.colors) && product.colors.length > 0) {
+    const inStockColor = product.colors.find(c => 
+      c.inStock || (Array.isArray(c.sizes) && c.sizes.some(s => Number(s.stock) > 0))
+    );
+    colorName = inStockColor ? inStockColor.name : product.colors[0].name;
+  }
+  const displayProduct = getActiveVariant(product, colorName);
+
+  const discount   = calcDiscount(displayProduct.price, displayProduct.originalPrice)
   const wishlisted = isWishlisted(product.id)
   const spec       = getCategorySpec(product.category)
 
@@ -39,10 +49,10 @@ function ProductInfo({ product }) {
 
       {/* Pricing */}
       <div className="product-info__pricing">
-        <span className="product-info__price">{formatPrice(product.price)}</span>
-        {product.originalPrice > product.price && (
+        <span className="product-info__price">{formatPrice(displayProduct.price)}</span>
+        {displayProduct.originalPrice > displayProduct.price && (
           <>
-            <span className="product-info__original">{formatPrice(product.originalPrice)}</span>
+            <span className="product-info__original">{formatPrice(displayProduct.originalPrice)}</span>
             <span className="product-info__discount">{discount}% off</span>
           </>
         )}
@@ -69,9 +79,9 @@ function ProductInfo({ product }) {
         <button
           className="btn btn--primary product-info__add"
           onClick={handleAddToCart}
-          disabled={!product.inStock}
+          disabled={!displayProduct.inStock}
         >
-          {product.inStock ? 'Add to Cart' : 'Out of Stock'}
+          {displayProduct.inStock ? 'Add to Cart' : 'Out of Stock'}
         </button>
 
         <button

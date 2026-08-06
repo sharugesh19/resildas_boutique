@@ -1,5 +1,6 @@
 import React, { useEffect, useReducer } from 'react'
 import { CartContext } from './CartContextObject'
+import { getActiveVariant } from '../data/productsData'
 
 const CART_STORAGE_KEY = 'resildas_cart'
 
@@ -29,13 +30,14 @@ function cartReducer(state, action) {
       const { product, size, quantity = 1, color = null } = action.payload
       const key = makeKey(product.id, size, color)
       const price = resolveUnitPrice(product, color)
+      const image = getActiveVariant(product, color).images?.[0] ?? null
       const existing = state.find((i) => i.key === key)
       if (existing) {
         return state.map((i) =>
           i.key === key ? { ...i, quantity: i.quantity + quantity } : i
         )
       }
-      return [...state, { key, product, size, quantity, color, price }]
+      return [...state, { key, product, size, quantity, color, price, image }]
     }
     case 'REMOVE': {
       return state.filter((i) => i.key !== action.payload.key)

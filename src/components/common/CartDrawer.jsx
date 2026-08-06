@@ -88,9 +88,9 @@ function CartItem({ item, liveProducts, onRemove, onQtyChange }) {
 
   return (
     <div className="cart-drawer__item">
-      {product.images?.[0] ? (
+      {(item.image ?? product.images?.[0]) ? (
   <img
-    src={product.images[0]}
+    src={item.image ?? product.images[0]}
     alt={product.name}
     className="cart-drawer__item-img"
   />

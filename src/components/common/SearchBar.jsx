@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useProducts } from '../../hooks/useProducts'
 import { formatPrice }    from '../../utils/formatPrice'
+import { getActiveVariant } from '../../data/productsData'
 
 function SearchBar({ onClose }) {
   const [query, setQuery]     = useState('')
@@ -21,7 +22,16 @@ function SearchBar({ onClose }) {
       p.name?.toLowerCase().includes(q) ||
       p.category?.toLowerCase().includes(q) ||
       (p.fabric ?? '').toLowerCase().includes(q)
-    ).slice(0, 6)
+    ).slice(0, 6).map((p) => {
+      let colorName = null;
+      if (Array.isArray(p.colors) && p.colors.length > 0) {
+        const inStockColor = p.colors.find(c => 
+          c.inStock || (Array.isArray(c.sizes) && c.sizes.some(s => Number(s.stock) > 0))
+        );
+        colorName = inStockColor ? inStockColor.name : p.colors[0].name;
+      }
+      return getActiveVariant(p, colorName);
+    });
     setResults(found)
   }, [query, products])
 

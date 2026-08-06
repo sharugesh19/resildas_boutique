@@ -378,8 +378,8 @@ method: {
                 {cart.map((item) => (
                   <li key={item.key} className="checkout-summary__item">
                     <div className="checkout-summary__img-wrap">
-                      {item.product.images?.[0]
-                        ? <img src={item.product.images[0]} alt={item.product.name} />
+                      {(item.image ?? item.product.images?.[0])
+                        ? <img src={item.image ?? item.product.images[0]} alt={item.product.name} />
                         : <span className="checkout-summary__img-placeholder" style={{ display: 'inline-flex', alignItems: 'center' }}><ImagePlaceholderIcon size={20} /></span>
                       }
                     </div>

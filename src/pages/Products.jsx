@@ -1,7 +1,7 @@
 import { useMemo, useState, useEffect } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { useParams, useSearchParams, Link } from 'react-router-dom'
-import { CATEGORY_LABELS } from '../data/productsData'
+import { CATEGORY_LABELS, getActiveVariant } from '../data/productsData'
 import { useProducts } from '../hooks/useProducts'
 import ProductGrid    from '../components/product/ProductGrid'
 import ProductFilters from '../components/product/ProductFilters'
@@ -36,15 +36,18 @@ function applyFilters(base, filters) {
     result = result.filter((p) => p.category === filters.category)
   }
 
-  result = result.filter((p) => p.price <= filters.maxPrice)
+  result = result.filter((p) => getActiveVariant(p).price <= filters.maxPrice)
 
   if (filters.collection === 'bestseller') result = result.filter((p) => p.isFeatured)
   if (filters.collection === 'new')        result = result.filter((p) => p.isNewArrival)
-  if (filters.collection === 'sale')       result = result.filter((p) => p.originalPrice > p.price)
+  if (filters.collection === 'sale')       result = result.filter((p) => {
+    const active = getActiveVariant(p)
+    return active.originalPrice > active.price
+  })
 
   switch (filters.sort) {
-    case 'price-low':  result.sort((a, b) => a.price - b.price);  break
-    case 'price-high': result.sort((a, b) => b.price - a.price);  break
+    case 'price-low':  result.sort((a, b) => getActiveVariant(a).price - getActiveVariant(b).price);  break
+    case 'price-high': result.sort((a, b) => getActiveVariant(b).price - getActiveVariant(a).price);  break
     case 'newest':     result.sort((a, b) => (b.isNewArrival ? 1 : 0) - (a.isNewArrival ? 1 : 0)); break
     case 'popular':    result.sort((a, b) => (b.isFeatured ? 1 : 0) - (a.isFeatured ? 1 : 0)); break
     default: break

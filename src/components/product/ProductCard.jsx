@@ -6,7 +6,7 @@ import { useWishlist } from '../../hooks/useWishlist'
 import { useAuth } from '../../hooks/useAuth'
 import { formatPrice, calcDiscount } from '../../utils/formatPrice'
 import { requireLogin } from '../../utils/requireLogin'
-import { CATEGORY_LABELS } from '../../data/productsData'
+import { CATEGORY_LABELS, getActiveVariant } from '../../data/productsData'
 import { normalizeSizes } from '../../utils/normalizeSizes'
 
 // Resolves which color to use (first one with any in-stock size, else the
@@ -37,10 +37,13 @@ function ProductCard({ product }) {
   const [pendingColor, setPendingColor]             = useState(null)
   const [pendingSizeOptions, setPendingSizeOptions] = useState([])
 
-  const discount      = calcDiscount(product.price, product.originalPrice)
+  const { color, sizeOptions } = getAddToCartOptions(product)
+  const displayProduct = getActiveVariant(product, color)
+
+  const discount      = calcDiscount(displayProduct.price, displayProduct.originalPrice)
   const wishlisted    = isWishlisted(product.id)
 
-  const imgSrc        = product.images?.[0]
+  const imgSrc        = displayProduct.images?.[0]
   const categoryLabel = CATEGORY_LABELS[product.category] ?? product.category
 
   const handleWishlist = async (e) => {
@@ -51,7 +54,6 @@ function ProductCard({ product }) {
 
   const handleAddToCart = (e) => {
     e.preventDefault()
-    const { color, sizeOptions } = getAddToCartOptions(product)
 
     // Only one size available (or none tracked) — just add it directly,
     // no need to make the customer pick from a list of one.
@@ -150,12 +152,12 @@ function ProductCard({ product }) {
         {/* Info */}
         <div className="product-card__info">
           <p className="product-card__category">{categoryLabel}</p>
-          <h3 className="product-card__name">{product.name}</h3>
+          <h3 className="product-card__name">{displayProduct.name}</h3>
           <div className="product-card__pricing">
-            <span className="product-card__price">{formatPrice(product.price)}</span>
-            {product.originalPrice > product.price && (
+            <span className="product-card__price">{formatPrice(displayProduct.price)}</span>
+            {displayProduct.originalPrice > displayProduct.price && (
               <>
-                <span className="product-card__original">{formatPrice(product.originalPrice)}</span>
+                <span className="product-card__original">{formatPrice(displayProduct.originalPrice)}</span>
                 <span className="product-card__discount">{discount}% off</span>
               </>
             )}
@@ -168,7 +170,7 @@ function ProductCard({ product }) {
         <motion.button
           className={`product-card__add${pressed ? ' product-card__add--pressed' : ''}`}
           onClick={handleAddToCart}
-          disabled={!product.inStock}
+          disabled={!displayProduct.inStock}
           whileTap={{ scale: 0.97, transition: { duration: 0.1 } }}
           onPointerDown={(e) => {
             e.currentTarget.setPointerCapture(e.pointerId)
@@ -177,7 +179,7 @@ function ProductCard({ product }) {
           onPointerUp={() => setPressed(false)}
           onPointerCancel={() => setPressed(false)}
         >
-          {product.inStock ? 'Add to Cart' : 'Out of Stock'}
+          {displayProduct.inStock ? 'Add to Cart' : 'Out of Stock'}
         </motion.button>
 
         {showSizePicker && (

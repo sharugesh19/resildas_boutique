@@ -6,6 +6,7 @@ import { db, storage } from '../firebase/firebaseConfig';
 import { Link } from 'react-router-dom';
 import { RefreshIcon } from '../components/common/Icons';
 import { invalidateProductsCache } from '../hooks/useProducts';
+import { getActiveVariant } from '../data/productsData';
 
 
 
@@ -94,6 +95,17 @@ export default function AdminProducts() {
   const fmt = (n) => '₹' + Number(n || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 });
   const categoryLabel = (slug) => CATEGORIES.find((c) => c.value === slug)?.label || slug;
 
+  const displayProducts = filtered.map(p => {
+    let colorName = null;
+    if (Array.isArray(p.colors) && p.colors.length > 0) {
+      const inStockColor = p.colors.find(c => 
+        c.inStock || (Array.isArray(c.sizes) && c.sizes.some(s => Number(s.stock) > 0))
+      );
+      colorName = inStockColor ? inStockColor.name : p.colors[0].name;
+    }
+    return getActiveVariant(p, colorName);
+  });
+
   return (
     <>
       <div className="page-header">
@@ -152,7 +164,7 @@ export default function AdminProducts() {
               {!loading && filtered.length === 0 && (
                 <tr className="loading-row"><td colSpan={7}>No products found.</td></tr>
               )}
-              {filtered.map((p) => (
+              {displayProducts.map((p) => (
                 <tr key={p.id}>
                   <td>
                     {p.images?.[0] ? (
@@ -200,7 +212,7 @@ export default function AdminProducts() {
       <div className="product-cards">
         {loading && <div className="empty-state"><p>Loading products…</p></div>}
         {!loading && filtered.length === 0 && <div className="empty-state"><p>No products found.</p></div>}
-        {filtered.map((p) => (
+        {displayProducts.map((p) => (
           <div className="product-card-item" key={p.id}>
             <div className="product-card-top">
               {p.images?.[0] ? (
