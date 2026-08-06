@@ -40,6 +40,7 @@ export default function SizeStockEditor({ sizes, onChange }) {
               style={{
                 display: 'flex',
                 alignItems: 'center',
+                flexWrap: 'wrap',
                 gap: 10,
                 border: '1px solid var(--admin-border, #e5e5e5)',
                 borderRadius: 6,

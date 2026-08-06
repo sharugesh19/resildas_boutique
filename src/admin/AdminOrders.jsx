@@ -149,8 +149,9 @@ export default function AdminOrders() {
 
       {msg && <div className={`admin-alert ${msg.type}`}>{msg.text}</div>}
 
+      {/* ── Desktop Table ─────────────────── */}
       <div className="admin-card">
-        <div className="admin-table-wrap">
+        <div className="admin-table-wrap orders-table-wrap">
           <table className="admin-table">
             <thead>
               <tr>
@@ -275,6 +276,92 @@ export default function AdminOrders() {
             </tbody>
           </table>
         </div>
+      </div>
+
+      {/* ── Mobile Cards ──────────────────── */}
+      <div className="order-cards">
+        {loading && <div className="empty-state"><p>Loading orders…</p></div>}
+        {!loading && filteredOrders.length === 0 && (
+          <div className="empty-state">
+            <p>{orders.length === 0 ? 'No orders found.' : 'No orders match your search/filter.'}</p>
+          </div>
+        )}
+        {filteredOrders.map((o) => (
+          <div
+            className="order-card-item"
+            key={o.id}
+            onClick={() => setExpandedId(expandedId === o.id ? null : o.id)}
+          >
+            <div className="order-card-top">
+              <div>
+                <div className="order-card-id">#{o.id.slice(0, 8).toUpperCase()}</div>
+                <div className="order-card-customer">{o.customer?.name || '—'}</div>
+                <div className="order-card-phone">{o.customer?.phone || '—'}</div>
+              </div>
+              <span className={`pill ${STATUS_CLASS[o.orderStatus] || 'pill-placed'}`}>
+                {o.orderStatus || 'placed'}
+              </span>
+            </div>
+
+            <div className="order-card-row">
+              <span className="order-card-total">{fmt(o.total)}</span>
+              <span className={`pill ${o.paymentStatus === 'paid' ? 'pill-paid' : 'pill-cod'}`}>
+                {o.paymentStatus === 'paid' ? 'Paid' : (o.paymentStatus || 'Pending')}
+              </span>
+            </div>
+
+            <div className="order-card-row">
+              <span className="order-card-date">{fmtDate(o.createdAt)}</span>
+            </div>
+
+            <div className="order-card-status-row" onClick={(e) => e.stopPropagation()}>
+              {saving === o.id ? (
+                <span className="spinner" />
+              ) : (
+                <select
+                  className="status-select"
+                  value={o.orderStatus || 'placed'}
+                  onChange={(e) => handleStatusChange(o.id, e.target.value)}
+                >
+                  {ORDER_STATUSES.map((s) => (
+                    <option key={s} value={s}>
+                      {s.charAt(0).toUpperCase() + s.slice(1)}
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
+
+            {expandedId === o.id ? (
+              <div className="order-card-details">
+                <div style={{ marginBottom: 10 }}>
+                  <strong>Delivery Address:</strong><br />
+                  {o.customer?.address1}{o.customer?.address2 ? `, ${o.customer.address2}` : ''}<br />
+                  {o.customer?.city}, {o.customer?.state} - {o.customer?.pincode}<br />
+                  Email: {o.customer?.email || '—'}
+                </div>
+                <strong>Items:</strong>
+                {(o.items || []).map((item, i) => (
+                  <div className="order-card-item-row" key={i}>
+                    {item.image ? (
+                      <img src={item.image} alt={item.name} className="order-card-item-thumb" />
+                    ) : (
+                      <div className="order-card-item-thumb" />
+                    )}
+                    <div className="order-card-item-info">
+                      <div>{item.name}</div>
+                      <div style={{ color: 'var(--admin-text-muted)' }}>
+                        Size {item.size} · {item.color || '—'} · Qty {item.quantity} · {fmt(item.lineTotal)}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="order-card-expand-hint">Tap to view items & address</div>
+            )}
+          </div>
+        ))}
       </div>
     </>
   );

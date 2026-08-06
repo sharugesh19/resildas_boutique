@@ -1,4 +1,5 @@
 // src/admin/AdminLayout.jsx
+import { useState } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { signOut } from 'firebase/auth';
 import { auth } from '../firebase/firebaseConfig';
@@ -65,16 +66,19 @@ const NAV = [
 export default function AdminLayout() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const handleLogout = async () => {
     await signOut(auth);
     navigate('/login');
   };
 
+  const closeMenu = () => setMenuOpen(false);
+
   return (
     <div className="admin-root admin-shell">
       {/* ── Sidebar ──────────────────────── */}
-      <aside className="admin-sidebar">
+      <aside className={'admin-sidebar' + (menuOpen ? ' open' : '')}>
         <div className="sidebar-logo">
           <h1>Resilda's Boutique</h1>
           <span>Admin Console</span>
@@ -89,6 +93,7 @@ export default function AdminLayout() {
                   key={item.to}
                   to={item.to}
                   end={item.end}
+                  onClick={closeMenu}
                   className={({ isActive }) =>
                     'sidebar-link' + (isActive ? ' active' : '')
                   }
@@ -112,9 +117,28 @@ export default function AdminLayout() {
         </div>
       </aside>
 
+      {/* ── Mobile Overlay ───────────────── */}
+      <div
+        className={'sidebar-overlay' + (menuOpen ? ' open' : '')}
+        onClick={closeMenu}
+      />
+
       {/* ── Topbar ───────────────────────── */}
       <header className="admin-topbar">
-        <span className="topbar-title">Admin Panel</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <button
+            className="mobile-menu-toggle"
+            onClick={() => setMenuOpen((prev) => !prev)}
+            aria-label="Toggle menu"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <line x1="3" y1="12" x2="21" y2="12" />
+              <line x1="3" y1="18" x2="21" y2="18" />
+            </svg>
+          </button>
+          <span className="topbar-title">Admin Panel</span>
+        </div>
         <div className="topbar-right">
           <span className="topbar-admin-badge">
              ● {user?.email || 'Administrator'}

@@ -130,8 +130,9 @@ export default function AdminProducts() {
         <button onClick={fetchProducts} className="btn btn-ghost"><RefreshIcon size={16} /></button>
       </div>
 
+      {/* ── Desktop Table ─────────────────── */}
       <div className="admin-card">
-        <div className="admin-table-wrap">
+        <div className="admin-table-wrap products-table-wrap">
           <table className="admin-table">
             <thead>
               <tr>
@@ -193,6 +194,50 @@ export default function AdminProducts() {
             </tbody>
           </table>
         </div>
+      </div>
+
+      {/* ── Mobile Cards ──────────────────── */}
+      <div className="product-cards">
+        {loading && <div className="empty-state"><p>Loading products…</p></div>}
+        {!loading && filtered.length === 0 && <div className="empty-state"><p>No products found.</p></div>}
+        {filtered.map((p) => (
+          <div className="product-card-item" key={p.id}>
+            <div className="product-card-top">
+              {p.images?.[0] ? (
+                <img src={p.images[0]} alt={p.name} className="product-card-thumb" />
+              ) : (
+                <div className="product-card-thumb product-card-thumb-empty">No img</div>
+              )}
+              <div className="product-card-info">
+                <strong>{p.name}</strong>
+                <span className="product-card-category">{categoryLabel(p.category)}</span>
+              </div>
+            </div>
+
+            <div className="product-card-row">
+              <span className="product-card-price">
+                {fmt(p.price)}
+                {p.originalPrice > p.price && (
+                  <span className="product-card-original">{fmt(p.originalPrice)}</span>
+                )}
+              </span>
+            </div>
+
+            <div className="product-card-row">
+              <span className={`pill ${p.inStock ? 'pill-delivered' : 'pill-cancelled'}`}>
+                {p.inStock ? 'In Stock' : 'Out of Stock'}
+              </span>
+              <span className={`pill ${p.isFeatured ? 'pill-bestseller' : p.isNewArrival ? 'pill-new' : 'pill-none'}`}>
+                {p.isFeatured ? 'Best Seller' : p.isNewArrival ? 'New' : 'None'}
+              </span>
+            </div>
+
+            <div className="product-card-actions">
+              <Link to={`/admin/products/edit/${p.id}`} className="btn btn-ghost btn-sm">Edit</Link>
+              <button onClick={() => setDeleteTarget(p)} className="btn btn-danger btn-sm">Delete</button>
+            </div>
+          </div>
+        ))}
       </div>
 
       {deleteTarget && (
