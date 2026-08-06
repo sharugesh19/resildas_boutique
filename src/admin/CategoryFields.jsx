@@ -95,7 +95,7 @@ const CATEGORY_CONFIG = {
       f('Saree Length', 'sareeLength'),
       sf('Blouse Included', 'blouseIncluded', ['Yes', 'No']),
       sf('Zari Work', 'zariWork', ['Pure Zari', 'Half Fine Zari', 'Tested Zari', 'No Zari']),
-      sf('Occasion', 'occasion', ['Wedding', 'Festival', 'Party Wear']),
+      sf('Occasion', 'occasion', ['Festival','Wedding', 'Party Wear']),
       f('Wash Care', 'washCare'),
     ],
   },
