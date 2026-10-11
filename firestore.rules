@@ -8,14 +8,12 @@ service cloud.firestore {
       allow write: if request.auth != null && request.auth.token.admin == true;
     }
 
-    // Orders — user can create their own, read/update their own; admin can do all
+        // Orders — customers can only read their own; only admin can change.
+    // Orders are created by the placeOrder Cloud Function (bypasses rules).
     match /orders/{id} {
-      allow create: if request.auth != null
-        && request.auth.uid == request.resource.data.userId
-        && request.resource.data.orderStatus == 'placed';
-      allow read, update: if request.auth != null &&
+      allow read: if request.auth != null &&
         (request.auth.uid == resource.data.userId || request.auth.token.admin == true);
-      allow delete: if request.auth != null && request.auth.token.admin == true;
+      allow create, update, delete: if request.auth != null && request.auth.token.admin == true;
     }
 
     // Wishlists — user can only access their own

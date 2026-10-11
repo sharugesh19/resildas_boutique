@@ -8,3 +8,5 @@ functions/.env
 # Playwright
 /test-results/
 /playwright-report/
+
+.firebase/
