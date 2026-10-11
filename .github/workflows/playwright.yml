@@ -27,7 +27,7 @@ jobs:
       - name: Run Playwright tests against live deployment
         run: npx playwright test
         env:
-          BASE_URL: https://resildas-boutique.vercel.app
+            BASE_URL: https://resildas.in
 
       # Report is uploaded as a downloadable artifact on the Actions run page
       # even when tests fail — that's the actual "QA report" your friend

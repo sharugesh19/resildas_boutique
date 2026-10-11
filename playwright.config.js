@@ -1,11 +1,11 @@
 // playwright.config.js
 import { defineConfig, devices } from '@playwright/test';
 
-// BASE_URL defaults to your live Vercel deployment so tests run against
+// BASE_URL defaults to the live site (resildas.in) so tests run against
 // real production behavior (matches how you've been testing throughout
 // this project — real device / real deploy, not just DevTools).
 // Override locally with: BASE_URL=http://localhost:5173 npx playwright test
-const BASE_URL = process.env.BASE_URL || 'https://resildas-boutique.vercel.app';
+const BASE_URL = process.env.BASE_URL || 'https://resildas.in';
 
 export default defineConfig({
   testDir: './tests',
