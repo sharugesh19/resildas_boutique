@@ -140,9 +140,9 @@ exports.placeOrder = onCall({ region: 'asia-south1', secrets: [razorpayKeyId, ra
   let razorpayOrder;
   try {
     const razorpay = new Razorpay({
-  key_id: razorpayKeyId.value(),
-  key_secret: razorpayKeySecret.value(),
-});
+      key_id: razorpayKeyId.value(),
+      key_secret: razorpayKeySecret.value(),
+    });
     razorpayOrder = await razorpay.orders.create({
       amount: Math.round(result.total * 100), // Razorpay wants paise, not rupees
       currency: 'INR',
@@ -186,10 +186,6 @@ exports.verifyPayment = onCall({ region: 'asia-south1', secrets: [razorpayKeySec
     .digest('hex');
 
   if (expectedSignature !== razorpay_signature) {
-    await db.collection('orders').doc(orderId).update({
-      paymentStatus: 'failed',
-      orderStatus: 'failed',
-    });
     throw new HttpsError('permission-denied', 'Payment verification failed.');
   }
 
@@ -202,6 +198,15 @@ exports.verifyPayment = onCall({ region: 'asia-south1', secrets: [razorpayKeySec
       throw new HttpsError('not-found', 'Order not found.');
     }
     const order = orderSnap.data();
+
+    // The payment must belong to this order.
+    if (order.razorpayOrderId !== razorpay_order_id) {
+      throw new HttpsError('permission-denied', 'Payment does not match this order.');
+    }
+    // The order must belong to the person calling (if it has an owner).
+    if (order.userId && order.userId !== request.auth.uid) {
+      throw new HttpsError('permission-denied', 'This order does not belong to you.');
+    }
 
     // Idempotency guard — if this order was already marked paid before,
     // don't decrement stock a second time.
